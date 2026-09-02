@@ -1,0 +1,25 @@
+[package]
+name = "closure-kernel"
+description = "Contact graphs, closure, and the six implementation invariants of the closure runtime"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+keywords = ["simulation", "agents", "graph", "deliberation"]
+categories = ["science", "simulation"]
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+rand = { workspace = true }
+rand_chacha = { workspace = true }
+sha2 = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+
+[lints]
+workspace = true

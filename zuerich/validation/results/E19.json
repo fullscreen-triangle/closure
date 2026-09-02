@@ -1,0 +1,11 @@
+{
+ "passed": true,
+ "records_tested": 60,
+ "distinct_digests": 60,
+ "deterministic": true,
+ "irreversible_after_contact": true,
+ "id": "E19",
+ "claim": "Pruning is determined (Thm 8.7)",
+ "method": "Zurich substrate",
+ "seconds": 0.04
+}

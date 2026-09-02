@@ -1,0 +1,41 @@
+{
+ "passed": true,
+ "rows": [
+  {
+   "n": 1,
+   "composite": 0.30000000000000004,
+   "residual": 0.7
+  },
+  {
+   "n": 2,
+   "composite": 0.51,
+   "residual": 0.48999999999999994
+  },
+  {
+   "n": 5,
+   "composite": 0.8319300000000001,
+   "residual": 0.16806999999999994
+  },
+  {
+   "n": 10,
+   "composite": 0.9717524751000001,
+   "residual": 0.02824752489999998
+  },
+  {
+   "n": 25,
+   "composite": 0.9998658931380336,
+   "residual": 0.00013410686196639628
+  },
+  {
+   "n": 50,
+   "composite": 0.9999999820153496,
+   "residual": 1.7984650426474064e-08
+  }
+ ],
+ "divergent_saturates": true,
+ "convergent_saturates": false,
+ "id": "E16",
+ "claim": "Saturation (Cor 7.4, Thm 7.6)",
+ "method": "exhaustive",
+ "seconds": 0.013
+}

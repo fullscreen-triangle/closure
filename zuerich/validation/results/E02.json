@@ -1,0 +1,11 @@
+{
+ "passed": true,
+ "constructed_min_cut": 1.0,
+ "constructed_block_size": 3,
+ "best_singleton": 20.0,
+ "regional_fraction_random": 0.225,
+ "id": "E02",
+ "claim": "Individuation is regional (Thm 3.3)",
+ "method": "constructed + random",
+ "seconds": 0.059
+}

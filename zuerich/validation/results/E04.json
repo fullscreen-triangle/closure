@@ -1,0 +1,9 @@
+{
+ "passed": true,
+ "blocks_sufficient_level_not": true,
+ "level_sufficient_blocks_not": true,
+ "id": "E04",
+ "claim": "Sufficiency not inherited (Prop 3.8)",
+ "method": "constructed",
+ "seconds": 0.0
+}

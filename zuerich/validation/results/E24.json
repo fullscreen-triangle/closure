@@ -1,0 +1,11 @@
+{
+ "passed": true,
+ "distinct_protocol_fingerprints": 1,
+ "distinct_trajectories": 34,
+ "run_to_completion": true,
+ "no_exit_code": true,
+ "id": "E24",
+ "claim": "Runtime: convergence + emergence (Thm 11.4, 11.8)",
+ "method": "randomised",
+ "seconds": 0.006
+}

@@ -1,0 +1,62 @@
+# ---- Rust ------------------------------------------------------------
+/target/
+**/*.rs.bk
+*.pdb
+
+# ---- Node ------------------------------------------------------------
+node_modules/
+web/dist/
+web/.vite/
+*.tsbuildinfo
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ---- Python (validation suite) ---------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# ---- LaTeX -----------------------------------------------------------
+# The PDF is a build product; the .tex, .bib and figures are the source.
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.synctex.gz
+*.toc
+zuerich/docs/**/build.log
+
+# ---- Data ------------------------------------------------------------
+# Raw open-government CSVs are large and re-fetchable; the normalised JSON
+# they produce is small and IS committed, so the validation suite runs
+# without network access.
+zuerich/data/raw/
+
+# ---- Local configuration and secrets ---------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.closure/
+
+# ---- Editors and OS --------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+*~
+
+# Keep .vscode/extensions.json, which is a shared recommendation.
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json

@@ -1,0 +1,11 @@
+{
+ "passed": true,
+ "trials": 300,
+ "verdict_changed_by_label": 0,
+ "falsifier_failures": 160,
+ "note": "invariance under label, sensitivity under resolution",
+ "id": "E06",
+ "claim": "Provenance-blindness (Thm 4.9)",
+ "method": "randomised + falsifier",
+ "seconds": 0.022
+}

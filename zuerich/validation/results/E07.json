@@ -1,0 +1,10 @@
+{
+ "passed": true,
+ "flips_changing_verdict": 0,
+ "all_false_but_committed": 200,
+ "note": "commitment identical under wholesale falsity",
+ "id": "E07",
+ "claim": "Truth-blindness (Thm 4.11)",
+ "method": "randomised",
+ "seconds": 0.019
+}

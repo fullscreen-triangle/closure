@@ -1,0 +1,3345 @@
+{
+ "source": "Statistik Stadt Zurich, politik_abstimmungen_seit1933",
+ "url": "https://data.stadt-zuerich.ch/dataset/politik_abstimmungen_seit1933/download/abstimmungen_seit1933.csv",
+ "n_rows_total": 11406,
+ "n_rows_city_district": 2580,
+ "districts": [
+  "Kreis 3",
+  "Kreis 6",
+  "Kreis 9",
+  "Kreis 10",
+  "Kreis 11",
+  "Kreis 12"
+ ],
+ "n_questions_all": 275,
+ "n_questions_complete": 275,
+ "years": [
+  "2002",
+  "2003",
+  "2004",
+  "2005",
+  "2006",
+  "2007",
+  "2008",
+  "2009",
+  "2010",
+  "2011",
+  "2012",
+  "2013",
+  "2014",
+  "2015",
+  "2016",
+  "2017",
+  "2018",
+  "2019",
+  "2020",
+  "2021",
+  "2022",
+  "2023",
+  "2024",
+  "2025",
+  "2026"
+ ],
+ "questions": [
+  {
+   "text": "Objektkredit von 27,109 Mio. Franken für das Projekt  'KITS für Kids'",
+   "date": "2002-04-07",
+   "yes_share": {
+    "Kreis 3": 0.6609999999999999,
+    "Kreis 6": 0.677,
+    "Kreis 9": 0.603,
+    "Kreis 10": 0.6559999999999999,
+    "Kreis 11": 0.614,
+    "Kreis 12": 0.578
+   }
+  },
+  {
+   "text": "Objektkredit von 76,8 Mio. Franken für die Erneuerung der Anlagen des Limmatkraftwerks Wettingen",
+   "date": "2002-04-07",
+   "yes_share": {
+    "Kreis 3": 0.848,
+    "Kreis 6": 0.88,
+    "Kreis 9": 0.846,
+    "Kreis 10": 0.8759999999999999,
+    "Kreis 11": 0.848,
+    "Kreis 12": 0.809
+   }
+  },
+  {
+   "text": "Objektkredit von 22,3 Mio. Franken für die Erstellung des Schulhauses Allenmoos II",
+   "date": "2002-04-07",
+   "yes_share": {
+    "Kreis 3": 0.7929999999999999,
+    "Kreis 6": 0.8270000000000001,
+    "Kreis 9": 0.757,
+    "Kreis 10": 0.8059999999999999,
+    "Kreis 11": 0.782,
+    "Kreis 12": 0.742
+   }
+  },
+  {
+   "text": "Neuregelung der Finanzkompetenzen (Anpassen an die Teuerung), Änderung der Gemeindeordnung",
+   "date": "2002-04-07",
+   "yes_share": {
+    "Kreis 3": 0.7190000000000001,
+    "Kreis 6": 0.753,
+    "Kreis 9": 0.6709999999999999,
+    "Kreis 10": 0.728,
+    "Kreis 11": 0.67,
+    "Kreis 12": 0.627
+   }
+  },
+  {
+   "text": "Beteiligung der Stadt Zürich mit 50 Mio. Franken am Aktienkapital der Crossair AG",
+   "date": "2002-04-07",
+   "yes_share": {
+    "Kreis 3": 0.45899999999999996,
+    "Kreis 6": 0.496,
+    "Kreis 9": 0.449,
+    "Kreis 10": 0.502,
+    "Kreis 11": 0.446,
+    "Kreis 12": 0.408
+   }
+  },
+  {
+   "text": "Kompetenzübertragung für den Erlass der Geschäftsordnungen von Stadtrat, Schulbehörde, Fürsorgebehörde und Vormundschaftsbehörde, Änderung der Gemeindeordnung",
+   "date": "2002-04-07",
+   "yes_share": {
+    "Kreis 3": 0.747,
+    "Kreis 6": 0.787,
+    "Kreis 9": 0.701,
+    "Kreis 10": 0.7609999999999999,
+    "Kreis 11": 0.703,
+    "Kreis 12": 0.6659999999999999
+   }
+  },
+  {
+   "text": "Umwandlung der Pensionskasse in eine öffentlich rechtliche Vorsorgestiftung  (Grundsatz und Änderung der Gemeindeordnung)",
+   "date": "2002-06-02",
+   "yes_share": {
+    "Kreis 3": 0.802,
+    "Kreis 6": 0.848,
+    "Kreis 9": 0.7490000000000001,
+    "Kreis 10": 0.821,
+    "Kreis 11": 0.76,
+    "Kreis 12": 0.705
+   }
+  },
+  {
+   "text": "Objektkredit von 1,75 Mio. Franken für die Verflüssigung des Verkehrs auf den Umfahrungsrouten des Limmatquais",
+   "date": "2002-06-02",
+   "yes_share": {
+    "Kreis 3": 0.741,
+    "Kreis 6": 0.768,
+    "Kreis 9": 0.667,
+    "Kreis 10": 0.7240000000000001,
+    "Kreis 11": 0.6579999999999999,
+    "Kreis 12": 0.616
+   }
+  },
+  {
+   "text": "Volksinitiative der Schweizerischen Volkspartei vom 11. November 1999  'für eine vernünftige Entwicklungshilfe",
+   "date": "2002-06-02",
+   "yes_share": {
+    "Kreis 3": 0.24,
+    "Kreis 6": 0.21600000000000003,
+    "Kreis 9": 0.337,
+    "Kreis 10": 0.264,
+    "Kreis 11": 0.317,
+    "Kreis 12": 0.386
+   }
+  },
+  {
+   "text": "Volksinitiative der Grünen Partei vom 17. März 1999  'Mehr Demokratie für weniger Geld!'  Kleinere Wahlkreise  Reduktion der Anzahl Gemeinderatsmitglieder",
+   "date": "2002-06-02",
+   "yes_share": {
+    "Kreis 3": 0.344,
+    "Kreis 6": 0.32299999999999995,
+    "Kreis 9": 0.29100000000000004,
+    "Kreis 10": 0.299,
+    "Kreis 11": 0.284,
+    "Kreis 12": 0.299
+   }
+  },
+  {
+   "text": "Schauspielhaus Zürich AG; Erhöhung des jährlichen Betriebsbeitrages um 3,88 Mio. Franken, wovon 2,38 Mio. Franken als Folge arbeitsrechtlicher Vorschriften",
+   "date": "2002-06-02",
+   "yes_share": {
+    "Kreis 3": 0.546,
+    "Kreis 6": 0.608,
+    "Kreis 9": 0.413,
+    "Kreis 10": 0.536,
+    "Kreis 11": 0.41200000000000003,
+    "Kreis 12": 0.35200000000000004
+   }
+  },
+  {
+   "text": "Schauspielhaus Zürich AG; Einschluss der Gebäudekosten von 3,5 Mio. Franken für das Pfauengebäude in den Subventionsvertrag und zusätzlicher einmaliger Beitrag von 2,5 Mio. Franken",
+   "date": "2002-06-02",
+   "yes_share": {
+    "Kreis 3": 0.551,
+    "Kreis 6": 0.613,
+    "Kreis 9": 0.42100000000000004,
+    "Kreis 10": 0.5479999999999999,
+    "Kreis 11": 0.414,
+    "Kreis 12": 0.358
+   }
+  },
+  {
+   "text": "Volksinitiative 'Für eine schlankere Stadtregierung' (Reduktion des Stadtrates von 9 auf 5 Mitglieder)",
+   "date": "2002-09-22",
+   "yes_share": {
+    "Kreis 3": 0.348,
+    "Kreis 6": 0.303,
+    "Kreis 9": 0.43,
+    "Kreis 10": 0.354,
+    "Kreis 11": 0.431,
+    "Kreis 12": 0.47700000000000004
+   }
+  },
+  {
+   "text": "Definitive Einführung der Schulsozialarbeit in den Volksschulen der Stadt Zürich, Bewilligung jährlich wiederkehrender Ausgaben von 3 Mio. Franken",
+   "date": "2002-09-22",
+   "yes_share": {
+    "Kreis 3": 0.721,
+    "Kreis 6": 0.7509999999999999,
+    "Kreis 9": 0.63,
+    "Kreis 10": 0.6990000000000001,
+    "Kreis 11": 0.635,
+    "Kreis 12": 0.602
+   }
+  },
+  {
+   "text": "Rahmenkredit von 75 Mio. Franken für den Bau von Anlagen des Geschäftsbereichs 'Energiedienstleistungen' des Elektrizitätswerks der Stadt Zürich",
+   "date": "2003-02-09",
+   "yes_share": {
+    "Kreis 3": 0.7859999999999999,
+    "Kreis 6": 0.805,
+    "Kreis 9": 0.7559999999999999,
+    "Kreis 10": 0.79,
+    "Kreis 11": 0.738,
+    "Kreis 12": 0.718
+   }
+  },
+  {
+   "text": "Sanierung und Erneuerung des Hallenstadions mit Landkauf von 31'448'000 Franken, Baurechtsgewährung, Darlehen von maximal 20'000'000 Franken und Beteiligung an der Aktienkapitalerh",
+   "date": "2003-05-18",
+   "yes_share": {
+    "Kreis 3": 0.7340000000000001,
+    "Kreis 6": 0.741,
+    "Kreis 9": 0.7290000000000001,
+    "Kreis 10": 0.74,
+    "Kreis 11": 0.75,
+    "Kreis 12": 0.74
+   }
+  },
+  {
+   "text": "Öffentlicher Gestaltungsplan 'Sechseläutenplatz-Theaterplatz'  (Opernhaus-Parking), Zürich Altstadt",
+   "date": "2003-05-18",
+   "yes_share": {
+    "Kreis 3": 0.695,
+    "Kreis 6": 0.735,
+    "Kreis 9": 0.6559999999999999,
+    "Kreis 10": 0.71,
+    "Kreis 11": 0.639,
+    "Kreis 12": 0.6
+   }
+  },
+  {
+   "text": "Wohnbauförderung und Pensionskasse, Verlustdeckungsgarantie für  Restfinanzierungsdarlehen der Pensionskasse Stadt Zürich, Ergänzung des Gemeindebeschlusses vom 31. August 1924",
+   "date": "2003-09-07",
+   "yes_share": {
+    "Kreis 3": 0.825,
+    "Kreis 6": 0.826,
+    "Kreis 9": 0.775,
+    "Kreis 10": 0.797,
+    "Kreis 11": 0.753,
+    "Kreis 12": 0.768
+   }
+  },
+  {
+   "text": "Privater Gestaltungsplan Stadion Zürich mit Umweltverträglichkeitsprüfung",
+   "date": "2003-09-07",
+   "yes_share": {
+    "Kreis 3": 0.604,
+    "Kreis 6": 0.6609999999999999,
+    "Kreis 9": 0.621,
+    "Kreis 10": 0.5920000000000001,
+    "Kreis 11": 0.657,
+    "Kreis 12": 0.632
+   }
+  },
+  {
+   "text": "Bewilligung von 46'666'500 Franken für die Beteiligung an der Stadion Zürich AG          bzw. für die Erstellung der Infrastruktur des Fussballstadions",
+   "date": "2003-09-07",
+   "yes_share": {
+    "Kreis 3": 0.561,
+    "Kreis 6": 0.612,
+    "Kreis 9": 0.588,
+    "Kreis 10": 0.56,
+    "Kreis 11": 0.618,
+    "Kreis 12": 0.6
+   }
+  },
+  {
+   "text": "Definitive Einführung der Blockzeiten an der Unterstufe der Volksschule ab Schuljahr  2005/2006, Bewilligung jährlich wiederkehrender Ausgaben von 3'650'000 Franken",
+   "date": "2003-09-07",
+   "yes_share": {
+    "Kreis 3": 0.722,
+    "Kreis 6": 0.772,
+    "Kreis 9": 0.642,
+    "Kreis 10": 0.725,
+    "Kreis 11": 0.66,
+    "Kreis 12": 0.608
+   }
+  },
+  {
+   "text": "Defintitive und flächendeckende Einführung von Schulleitungen an der Volksschule der  Stadt Zürich ab Schuljahr 2005/2006 (Änderung der Gemeindeordung) Geleitete Schulen",
+   "date": "2004-02-08",
+   "yes_share": {
+    "Kreis 3": 0.779,
+    "Kreis 6": 0.792,
+    "Kreis 9": 0.695,
+    "Kreis 10": 0.753,
+    "Kreis 11": 0.7120000000000001,
+    "Kreis 12": 0.654
+   }
+  },
+  {
+   "text": "Neufestsetzung des kommunalen Verkehrsplans der Stadt Zürich",
+   "date": "2004-02-08",
+   "yes_share": {
+    "Kreis 3": 0.7120000000000001,
+    "Kreis 6": 0.706,
+    "Kreis 9": 0.602,
+    "Kreis 10": 0.652,
+    "Kreis 11": 0.614,
+    "Kreis 12": 0.5479999999999999
+   }
+  },
+  {
+   "text": "Objektkredit von 27,9 Mio. Franken für die Erweiterung der Schulanlage Falletsche",
+   "date": "2004-05-16",
+   "yes_share": {
+    "Kreis 3": 0.769,
+    "Kreis 6": 0.7979999999999999,
+    "Kreis 9": 0.7170000000000001,
+    "Kreis 10": 0.764,
+    "Kreis 11": 0.6990000000000001,
+    "Kreis 12": 0.664
+   }
+  },
+  {
+   "text": "Polikliniken für die betäubungsmittelgestützte Behandlung schwer drogenabhängiger Menschen",
+   "date": "2004-09-26",
+   "yes_share": {
+    "Kreis 3": 0.769,
+    "Kreis 6": 0.8079999999999999,
+    "Kreis 9": 0.6679999999999999,
+    "Kreis 10": 0.769,
+    "Kreis 11": 0.675,
+    "Kreis 12": 0.603
+   }
+  },
+  {
+   "text": "Zürcher Filmstiftung, Jahresbeitrag ab 2004",
+   "date": "2004-09-26",
+   "yes_share": {
+    "Kreis 3": 0.59,
+    "Kreis 6": 0.614,
+    "Kreis 9": 0.42200000000000004,
+    "Kreis 10": 0.547,
+    "Kreis 11": 0.435,
+    "Kreis 12": 0.36
+   }
+  },
+  {
+   "text": "Wahlkreisreform, Änderung der Gemeindeordnung",
+   "date": "2004-09-26",
+   "yes_share": {
+    "Kreis 3": 0.8109999999999999,
+    "Kreis 6": 0.872,
+    "Kreis 9": 0.753,
+    "Kreis 10": 0.833,
+    "Kreis 11": 0.7490000000000001,
+    "Kreis 12": 0.667
+   }
+  },
+  {
+   "text": "Übernahme der kantonalen Fernwärme durch die Stadt Zürich",
+   "date": "2004-11-28",
+   "yes_share": {
+    "Kreis 3": 0.8690000000000001,
+    "Kreis 6": 0.888,
+    "Kreis 9": 0.831,
+    "Kreis 10": 0.86,
+    "Kreis 11": 0.8340000000000001,
+    "Kreis 12": 0.8170000000000001
+   }
+  },
+  {
+   "text": "Objektkredit von 52,32 Mio. Franken für den Neubau eines Oberstufenschulhauses beim Albisriederplatz und einer Dreifachsporthalle an der Bullingerstrasse sowie Wiedererstellung des",
+   "date": "2005-02-27",
+   "yes_share": {
+    "Kreis 3": 0.773,
+    "Kreis 6": 0.7829999999999999,
+    "Kreis 9": 0.6990000000000001,
+    "Kreis 10": 0.7490000000000001,
+    "Kreis 11": 0.688,
+    "Kreis 12": 0.635
+   }
+  },
+  {
+   "text": "Objektkredit von 60,75 Mio. Franken für den Neubau der Schulanlage Leutschenbach.",
+   "date": "2005-02-27",
+   "yes_share": {
+    "Kreis 3": 0.748,
+    "Kreis 6": 0.765,
+    "Kreis 9": 0.649,
+    "Kreis 10": 0.722,
+    "Kreis 11": 0.6659999999999999,
+    "Kreis 12": 0.619
+   }
+  },
+  {
+   "text": "Objektkredit von 110 Mio. Franken für den Neubau des Stadions Letzigrund",
+   "date": "2005-06-05",
+   "yes_share": {
+    "Kreis 3": 0.772,
+    "Kreis 6": 0.754,
+    "Kreis 9": 0.76,
+    "Kreis 10": 0.7609999999999999,
+    "Kreis 11": 0.743,
+    "Kreis 12": 0.728
+   }
+  },
+  {
+   "text": "Erhöhung des Objektkredits von 110 Mio. Franken um 11,3 Mio. Franken auf 121,3 Mio. Franken für die zusätzlichen baulichen Anpassungen, die temporäre Infrastruktur und die organisa",
+   "date": "2005-06-05",
+   "yes_share": {
+    "Kreis 3": 0.715,
+    "Kreis 6": 0.6940000000000001,
+    "Kreis 9": 0.7,
+    "Kreis 10": 0.693,
+    "Kreis 11": 0.684,
+    "Kreis 12": 0.6709999999999999
+   }
+  },
+  {
+   "text": "Gegenvorschlag des Gemeinderates zur zurückgezogenen Volksinitiative „Kinderbetreuung konkret“, Änderung der Gemeindeordnun",
+   "date": "2005-06-05",
+   "yes_share": {
+    "Kreis 3": 0.7090000000000001,
+    "Kreis 6": 0.733,
+    "Kreis 9": 0.598,
+    "Kreis 10": 0.6759999999999999,
+    "Kreis 11": 0.607,
+    "Kreis 12": 0.541
+   }
+  },
+  {
+   "text": "Umwandlung der Asyl-Organisation Zürich in eine selbstständige öffentlich-rechtliche Anstalt der Stadt Zürich, Änderung der Gemeindeordnung",
+   "date": "2005-06-05",
+   "yes_share": {
+    "Kreis 3": 0.731,
+    "Kreis 6": 0.7609999999999999,
+    "Kreis 9": 0.63,
+    "Kreis 10": 0.726,
+    "Kreis 11": 0.644,
+    "Kreis 12": 0.552
+   }
+  },
+  {
+   "text": "Schulbehördenreorganisation in der Stadt Zürich, Änderung der Gemeindeordnun",
+   "date": "2005-06-05",
+   "yes_share": {
+    "Kreis 3": 0.7879999999999999,
+    "Kreis 6": 0.8270000000000001,
+    "Kreis 9": 0.708,
+    "Kreis 10": 0.7859999999999999,
+    "Kreis 11": 0.721,
+    "Kreis 12": 0.642
+   }
+  },
+  {
+   "text": "Anpassung an das kantonale Referendums- und Initiativrecht, Änderung der Gemeindeordnung",
+   "date": "2005-11-27",
+   "yes_share": {
+    "Kreis 3": 0.83,
+    "Kreis 6": 0.8640000000000001,
+    "Kreis 9": 0.7979999999999999,
+    "Kreis 10": 0.8370000000000001,
+    "Kreis 11": 0.79,
+    "Kreis 12": 0.741
+   }
+  },
+  {
+   "text": "Verlängerung der Baurechtsverträge über zwei Wohnhochhäuser mit Nebengebäuden am Letzigraben bzw. an der Badenerstrasse",
+   "date": "2005-11-27",
+   "yes_share": {
+    "Kreis 3": 0.623,
+    "Kreis 6": 0.726,
+    "Kreis 9": 0.6629999999999999,
+    "Kreis 10": 0.7040000000000001,
+    "Kreis 11": 0.685,
+    "Kreis 12": 0.631
+   }
+  },
+  {
+   "text": "Wohnraumkredite 2005, Kredit von 30 Mio. Franken für die Wohnbauaktion 2005",
+   "date": "2006-05-21",
+   "yes_share": {
+    "Kreis 3": 0.847,
+    "Kreis 6": 0.804,
+    "Kreis 9": 0.7759999999999999,
+    "Kreis 10": 0.7809999999999999,
+    "Kreis 11": 0.737,
+    "Kreis 12": 0.778
+   }
+  },
+  {
+   "text": "Wohnraumkredite 2005, Kredit von 60 Mio. Franken für die Erhöhung des Stiftungskapitals der Stiftung Alterwohnungen der Stadt Zürich (SAW)",
+   "date": "2006-05-21",
+   "yes_share": {
+    "Kreis 3": 0.897,
+    "Kreis 6": 0.87,
+    "Kreis 9": 0.858,
+    "Kreis 10": 0.863,
+    "Kreis 11": 0.836,
+    "Kreis 12": 0.848
+   }
+  },
+  {
+   "text": "Objektkredit von 39,8 Millionen Franken als Beitrag der Stadt Zürich an die Kosten für die Einhausung der Autobahn Schwamendingen sowie die damit zusammenhängende Aufweitung der Un",
+   "date": "2006-09-24",
+   "yes_share": {
+    "Kreis 3": 0.8320000000000001,
+    "Kreis 6": 0.8440000000000001,
+    "Kreis 9": 0.794,
+    "Kreis 10": 0.833,
+    "Kreis 11": 0.813,
+    "Kreis 12": 0.89
+   }
+  },
+  {
+   "text": "Privater Gestaltungsplan «Stadtraum HB Zürich» mit Umweltverträglichkeitsprüfung",
+   "date": "2006-09-24",
+   "yes_share": {
+    "Kreis 3": 0.669,
+    "Kreis 6": 0.6629999999999999,
+    "Kreis 9": 0.6579999999999999,
+    "Kreis 10": 0.65,
+    "Kreis 11": 0.633,
+    "Kreis 12": 0.618
+   }
+  },
+  {
+   "text": "Netto-Objektkredit von 29,9 Millionen Franken für den Neubau des Leutschenparks",
+   "date": "2006-11-26",
+   "yes_share": {
+    "Kreis 3": 0.607,
+    "Kreis 6": 0.633,
+    "Kreis 9": 0.513,
+    "Kreis 10": 0.575,
+    "Kreis 11": 0.491,
+    "Kreis 12": 0.46799999999999997
+   }
+  },
+  {
+   "text": "Aufbau und Betrieb eines Breitband-Telekommunikationsnetzes (Glasfasernetz) durch das Elektrizitätswerk der Stadt Zürich (ewz), Rahmenkredit von 200 Mio. Franken, Ergänzung der Gem",
+   "date": "2007-03-11",
+   "yes_share": {
+    "Kreis 3": 0.674,
+    "Kreis 6": 0.659,
+    "Kreis 9": 0.629,
+    "Kreis 10": 0.644,
+    "Kreis 11": 0.635,
+    "Kreis 12": 0.635
+   }
+  },
+  {
+   "text": "Objektkredit von 59 Millionen Franken für den Bau des Trams Zürich-West",
+   "date": "2007-06-17",
+   "yes_share": {
+    "Kreis 3": 0.6970000000000001,
+    "Kreis 6": 0.736,
+    "Kreis 9": 0.7040000000000001,
+    "Kreis 10": 0.6409999999999999,
+    "Kreis 11": 0.6759999999999999,
+    "Kreis 12": 0.6709999999999999
+   }
+  },
+  {
+   "text": "Änderung der Gemeindeordnung, Rechtsgrundlagen für die Parlamentsdienste",
+   "date": "2007-11-25",
+   "yes_share": {
+    "Kreis 3": 0.892,
+    "Kreis 6": 0.9159999999999999,
+    "Kreis 9": 0.8540000000000001,
+    "Kreis 10": 0.902,
+    "Kreis 11": 0.858,
+    "Kreis 12": 0.8059999999999999
+   }
+  },
+  {
+   "text": "Änderung der Gemeindeordnung, Stärkung der Unabhängigkeit der Finanzkontrolle",
+   "date": "2007-11-25",
+   "yes_share": {
+    "Kreis 3": 0.9009999999999999,
+    "Kreis 6": 0.927,
+    "Kreis 9": 0.878,
+    "Kreis 10": 0.9179999999999999,
+    "Kreis 11": 0.877,
+    "Kreis 12": 0.838
+   }
+  },
+  {
+   "text": "Änderung der Gemeindeordnung, Wahl der oder des Datenschutzbeauftragten allein durch den Gemeinderat",
+   "date": "2007-11-25",
+   "yes_share": {
+    "Kreis 3": 0.841,
+    "Kreis 6": 0.87,
+    "Kreis 9": 0.812,
+    "Kreis 10": 0.86,
+    "Kreis 11": 0.813,
+    "Kreis 12": 0.7659999999999999
+   }
+  },
+  {
+   "text": "Änderung der Gemeindeordnung, Übertragung der Zuständigkeit zur Erteilung des Bürgerrechts an den Stadtrat",
+   "date": "2007-11-25",
+   "yes_share": {
+    "Kreis 3": 0.738,
+    "Kreis 6": 0.755,
+    "Kreis 9": 0.623,
+    "Kreis 10": 0.7070000000000001,
+    "Kreis 11": 0.628,
+    "Kreis 12": 0.564
+   }
+  },
+  {
+   "text": "Objektkredit von 49,96 Millionen Franken für die Erneuerung der Sportanlage Heerenschürli",
+   "date": "2007-11-25",
+   "yes_share": {
+    "Kreis 3": 0.7659999999999999,
+    "Kreis 6": 0.7809999999999999,
+    "Kreis 9": 0.7,
+    "Kreis 10": 0.7559999999999999,
+    "Kreis 11": 0.726,
+    "Kreis 12": 0.725
+   }
+  },
+  {
+   "text": "Stadtspital Triemli, Objektkredit von 290 Millionen Franken für den Neubau des Bettenhauses",
+   "date": "2007-11-25",
+   "yes_share": {
+    "Kreis 3": 0.909,
+    "Kreis 6": 0.902,
+    "Kreis 9": 0.894,
+    "Kreis 10": 0.912,
+    "Kreis 11": 0.867,
+    "Kreis 12": 0.852
+   }
+  },
+  {
+   "text": "Referendum gegen den Beschluss des Gemeinderates vom 26. September 2007 für die Bewerbung der Stadt Zürich um den Sitz des Club of Rome, Bewilligung eines Beitrags für die Jahre 20",
+   "date": "2008-02-24",
+   "yes_share": {
+    "Kreis 3": 0.494,
+    "Kreis 6": 0.57,
+    "Kreis 9": 0.392,
+    "Kreis 10": 0.479,
+    "Kreis 11": 0.44,
+    "Kreis 12": 0.335
+   }
+  },
+  {
+   "text": "Naturpark Zürich (Sihlwald und Wildpark Langenberg), Bewilligung eines jährlichen Betriebsbeitrags von höchstens 3,8 Millionen Franken.",
+   "date": "2008-06-01",
+   "yes_share": {
+    "Kreis 3": 0.9129999999999999,
+    "Kreis 6": 0.9109999999999999,
+    "Kreis 9": 0.873,
+    "Kreis 10": 0.903,
+    "Kreis 11": 0.872,
+    "Kreis 12": 0.856
+   }
+  },
+  {
+   "text": "Landerwerb für das neue Kongresszentrum Zürich, Bewilligung eines Kredites von 46 Mio. Franken für den Aktienkauf der Rosau Parking AG sowie von maximal 12,7 Mio. Franken für desse",
+   "date": "2008-06-01",
+   "yes_share": {
+    "Kreis 3": 0.425,
+    "Kreis 6": 0.45,
+    "Kreis 9": 0.424,
+    "Kreis 10": 0.44299999999999995,
+    "Kreis 11": 0.431,
+    "Kreis 12": 0.364
+   }
+  },
+  {
+   "text": "Landerwerb für das neue Kongresszentrum Zürich, Genehmigung einer Reservationsvereinbarung und Bewilligung eines Kredites von 1 Mio. Franken",
+   "date": "2008-06-01",
+   "yes_share": {
+    "Kreis 3": 0.44299999999999995,
+    "Kreis 6": 0.46399999999999997,
+    "Kreis 9": 0.43700000000000006,
+    "Kreis 10": 0.46,
+    "Kreis 11": 0.45,
+    "Kreis 12": 0.38799999999999996
+   }
+  },
+  {
+   "text": "Cabaret Voltaire, Verlängerung des Mietvertrags für Räumlichkeiten an der Münstergasse 26/Spiegelgasse 1 für weitere drei Jahre (1. Mai 2008 bis 30. April 2011) mit jährlichen Miet",
+   "date": "2008-09-28",
+   "yes_share": {
+    "Kreis 3": 0.7070000000000001,
+    "Kreis 6": 0.718,
+    "Kreis 9": 0.5529999999999999,
+    "Kreis 10": 0.65,
+    "Kreis 11": 0.588,
+    "Kreis 12": 0.511
+   }
+  },
+  {
+   "text": "Parkierung und Aufwertung der Umgebung Helvetiaplatz, Objektkredit von 4 975 000 Franken",
+   "date": "2008-09-28",
+   "yes_share": {
+    "Kreis 3": 0.626,
+    "Kreis 6": 0.629,
+    "Kreis 9": 0.532,
+    "Kreis 10": 0.586,
+    "Kreis 11": 0.556,
+    "Kreis 12": 0.521
+   }
+  },
+  {
+   "text": "Villa Winkelwiese 10, Abgabe im Baurecht gegen eine an die Stadt zu leistende Entschädigung von 4,5 Mio. Franken und einen jährlichen Baurechtszins von anfänglich 210 000 Franken",
+   "date": "2008-09-28",
+   "yes_share": {
+    "Kreis 3": 0.483,
+    "Kreis 6": 0.513,
+    "Kreis 9": 0.528,
+    "Kreis 10": 0.532,
+    "Kreis 11": 0.547,
+    "Kreis 12": 0.495
+   }
+  },
+  {
+   "text": "Ergänzung der Gemeindeordnung, Verankerung der Nachhaltigkeit und der 2000-Watt-Gesellschaft",
+   "date": "2008-11-30",
+   "yes_share": {
+    "Kreis 3": 0.804,
+    "Kreis 6": 0.8079999999999999,
+    "Kreis 9": 0.727,
+    "Kreis 10": 0.7659999999999999,
+    "Kreis 11": 0.7290000000000001,
+    "Kreis 12": 0.677
+   }
+  },
+  {
+   "text": "Baulinienvorlage Gleisfeld Neufrankengasse zwischen der Lang- und Hohlstrasse, Zürich-Aussersihl, Festsetzung",
+   "date": "2008-11-30",
+   "yes_share": {
+    "Kreis 3": 0.58,
+    "Kreis 6": 0.6729999999999999,
+    "Kreis 9": 0.603,
+    "Kreis 10": 0.623,
+    "Kreis 11": 0.636,
+    "Kreis 12": 0.581
+   }
+  },
+  {
+   "text": "Teilrevision Nutzungsplan, Zonenplanänderung im Bereich Kronenwiese, Zürich-Unterstrass",
+   "date": "2008-11-30",
+   "yes_share": {
+    "Kreis 3": 0.7020000000000001,
+    "Kreis 6": 0.6970000000000001,
+    "Kreis 9": 0.6990000000000001,
+    "Kreis 10": 0.6679999999999999,
+    "Kreis 11": 0.672,
+    "Kreis 12": 0.648
+   }
+  },
+  {
+   "text": "Teilrevision Nutzungsplan, Zonenplanänderung Zollfreilager-Areal Flurstrasse/Rautistrasse, Zürich-Albisrieden",
+   "date": "2008-11-30",
+   "yes_share": {
+    "Kreis 3": 0.773,
+    "Kreis 6": 0.804,
+    "Kreis 9": 0.774,
+    "Kreis 10": 0.7879999999999999,
+    "Kreis 11": 0.778,
+    "Kreis 12": 0.726
+   }
+  },
+  {
+   "text": "Volksinitiative «Pro Patumbah-Park»",
+   "date": "2009-02-28",
+   "yes_share": {
+    "Kreis 3": 0.258,
+    "Kreis 6": 0.256,
+    "Kreis 9": 0.23399999999999999,
+    "Kreis 10": 0.252,
+    "Kreis 11": 0.233,
+    "Kreis 12": 0.254
+   }
+  },
+  {
+   "text": "Privater Gestaltungsplan Edisonstrasse, Zürich Oerlikon",
+   "date": "2009-05-17",
+   "yes_share": {
+    "Kreis 3": 0.688,
+    "Kreis 6": 0.7090000000000001,
+    "Kreis 9": 0.675,
+    "Kreis 10": 0.715,
+    "Kreis 11": 0.655,
+    "Kreis 12": 0.608
+   }
+  },
+  {
+   "text": "Rahmenkredit von 200 Mio. Franken zur Realisierung von Windenergieanlagen",
+   "date": "2009-05-17",
+   "yes_share": {
+    "Kreis 3": 0.8370000000000001,
+    "Kreis 6": 0.8240000000000001,
+    "Kreis 9": 0.7809999999999999,
+    "Kreis 10": 0.809,
+    "Kreis 11": 0.778,
+    "Kreis 12": 0.7609999999999999
+   }
+  },
+  {
+   "text": "Altersheim Dorflinde, Kauf und Integration von Alterswohnungen der Stiftung Alterswohnungen (SAW) ins Altersheim Dorflinde sowie Instandsetzung der Gebäude, Objektkredit von 27,3 M",
+   "date": "2009-05-17",
+   "yes_share": {
+    "Kreis 3": 0.9259999999999999,
+    "Kreis 6": 0.935,
+    "Kreis 9": 0.91,
+    "Kreis 10": 0.9279999999999999,
+    "Kreis 11": 0.922,
+    "Kreis 12": 0.91
+   }
+  },
+  {
+   "text": "Verordnung über die polizeiliche Datenbank GAMMA zu Sportveranstaltungen in der Stadt Zürich.",
+   "date": "2009-09-27",
+   "yes_share": {
+    "Kreis 3": 0.675,
+    "Kreis 6": 0.7140000000000001,
+    "Kreis 9": 0.772,
+    "Kreis 10": 0.7240000000000001,
+    "Kreis 11": 0.774,
+    "Kreis 12": 0.7659999999999999
+   }
+  },
+  {
+   "text": "Projekt Albis, Übertragung von Teilen der Liegenschaft vom Finanz- ins Verwaltungsvermögen sowie Umbau für die Nutzung als Hauptstandort von Organisation und Informatik der Stadt Z",
+   "date": "2009-09-27",
+   "yes_share": {
+    "Kreis 3": 0.767,
+    "Kreis 6": 0.792,
+    "Kreis 9": 0.725,
+    "Kreis 10": 0.754,
+    "Kreis 11": 0.7140000000000001,
+    "Kreis 12": 0.6559999999999999
+   }
+  },
+  {
+   "text": "Rahmenkredit von 180 Mio. Franken für den Bau von umweltschonenden Anlagen des ewz-Geschäftsfeldes «Energiedienstleistungen».",
+   "date": "2009-09-27",
+   "yes_share": {
+    "Kreis 3": 0.8220000000000001,
+    "Kreis 6": 0.8320000000000001,
+    "Kreis 9": 0.774,
+    "Kreis 10": 0.809,
+    "Kreis 11": 0.775,
+    "Kreis 12": 0.7290000000000001
+   }
+  },
+  {
+   "text": "Objektkredit von 50 Mio. Franken für eine städtische Quartierverbindung in Oerlikon.",
+   "date": "2009-09-27",
+   "yes_share": {
+    "Kreis 3": 0.768,
+    "Kreis 6": 0.828,
+    "Kreis 9": 0.723,
+    "Kreis 10": 0.785,
+    "Kreis 11": 0.828,
+    "Kreis 12": 0.763
+   }
+  },
+  {
+   "text": "Stadtpark Hardau, Objektkredit von 13,23 Mio. Franken.",
+   "date": "2009-11-29",
+   "yes_share": {
+    "Kreis 3": 0.757,
+    "Kreis 6": 0.768,
+    "Kreis 9": 0.667,
+    "Kreis 10": 0.7170000000000001,
+    "Kreis 11": 0.649,
+    "Kreis 12": 0.609
+   }
+  },
+  {
+   "text": "Neues Organisationsmodell für die Sozialhilfe in der Stadt Zürich, Änderung der Gemeindeordnung.",
+   "date": "2009-11-29",
+   "yes_share": {
+    "Kreis 3": 0.8909999999999999,
+    "Kreis 6": 0.9209999999999999,
+    "Kreis 9": 0.873,
+    "Kreis 10": 0.912,
+    "Kreis 11": 0.883,
+    "Kreis 12": 0.852
+   }
+  },
+  {
+   "text": "Elektrizitätswerk, Erhöhung des Objektkredites von 19,89 Mio. Franken um 18,81 Mio. Franken auf 38,7 Mio. Franken für eine zweite Bohrung zur Erforschung der Geothermienutzung und ",
+   "date": "2009-11-29",
+   "yes_share": {
+    "Kreis 3": 0.8140000000000001,
+    "Kreis 6": 0.8340000000000001,
+    "Kreis 9": 0.7559999999999999,
+    "Kreis 10": 0.805,
+    "Kreis 11": 0.748,
+    "Kreis 12": 0.705
+   }
+  },
+  {
+   "text": "Volksinitiative «40 Meter sind genug».",
+   "date": "2009-11-29",
+   "yes_share": {
+    "Kreis 3": 0.255,
+    "Kreis 6": 0.24,
+    "Kreis 9": 0.321,
+    "Kreis 10": 0.297,
+    "Kreis 11": 0.307,
+    "Kreis 12": 0.37200000000000005
+   }
+  },
+  {
+   "text": "Standortbeitrag und Landabtretung zwecks Erweiterungsbau des Schweizerischen Landesmuseums von 10 Mio. Franken.",
+   "date": "2010-06-13",
+   "yes_share": {
+    "Kreis 3": 0.54,
+    "Kreis 6": 0.5720000000000001,
+    "Kreis 9": 0.499,
+    "Kreis 10": 0.522,
+    "Kreis 11": 0.528,
+    "Kreis 12": 0.442
+   }
+  },
+  {
+   "text": "Volksinitiative «Freie Allmend».",
+   "date": "2010-06-13",
+   "yes_share": {
+    "Kreis 3": 0.303,
+    "Kreis 6": 0.253,
+    "Kreis 9": 0.349,
+    "Kreis 10": 0.266,
+    "Kreis 11": 0.321,
+    "Kreis 12": 0.39399999999999996
+   }
+  },
+  {
+   "text": "Volksinitiative «Für bezahlbare Wohnungen und Gewerberäume in der Stadt Zürich».",
+   "date": "2010-06-13",
+   "yes_share": {
+    "Kreis 3": 0.779,
+    "Kreis 6": 0.708,
+    "Kreis 9": 0.727,
+    "Kreis 10": 0.687,
+    "Kreis 11": 0.698,
+    "Kreis 12": 0.7759999999999999
+   }
+  },
+  {
+   "text": "Schmiede Wiedikon und Umgebung, Neugestaltung Strassenraum, Objektkredit von 3,154 Mio. Franken.",
+   "date": "2010-06-13",
+   "yes_share": {
+    "Kreis 3": 0.5720000000000001,
+    "Kreis 6": 0.695,
+    "Kreis 9": 0.512,
+    "Kreis 10": 0.617,
+    "Kreis 11": 0.598,
+    "Kreis 12": 0.563
+   }
+  },
+  {
+   "text": "Ersatzneubau Altersheim Trotte und Umbauten im Altersheim Sydefädeli, Quartier Wipkingen, Objektkredit von 62 Mio. Franken.",
+   "date": "2010-06-13",
+   "yes_share": {
+    "Kreis 3": 0.903,
+    "Kreis 6": 0.9109999999999999,
+    "Kreis 9": 0.8859999999999999,
+    "Kreis 10": 0.919,
+    "Kreis 11": 0.889,
+    "Kreis 12": 0.879
+   }
+  },
+  {
+   "text": "Änderung der Gemeindeordnung, Auflösung der Dienstabteilung Stadtküche.",
+   "date": "2010-06-13",
+   "yes_share": {
+    "Kreis 3": 0.457,
+    "Kreis 6": 0.514,
+    "Kreis 9": 0.46399999999999997,
+    "Kreis 10": 0.545,
+    "Kreis 11": 0.509,
+    "Kreis 12": 0.431
+   }
+  },
+  {
+   "text": "Förderung und Unterstützung der Arbeitsintegration von Jugendlichen und Erwachsenen.",
+   "date": "2010-06-13",
+   "yes_share": {
+    "Kreis 3": 0.8420000000000001,
+    "Kreis 6": 0.851,
+    "Kreis 9": 0.777,
+    "Kreis 10": 0.812,
+    "Kreis 11": 0.7979999999999999,
+    "Kreis 12": 0.7659999999999999
+   }
+  },
+  {
+   "text": "Verkauf von Bauland an der Pfingstweidstrasse/Mühleweg im Industriequartier für 4,39 Mio. Franken.",
+   "date": "2010-09-26",
+   "yes_share": {
+    "Kreis 3": 0.588,
+    "Kreis 6": 0.636,
+    "Kreis 9": 0.642,
+    "Kreis 10": 0.604,
+    "Kreis 11": 0.654,
+    "Kreis 12": 0.623
+   }
+  },
+  {
+   "text": "Escher-Wyss-Platz, Projekt Nagelhaus, Kunst und Architektur, Gastronomiebetrieb, Kiosk und ZüriWC-Anlage, Objektkredit von 5,9 Mio. Franken.",
+   "date": "2010-09-26",
+   "yes_share": {
+    "Kreis 3": 0.529,
+    "Kreis 6": 0.5379999999999999,
+    "Kreis 9": 0.43200000000000005,
+    "Kreis 10": 0.457,
+    "Kreis 11": 0.429,
+    "Kreis 12": 0.40299999999999997
+   }
+  },
+  {
+   "text": "Änderung der Gemeindeordnung, definitive Verankerung der Globalbudgetierung.",
+   "date": "2010-09-26",
+   "yes_share": {
+    "Kreis 3": 0.8340000000000001,
+    "Kreis 6": 0.863,
+    "Kreis 9": 0.7829999999999999,
+    "Kreis 10": 0.845,
+    "Kreis 11": 0.797,
+    "Kreis 12": 0.7559999999999999
+   }
+  },
+  {
+   "text": "Logistikzentrum Hagenholz für thermische Abfallverwertung und Recycling und für ein Rechenzentrum, Objektkredit von 72,1 Mio. Franken.",
+   "date": "2010-09-26",
+   "yes_share": {
+    "Kreis 3": 0.852,
+    "Kreis 6": 0.87,
+    "Kreis 9": 0.799,
+    "Kreis 10": 0.826,
+    "Kreis 11": 0.8109999999999999,
+    "Kreis 12": 0.75
+   }
+  },
+  {
+   "text": "Ausbau Nordumfahrung Zürich, Beitrag der Stadt Zürich von maximal 20 Mio. Franken an die Kosten für die Autobahnüberdeckung Katzensee",
+   "date": "2010-11-28",
+   "yes_share": {
+    "Kreis 3": 0.735,
+    "Kreis 6": 0.769,
+    "Kreis 9": 0.6629999999999999,
+    "Kreis 10": 0.727,
+    "Kreis 11": 0.723,
+    "Kreis 12": 0.596
+   }
+  },
+  {
+   "text": "Bahnhof Oerlikon, Quartieranbindung Ost, Erhöhung des Objektkredits von 11,172 Mio. Franken um 98,828 Mio. Franken auf 110 Mio. Franken",
+   "date": "2010-11-28",
+   "yes_share": {
+    "Kreis 3": 0.6890000000000001,
+    "Kreis 6": 0.769,
+    "Kreis 9": 0.639,
+    "Kreis 10": 0.7120000000000001,
+    "Kreis 11": 0.759,
+    "Kreis 12": 0.67
+   }
+  },
+  {
+   "text": "Teilrevision der städtischen Parkplatzverordnung",
+   "date": "2010-11-28",
+   "yes_share": {
+    "Kreis 3": 0.607,
+    "Kreis 6": 0.599,
+    "Kreis 9": 0.473,
+    "Kreis 10": 0.5379999999999999,
+    "Kreis 11": 0.483,
+    "Kreis 12": 0.44
+   }
+  },
+  {
+   "text": "A. Volksinitiative «Rosengarten-Tram», Umsetzungsvorlage",
+   "date": "2010-11-28",
+   "yes_share": {
+    "Kreis 3": 0.377,
+    "Kreis 6": 0.371,
+    "Kreis 9": 0.26899999999999996,
+    "Kreis 10": 0.33399999999999996,
+    "Kreis 11": 0.281,
+    "Kreis 12": 0.26899999999999996
+   }
+  },
+  {
+   "text": "B. Gegenvorschlag des Gemeinderats zur Volksinitiative «Rosengarten-Tram»",
+   "date": "2010-11-28",
+   "yes_share": {
+    "Kreis 3": 0.409,
+    "Kreis 6": 0.41700000000000004,
+    "Kreis 9": 0.3,
+    "Kreis 10": 0.35700000000000004,
+    "Kreis 11": 0.309,
+    "Kreis 12": 0.285
+   }
+  },
+  {
+   "text": "C. Stichfrage: Welche der beiden Vorlagen soll in Kraft treten, falls sowohl die Volksinitiative als auch der Gegenvorschlag des Gemeinderats von den Stimmberechtigten angenommen w",
+   "date": "2010-11-28",
+   "yes_share": {
+    "Kreis 3": 0.32299999999999995,
+    "Kreis 6": 0.301,
+    "Kreis 9": 0.335,
+    "Kreis 10": 0.439,
+    "Kreis 11": 0.34,
+    "Kreis 12": 0.386
+   }
+  },
+  {
+   "text": "Privater Gestaltungsplan Kornhaus Swissmill, Zürich Aussersihl.",
+   "date": "2011-02-13",
+   "yes_share": {
+    "Kreis 3": 0.598,
+    "Kreis 6": 0.568,
+    "Kreis 9": 0.613,
+    "Kreis 10": 0.441,
+    "Kreis 11": 0.613,
+    "Kreis 12": 0.58
+   }
+  },
+  {
+   "text": "A. Volksinitiative «Zur Förderung des öV, Fuss- und Veloverkehrs in der Stadt Zürich».",
+   "date": "2011-09-04",
+   "yes_share": {
+    "Kreis 3": 0.608,
+    "Kreis 6": 0.5720000000000001,
+    "Kreis 9": 0.47200000000000003,
+    "Kreis 10": 0.509,
+    "Kreis 11": 0.48100000000000004,
+    "Kreis 12": 0.48
+   }
+  },
+  {
+   "text": "B. Gegenvorschlag des Gemeinderats zur Volksinitiative «Zur Förderung des öV, Fuss- und Veloverkehrs in der Stadt Zürich».",
+   "date": "2011-09-04",
+   "yes_share": {
+    "Kreis 3": 0.71,
+    "Kreis 6": 0.6990000000000001,
+    "Kreis 9": 0.586,
+    "Kreis 10": 0.636,
+    "Kreis 11": 0.608,
+    "Kreis 12": 0.573
+   }
+  },
+  {
+   "text": "C. Stichfrage: Welche der beiden Vorlagen soll in Kraft treten, falls sowohl das Volksinitiative als auch der Gegenvorschlag von den Stimmberechtigten angenommen werden? ('Ja'= Vol",
+   "date": "2011-09-04",
+   "yes_share": {
+    "Kreis 3": 0.583,
+    "Kreis 6": 0.525,
+    "Kreis 9": 0.475,
+    "Kreis 10": 0.504,
+    "Kreis 11": 0.46799999999999997,
+    "Kreis 12": 0.49700000000000005
+   }
+  },
+  {
+   "text": "Wohnbauaktion 2011, Rahmenkredit von 30 Mio. Franken und Änderung Kreditanteil von 5 Mio. Franken der Wohnbauaktion 2005.",
+   "date": "2011-09-04",
+   "yes_share": {
+    "Kreis 3": 0.8490000000000001,
+    "Kreis 6": 0.8390000000000001,
+    "Kreis 9": 0.775,
+    "Kreis 10": 0.802,
+    "Kreis 11": 0.7759999999999999,
+    "Kreis 12": 0.7659999999999999
+   }
+  },
+  {
+   "text": "Einzelinitiative von Jacqueline Rizzo betreffend Gemeinderatswahlen mit tieferer Sperrklausel, Änderung der Gemeindeordnung.",
+   "date": "2011-09-04",
+   "yes_share": {
+    "Kreis 3": 0.37200000000000005,
+    "Kreis 6": 0.359,
+    "Kreis 9": 0.319,
+    "Kreis 10": 0.34700000000000003,
+    "Kreis 11": 0.336,
+    "Kreis 12": 0.314
+   }
+  },
+  {
+   "text": "Bau des Vulkanplatzes, Objektkredit von 3 983 000 Franken.",
+   "date": "2011-11-27",
+   "yes_share": {
+    "Kreis 3": 0.652,
+    "Kreis 6": 0.642,
+    "Kreis 9": 0.5710000000000001,
+    "Kreis 10": 0.585,
+    "Kreis 11": 0.55,
+    "Kreis 12": 0.509
+   }
+  },
+  {
+   "text": "Blaue Zone, Erlass einer Parkkartenverordnung.",
+   "date": "2011-11-27",
+   "yes_share": {
+    "Kreis 3": 0.633,
+    "Kreis 6": 0.612,
+    "Kreis 9": 0.5660000000000001,
+    "Kreis 10": 0.6,
+    "Kreis 11": 0.579,
+    "Kreis 12": 0.502
+   }
+  },
+  {
+   "text": "Wohnpolitischer Grundsatzartikel in der Gemeindeordnung: «Bezahlbare Wohnungen für Zürich» (Gegenvorschlag des Gemeinderats zu drei Volksinitiativen).",
+   "date": "2011-11-27",
+   "yes_share": {
+    "Kreis 3": 0.8190000000000001,
+    "Kreis 6": 0.777,
+    "Kreis 9": 0.758,
+    "Kreis 10": 0.742,
+    "Kreis 11": 0.747,
+    "Kreis 12": 0.79
+   }
+  },
+  {
+   "text": "Projekt Strichplatz Depotweg, Bewilligung Objektkredit von 2 395 000 Franken und einer Miete von 92 480 Franken pro Jahr.",
+   "date": "2012-03-11",
+   "yes_share": {
+    "Kreis 3": 0.573,
+    "Kreis 6": 0.608,
+    "Kreis 9": 0.36,
+    "Kreis 10": 0.539,
+    "Kreis 11": 0.483,
+    "Kreis 12": 0.41700000000000004
+   }
+  },
+  {
+   "text": "Baulinienrevisionen im Quartier Affoltern, Kreis 11, Anpassung der Baulinien an die Richtplanung im Zusammenhang mit der Neufestsetzung des kommunalen Verkehrsplans der Stadt Züric",
+   "date": "2012-06-17",
+   "yes_share": {
+    "Kreis 3": 0.755,
+    "Kreis 6": 0.755,
+    "Kreis 9": 0.677,
+    "Kreis 10": 0.701,
+    "Kreis 11": 0.6459999999999999,
+    "Kreis 12": 0.648
+   }
+  },
+  {
+   "text": "KMU-Artikel in der Gemeindeordnung: «Günstige Rahmenbedingungen und Beachtung der Regulierungsfolgen für die lokale Wirtschaft und die KMU» (Gegenvorschlag des Gemeinderats zu zwei",
+   "date": "2012-06-17",
+   "yes_share": {
+    "Kreis 3": 0.856,
+    "Kreis 6": 0.879,
+    "Kreis 9": 0.8440000000000001,
+    "Kreis 10": 0.867,
+    "Kreis 11": 0.8390000000000001,
+    "Kreis 12": 0.8029999999999999
+   }
+  },
+  {
+   "text": "Sechseläuten-/Theaterplatz: Neugestaltung und Velomassnahmen, Objektkredit von 17,203 Mio. Franken.",
+   "date": "2012-09-23",
+   "yes_share": {
+    "Kreis 3": 0.65,
+    "Kreis 6": 0.6779999999999999,
+    "Kreis 9": 0.529,
+    "Kreis 10": 0.626,
+    "Kreis 11": 0.563,
+    "Kreis 12": 0.478
+   }
+  },
+  {
+   "text": "Flächendeckende Erschliessung der Stadt Zürich mit Glasfasern, Objektkredit von 400 Mio. Franken.",
+   "date": "2012-09-23",
+   "yes_share": {
+    "Kreis 3": 0.6729999999999999,
+    "Kreis 6": 0.7190000000000001,
+    "Kreis 9": 0.612,
+    "Kreis 10": 0.669,
+    "Kreis 11": 0.612,
+    "Kreis 12": 0.584
+   }
+  },
+  {
+   "text": "Kunsthaus-Erweiterung Zürich, Investitionsbeitrag von 88 Mio. Franken an die Bauherrschaft, einmaliger Beitrag von 5 Mio. Franken und Erhöhung des jährlichen Unterhalts- und Betrie",
+   "date": "2012-11-25",
+   "yes_share": {
+    "Kreis 3": 0.5589999999999999,
+    "Kreis 6": 0.5670000000000001,
+    "Kreis 9": 0.45299999999999996,
+    "Kreis 10": 0.5429999999999999,
+    "Kreis 11": 0.47,
+    "Kreis 12": 0.402
+   }
+  },
+  {
+   "text": "Bau einer zentralen Klärschlammverwertungsanlage auf dem Areal Werdhölzli, Objektkredit von 68 Millionen Franken.",
+   "date": "2013-03-03",
+   "yes_share": {
+    "Kreis 3": 0.948,
+    "Kreis 6": 0.9540000000000001,
+    "Kreis 9": 0.9179999999999999,
+    "Kreis 10": 0.938,
+    "Kreis 11": 0.9259999999999999,
+    "Kreis 12": 0.907
+   }
+  },
+  {
+   "text": "Vormundschaftsbehörde, Neuorganisation zur Kindes- und Erwachsenenschutzbehörde (KESB) gemäss übergeordnetem Recht, Änderung der Gemeindeordnung.",
+   "date": "2013-03-03",
+   "yes_share": {
+    "Kreis 3": 0.907,
+    "Kreis 6": 0.922,
+    "Kreis 9": 0.858,
+    "Kreis 10": 0.9,
+    "Kreis 11": 0.866,
+    "Kreis 12": 0.826
+   }
+  },
+  {
+   "text": "Stiftung für bezahlbare und ökologische Wohnungen, Grundkapital von 80 Millionen Franken (Umsetzung einer Volksinitiative).",
+   "date": "2013-03-03",
+   "yes_share": {
+    "Kreis 3": 0.81,
+    "Kreis 6": 0.745,
+    "Kreis 9": 0.753,
+    "Kreis 10": 0.742,
+    "Kreis 11": 0.74,
+    "Kreis 12": 0.777
+   }
+  },
+  {
+   "text": "Neue kommunale Wohnsiedlung auf dem Areal Kronenwiese, Zürich-Unterstrass, Objektkredit von 64,8 Millionen Franken.",
+   "date": "2013-06-09",
+   "yes_share": {
+    "Kreis 3": 0.7859999999999999,
+    "Kreis 6": 0.7490000000000001,
+    "Kreis 9": 0.705,
+    "Kreis 10": 0.716,
+    "Kreis 11": 0.785,
+    "Kreis 12": 0.688
+   }
+  },
+  {
+   "text": "Neubau Schulanlage Blumenfeld, Zürich-Affoltern, Objektkredit von 90 Millionen Franken.",
+   "date": "2013-06-09",
+   "yes_share": {
+    "Kreis 3": 0.8109999999999999,
+    "Kreis 6": 0.813,
+    "Kreis 9": 0.74,
+    "Kreis 10": 0.78,
+    "Kreis 11": 0.6990000000000001,
+    "Kreis 12": 0.7340000000000001
+   }
+  },
+  {
+   "text": "Objektkredit von 216,144 Millionen Franken für den Bau eines Stadions mit Stadionplatz auf dem Areal Hardturm sowie Beteiligung von höchstens 5 Millionen Franken und jährlich wiede",
+   "date": "2013-09-22",
+   "yes_share": {
+    "Kreis 3": 0.511,
+    "Kreis 6": 0.49200000000000005,
+    "Kreis 9": 0.504,
+    "Kreis 10": 0.491,
+    "Kreis 11": 0.499,
+    "Kreis 12": 0.5
+   }
+  },
+  {
+   "text": "Objektkredit von 103,15 Millionen Franken für die Erstellung einer Wohnsiedlung auf dem Areal Hardturm.",
+   "date": "2013-09-22",
+   "yes_share": {
+    "Kreis 3": 0.72,
+    "Kreis 6": 0.696,
+    "Kreis 9": 0.667,
+    "Kreis 10": 0.685,
+    "Kreis 11": 0.64,
+    "Kreis 12": 0.622
+   }
+  },
+  {
+   "text": "Lagerstrasse, Abschnitt Lang- bis Kasernenstrasse, Strassenneugestaltung, Landerwerb, Lärmsanierung, Objektkredit von 16,69 Millionen Franken.",
+   "date": "2013-11-24",
+   "yes_share": {
+    "Kreis 3": 0.622,
+    "Kreis 6": 0.654,
+    "Kreis 9": 0.556,
+    "Kreis 10": 0.617,
+    "Kreis 11": 0.601,
+    "Kreis 12": 0.535
+   }
+  },
+  {
+   "text": "Neuregelung der Zusammensetzung des Büros des Gemeinderats, Änderung der Gemeindeordnung.",
+   "date": "2013-11-24",
+   "yes_share": {
+    "Kreis 3": 0.8220000000000001,
+    "Kreis 6": 0.855,
+    "Kreis 9": 0.746,
+    "Kreis 10": 0.836,
+    "Kreis 11": 0.7709999999999999,
+    "Kreis 12": 0.711
+   }
+  },
+  {
+   "text": "Rahmenkredit von 50 Millionen Franken zur Beschaffung und Installation von Schulraumpavillons",
+   "date": "2014-05-18",
+   "yes_share": {
+    "Kreis 3": 0.772,
+    "Kreis 6": 0.799,
+    "Kreis 9": 0.727,
+    "Kreis 10": 0.784,
+    "Kreis 11": 0.728,
+    "Kreis 12": 0.718
+   }
+  },
+  {
+   "text": "Sportzentrum Heuried, Quartier Friesenberg, Neubau Hochbauten (Eissportanlage) und Erneuerung Badeanlage, Objektkredit von 81,359 Millionen Franken",
+   "date": "2014-09-28",
+   "yes_share": {
+    "Kreis 3": 0.828,
+    "Kreis 6": 0.805,
+    "Kreis 9": 0.779,
+    "Kreis 10": 0.7929999999999999,
+    "Kreis 11": 0.742,
+    "Kreis 12": 0.71
+   }
+  },
+  {
+   "text": "Zürcher Ausnüchterungs- und Betreuungsstelle (ZAB), Erlass einer Verordnung für die definitive Einrichtung",
+   "date": "2014-11-30",
+   "yes_share": {
+    "Kreis 3": 0.682,
+    "Kreis 6": 0.7040000000000001,
+    "Kreis 9": 0.6679999999999999,
+    "Kreis 10": 0.652,
+    "Kreis 11": 0.659,
+    "Kreis 12": 0.667
+   }
+  },
+  {
+   "text": "Kehrichtheizkraftwerk Hagenholz, Metallrückgewinnung aus Kehrichtschlacke, Anpassung der Anlagen für den Schlackeaustrag, Objektkredit von 38,9 Millionen Franken",
+   "date": "2015-03-08",
+   "yes_share": {
+    "Kreis 3": 0.925,
+    "Kreis 6": 0.934,
+    "Kreis 9": 0.898,
+    "Kreis 10": 0.922,
+    "Kreis 11": 0.903,
+    "Kreis 12": 0.8740000000000001
+   }
+  },
+  {
+   "text": "Neue kommunale Wohnsiedlung auf dem Areal Hornbach, Quartier Riesbach, mit Gewerbeflächen, Kinderbetreuungseinrichtungen und Werkhof, Objektkredit von 100,7 Millionen Franken",
+   "date": "2015-06-14",
+   "yes_share": {
+    "Kreis 3": 0.735,
+    "Kreis 6": 0.6990000000000001,
+    "Kreis 9": 0.628,
+    "Kreis 10": 0.655,
+    "Kreis 11": 0.609,
+    "Kreis 12": 0.628
+   }
+  },
+  {
+   "text": "A: «Volksinitiative für sichere und durchgängige Velorouten» (Velo-Initiative)",
+   "date": "2015-06-14",
+   "yes_share": {
+    "Kreis 3": 0.598,
+    "Kreis 6": 0.544,
+    "Kreis 9": 0.47,
+    "Kreis 10": 0.509,
+    "Kreis 11": 0.45799999999999996,
+    "Kreis 12": 0.457
+   }
+  },
+  {
+   "text": "B: Gegenvorschlag des Gemeinderats zur Velo-Initiative",
+   "date": "2015-06-14",
+   "yes_share": {
+    "Kreis 3": 0.6859999999999999,
+    "Kreis 6": 0.6779999999999999,
+    "Kreis 9": 0.593,
+    "Kreis 10": 0.631,
+    "Kreis 11": 0.597,
+    "Kreis 12": 0.5670000000000001
+   }
+  },
+  {
+   "text": "C. Stichfrage: Falls die Vorlagen A ('Velo-Initiative') und B (Gegenvorschlag) angenommen werden: Welche Vorlage soll in Kraft treten? ('Ja'= Vorlage A).",
+   "date": "2015-06-14",
+   "yes_share": {
+    "Kreis 3": 0.527,
+    "Kreis 6": 0.451,
+    "Kreis 9": 0.42700000000000005,
+    "Kreis 10": 0.44,
+    "Kreis 11": 0.391,
+    "Kreis 12": 0.42
+   }
+  },
+  {
+   "text": "«Zürich im Landesmuseum», permanente Ausstellung über Stadt und Kanton Zürich, Objektkredit von 1,76 Millionen Franken und jährlich wiederkehrende Betriebsbeiträge von 300'000 Fran",
+   "date": "2015-06-14",
+   "yes_share": {
+    "Kreis 3": 0.645,
+    "Kreis 6": 0.6709999999999999,
+    "Kreis 9": 0.593,
+    "Kreis 10": 0.6459999999999999,
+    "Kreis 11": 0.608,
+    "Kreis 12": 0.575
+   }
+  },
+  {
+   "text": "Kauf der Liegenschaft Florhofgasse 6 für die Musikschule Konservatorium Zürich und bauliche Sofortmassnahmen, Objektkredit von 33,6 Millionen Franken",
+   "date": "2015-06-14",
+   "yes_share": {
+    "Kreis 3": 0.757,
+    "Kreis 6": 0.7929999999999999,
+    "Kreis 9": 0.672,
+    "Kreis 10": 0.748,
+    "Kreis 11": 0.6729999999999999,
+    "Kreis 12": 0.637
+   }
+  },
+  {
+   "text": "Änderung der Gemeindeordnung: Anpassung der Aufgabenzuordnung der Departemente sowie von Bestimmungen des Abschnitts Schule und Schulbehörden, Umbenennung eines Departements, Strei",
+   "date": "2015-11-22",
+   "yes_share": {
+    "Kreis 3": 0.792,
+    "Kreis 6": 0.792,
+    "Kreis 9": 0.723,
+    "Kreis 10": 0.765,
+    "Kreis 11": 0.741,
+    "Kreis 12": 0.71
+   }
+  },
+  {
+   "text": "Instandsetzung und Umbau von Kongresshaus und Tonhalle (165 Millionen Franken), Beitrag an Tonhalle-Provisorium (höchstens 1,65 Millionen Franken) und Entschuldung der bestehenden ",
+   "date": "2016-06-05",
+   "yes_share": {
+    "Kreis 3": 0.764,
+    "Kreis 6": 0.7859999999999999,
+    "Kreis 9": 0.684,
+    "Kreis 10": 0.757,
+    "Kreis 11": 0.68,
+    "Kreis 12": 0.623
+   }
+  },
+  {
+   "text": "Errichtung einer öffentlich-rechtlichen Kongresshaus-Stiftung Zürich, Änderung der Gemeindeordnung",
+   "date": "2016-06-05",
+   "yes_share": {
+    "Kreis 3": 0.7829999999999999,
+    "Kreis 6": 0.8009999999999999,
+    "Kreis 9": 0.6990000000000001,
+    "Kreis 10": 0.769,
+    "Kreis 11": 0.6940000000000001,
+    "Kreis 12": 0.639
+   }
+  },
+  {
+   "text": "Pflegezentrum Bombach in Zürich-Höngg, Neubau Haus B, Objektkredit von 23,575 Millionen Franken",
+   "date": "2016-06-05",
+   "yes_share": {
+    "Kreis 3": 0.9309999999999999,
+    "Kreis 6": 0.937,
+    "Kreis 9": 0.914,
+    "Kreis 10": 0.946,
+    "Kreis 11": 0.914,
+    "Kreis 12": 0.899
+   }
+  },
+  {
+   "text": "Ausstieg der Stadt Zürich aus der Kernenergie, Änderung der Gemeindeordnung",
+   "date": "2016-06-05",
+   "yes_share": {
+    "Kreis 3": 0.762,
+    "Kreis 6": 0.7340000000000001,
+    "Kreis 9": 0.6779999999999999,
+    "Kreis 10": 0.711,
+    "Kreis 11": 0.67,
+    "Kreis 12": 0.6709999999999999
+   }
+  },
+  {
+   "text": "Gemeindebeschluss «Rationelle Verwendung von Elektrizität» vom 5. März 1989, Teilaufhebung",
+   "date": "2016-06-05",
+   "yes_share": {
+    "Kreis 3": 0.868,
+    "Kreis 6": 0.866,
+    "Kreis 9": 0.8029999999999999,
+    "Kreis 10": 0.858,
+    "Kreis 11": 0.8009999999999999,
+    "Kreis 12": 0.792
+   }
+  },
+  {
+   "text": "Verordnung über gemeinwirtschaftliche Leistungen des Elektrizitätswerks der Stadt Zürich (ewz) im Rahmen der 2000-Watt-Ziele, Neuerlass",
+   "date": "2016-06-05",
+   "yes_share": {
+    "Kreis 3": 0.789,
+    "Kreis 6": 0.775,
+    "Kreis 9": 0.71,
+    "Kreis 10": 0.746,
+    "Kreis 11": 0.7070000000000001,
+    "Kreis 12": 0.7
+   }
+  },
+  {
+   "text": "Eishockey- und Sportarena, Gewährung eines Baurechts, eines rückzahlungspflichtigen und zu verzinsenden Darlehens von 120 Millionen Franken und eines jährlichen Betriebsbeitrags vo",
+   "date": "2016-09-25",
+   "yes_share": {
+    "Kreis 3": 0.5539999999999999,
+    "Kreis 6": 0.556,
+    "Kreis 9": 0.5529999999999999,
+    "Kreis 10": 0.569,
+    "Kreis 11": 0.584,
+    "Kreis 12": 0.5870000000000001
+   }
+  },
+  {
+   "text": "Änderung der Vorschriften über die Parkierungs- und Parkuhrkontrollgebühren vom 25. September 1994",
+   "date": "2016-09-25",
+   "yes_share": {
+    "Kreis 3": 0.595,
+    "Kreis 6": 0.585,
+    "Kreis 9": 0.467,
+    "Kreis 10": 0.534,
+    "Kreis 11": 0.44,
+    "Kreis 12": 0.42100000000000004
+   }
+  },
+  {
+   "text": "Schütze-Areal, Industriequartier, Instandsetzung und Umbau des Schulhauses Heinrichstrasse, Erstellung eines Anbaus mit Kindergarten, Quartierhaus, Bibliothek und Sporthalle sowie ",
+   "date": "2016-09-25",
+   "yes_share": {
+    "Kreis 3": 0.875,
+    "Kreis 6": 0.887,
+    "Kreis 9": 0.828,
+    "Kreis 10": 0.8740000000000001,
+    "Kreis 11": 0.823,
+    "Kreis 12": 0.7929999999999999
+   }
+  },
+  {
+   "text": "Schulanlage Schauenberg, Quartier Affoltern, Ersatzneubau, Objektkredit von 50,2 Millionen Franken",
+   "date": "2016-09-25",
+   "yes_share": {
+    "Kreis 3": 0.862,
+    "Kreis 6": 0.877,
+    "Kreis 9": 0.8079999999999999,
+    "Kreis 10": 0.87,
+    "Kreis 11": 0.8440000000000001,
+    "Kreis 12": 0.79
+   }
+  },
+  {
+   "text": "Volksinitiative «Faires Wahlrecht für Züri – jede Stimme zählt!»",
+   "date": "2017-02-12",
+   "yes_share": {
+    "Kreis 3": 0.402,
+    "Kreis 6": 0.368,
+    "Kreis 9": 0.39,
+    "Kreis 10": 0.385,
+    "Kreis 11": 0.382,
+    "Kreis 12": 0.423
+   }
+  },
+  {
+   "text": "Konfliktvermittlung und Hilfe im öffentlich zugänglichen Raum, Gemeindebeschluss",
+   "date": "2017-02-12",
+   "yes_share": {
+    "Kreis 3": 0.805,
+    "Kreis 6": 0.816,
+    "Kreis 9": 0.782,
+    "Kreis 10": 0.8,
+    "Kreis 11": 0.7809999999999999,
+    "Kreis 12": 0.764
+   }
+  },
+  {
+   "text": "Neubau Schulanlage Pfingstweid, Escher-Wyss-Quartier, Objektkredit von 29,4387 Millionen Franken",
+   "date": "2017-02-12",
+   "yes_share": {
+    "Kreis 3": 0.899,
+    "Kreis 6": 0.892,
+    "Kreis 9": 0.855,
+    "Kreis 10": 0.899,
+    "Kreis 11": 0.85,
+    "Kreis 12": 0.8170000000000001
+   }
+  },
+  {
+   "text": "Wohnbauaktion 2017, Rahmenkredit von 90 Millionen Franken",
+   "date": "2017-05-21",
+   "yes_share": {
+    "Kreis 3": 0.8109999999999999,
+    "Kreis 6": 0.764,
+    "Kreis 9": 0.7390000000000001,
+    "Kreis 10": 0.75,
+    "Kreis 11": 0.7140000000000001,
+    "Kreis 12": 0.742
+   }
+  },
+  {
+   "text": "Gegenvorschlag des Gemeinderats zur «Volksinitiative für den Schutz und die Förderung von Grün- und Freiräumen» (Grünstadt-Initiative)",
+   "date": "2017-05-21",
+   "yes_share": {
+    "Kreis 3": 0.843,
+    "Kreis 6": 0.825,
+    "Kreis 9": 0.787,
+    "Kreis 10": 0.7979999999999999,
+    "Kreis 11": 0.789,
+    "Kreis 12": 0.7809999999999999
+   }
+  },
+  {
+   "text": "Verein Tanzhaus Zürich, jährliche Beiträge von maximal 1'827'166 Franken ab 2019",
+   "date": "2017-05-21",
+   "yes_share": {
+    "Kreis 3": 0.696,
+    "Kreis 6": 0.696,
+    "Kreis 9": 0.578,
+    "Kreis 10": 0.687,
+    "Kreis 11": 0.555,
+    "Kreis 12": 0.525
+   }
+  },
+  {
+   "text": "Erstellung Bundesasylzentrum auf dem Duttweiler-Areal, Zürich-West, Objektkredit von 24,5 Millionen Franken",
+   "date": "2017-09-24",
+   "yes_share": {
+    "Kreis 3": 0.753,
+    "Kreis 6": 0.753,
+    "Kreis 9": 0.616,
+    "Kreis 10": 0.708,
+    "Kreis 11": 0.6409999999999999,
+    "Kreis 12": 0.588
+   }
+  },
+  {
+   "text": "Gemeindebeschluss «Rationelle Verwendung von Elektrizität» vom 5. März 1989, Aufhebung",
+   "date": "2017-09-24",
+   "yes_share": {
+    "Kreis 3": 0.888,
+    "Kreis 6": 0.9009999999999999,
+    "Kreis 9": 0.853,
+    "Kreis 10": 0.897,
+    "Kreis 11": 0.86,
+    "Kreis 12": 0.83
+   }
+  },
+  {
+   "text": "Elektrizitätswerk der Stadt Zürich, Rahmenkredit von 200 Millionen Franken für den Erwerb von Energieerzeugungsanlagen, die erneuerbare Energie nutzen",
+   "date": "2017-09-24",
+   "yes_share": {
+    "Kreis 3": 0.858,
+    "Kreis 6": 0.847,
+    "Kreis 9": 0.802,
+    "Kreis 10": 0.831,
+    "Kreis 11": 0.792,
+    "Kreis 12": 0.787
+   }
+  },
+  {
+   "text": "Cabaret Voltaire, langfristige Sicherung durch Liegenschaftentausch mit der Anlagestiftung Swiss Life",
+   "date": "2017-09-24",
+   "yes_share": {
+    "Kreis 3": 0.664,
+    "Kreis 6": 0.6890000000000001,
+    "Kreis 9": 0.596,
+    "Kreis 10": 0.662,
+    "Kreis 11": 0.6,
+    "Kreis 12": 0.5770000000000001
+   }
+  },
+  {
+   "text": "Ausrichtung der Schulbehördenorganisation auf die schulische Integration und weitere Massnahmen zur Verbesserung der Führung im Schulwesen der Stadt Zürich, Änderung der Gemeindeor",
+   "date": "2017-11-26",
+   "yes_share": {
+    "Kreis 3": 0.7390000000000001,
+    "Kreis 6": 0.747,
+    "Kreis 9": 0.695,
+    "Kreis 10": 0.722,
+    "Kreis 11": 0.6890000000000001,
+    "Kreis 12": 0.667
+   }
+  },
+  {
+   "text": "Elektrizitätswerk der Stadt Zürich, Rahmenkredit von 200 Millionen Franken für den Bau von Anlagen des Geschäftsfelds Energielösungen",
+   "date": "2017-11-26",
+   "yes_share": {
+    "Kreis 3": 0.773,
+    "Kreis 6": 0.75,
+    "Kreis 9": 0.7240000000000001,
+    "Kreis 10": 0.733,
+    "Kreis 11": 0.701,
+    "Kreis 12": 0.696
+   }
+  },
+  {
+   "text": "Alterszentrum Mathysweg, Quartier Albisrieden, Ersatzneubau, Objektkredit von 63,25 Millionen Franken",
+   "date": "2017-11-26",
+   "yes_share": {
+    "Kreis 3": 0.919,
+    "Kreis 6": 0.919,
+    "Kreis 9": 0.929,
+    "Kreis 10": 0.93,
+    "Kreis 11": 0.895,
+    "Kreis 12": 0.885
+   }
+  },
+  {
+   "text": "Schulanlage Hofacker, Quartier Hirslanden, Ersatzneubau eines Sekundarschulhauses mit Dreifachsporthalle sowie Ausbauten in den Hauptgebäuden, Objektkredit von 33,8 Millionen Frank",
+   "date": "2017-11-26",
+   "yes_share": {
+    "Kreis 3": 0.831,
+    "Kreis 6": 0.84,
+    "Kreis 9": 0.7929999999999999,
+    "Kreis 10": 0.8320000000000001,
+    "Kreis 11": 0.78,
+    "Kreis 12": 0.758
+   }
+  },
+  {
+   "text": "Gegenvorschlag des Gemeinderats zur Volksinitiative «Nachhaltige und faire Ernährung», Änderung der Gemeindeordnung",
+   "date": "2017-11-26",
+   "yes_share": {
+    "Kreis 3": 0.652,
+    "Kreis 6": 0.632,
+    "Kreis 9": 0.583,
+    "Kreis 10": 0.605,
+    "Kreis 11": 0.56,
+    "Kreis 12": 0.575
+   }
+  },
+  {
+   "text": "Tagesschule 2025: Pilotphase II des städtischen Pilotprojekts mit gebundenen Tagesschulen an der Volksschule, Objektkredit von 74,57 Millionen Franken für die Jahre 2018–2022",
+   "date": "2018-06-10",
+   "yes_share": {
+    "Kreis 3": 0.792,
+    "Kreis 6": 0.7979999999999999,
+    "Kreis 9": 0.7040000000000001,
+    "Kreis 10": 0.79,
+    "Kreis 11": 0.721,
+    "Kreis 12": 0.6940000000000001
+   }
+  },
+  {
+   "text": "Gemeinnütziger Wohnungsbau auf dem Koch-Areal, Quartiere Albisrieden/Altstetten, Übertragung der Wohnbaufelder vom Finanz- ins Verwaltungsvermögen, Objektkredit von 35,126388 Milli",
+   "date": "2018-06-10",
+   "yes_share": {
+    "Kreis 3": 0.789,
+    "Kreis 6": 0.737,
+    "Kreis 9": 0.721,
+    "Kreis 10": 0.722,
+    "Kreis 11": 0.7,
+    "Kreis 12": 0.726
+   }
+  },
+  {
+   "text": "Volksinitiative «Wohnen und Leben auf dem Koch-Areal»",
+   "date": "2018-06-10",
+   "yes_share": {
+    "Kreis 3": 0.294,
+    "Kreis 6": 0.327,
+    "Kreis 9": 0.379,
+    "Kreis 10": 0.331,
+    "Kreis 11": 0.364,
+    "Kreis 12": 0.375
+   }
+  },
+  {
+   "text": "A. Volksinitiative «Freier Sechseläutenplatz»",
+   "date": "2018-06-10",
+   "yes_share": {
+    "Kreis 3": 0.34700000000000003,
+    "Kreis 6": 0.342,
+    "Kreis 9": 0.261,
+    "Kreis 10": 0.308,
+    "Kreis 11": 0.258,
+    "Kreis 12": 0.27399999999999997
+   }
+  },
+  {
+   "text": "Gartenareal Dunkelhölzli mit Erneuerung Wirtschaftsgebäude, Bachöffnung, Hochwasserschutz, Objektkredit von 10,51 Millionen Franken",
+   "date": "2018-06-10",
+   "yes_share": {
+    "Kreis 3": 0.773,
+    "Kreis 6": 0.765,
+    "Kreis 9": 0.584,
+    "Kreis 10": 0.741,
+    "Kreis 11": 0.726,
+    "Kreis 12": 0.731
+   }
+  },
+  {
+   "text": "Bürogebäude Eggbühlstrasse 21/23/25, Quartier Seebach, Instandsetzung und bauliche Anpassungen für die städtische Verwaltung, Übertragung vom Finanz- ins Verwaltungsvermögen, Objek",
+   "date": "2018-06-10",
+   "yes_share": {
+    "Kreis 3": 0.754,
+    "Kreis 6": 0.75,
+    "Kreis 9": 0.6659999999999999,
+    "Kreis 10": 0.737,
+    "Kreis 11": 0.716,
+    "Kreis 12": 0.685
+   }
+  },
+  {
+   "text": "Neue kommunale Wohnsiedlung Herdern, Quartier Aussersihl, sowie Energie-Contracting, Objektkredit von 28,565 Millionen Franken",
+   "date": "2018-06-10",
+   "yes_share": {
+    "Kreis 3": 0.805,
+    "Kreis 6": 0.7609999999999999,
+    "Kreis 9": 0.725,
+    "Kreis 10": 0.7390000000000001,
+    "Kreis 11": 0.7170000000000001,
+    "Kreis 12": 0.742
+   }
+  },
+  {
+   "text": "Ausbildungszentrum Rohwiesen, Opfikon, Erweiterung und Instandsetzung, Integration Sporthalle für die Schule Auzelg, Objektkredit von 118,84 Millionen Franken",
+   "date": "2018-06-10",
+   "yes_share": {
+    "Kreis 3": 0.87,
+    "Kreis 6": 0.8759999999999999,
+    "Kreis 9": 0.812,
+    "Kreis 10": 0.863,
+    "Kreis 11": 0.8390000000000001,
+    "Kreis 12": 0.847
+   }
+  },
+  {
+   "text": "Areal Herdern-, Bienen- und Bullingerstrasse, Quartier Aussersihl, Erweiterung VBZ-Busgarage Hardau und Ersatzneubau ERZ-Werkhof, Übertragung des Grundstücks vom Finanz- ins Verwal",
+   "date": "2018-06-10",
+   "yes_share": {
+    "Kreis 3": 0.863,
+    "Kreis 6": 0.855,
+    "Kreis 9": 0.816,
+    "Kreis 10": 0.848,
+    "Kreis 11": 0.816,
+    "Kreis 12": 0.8059999999999999
+   }
+  },
+  {
+   "text": "Grundstück Mühleweg, Escher-Wyss-Quartier, Neubau für die Kriminalabteilung der Stadtpolizei, Übertragung vom Finanz- ins Verwaltungsvermögen, Objektkredit von 82,37358 Millionen F",
+   "date": "2018-06-10",
+   "yes_share": {
+    "Kreis 3": 0.8190000000000001,
+    "Kreis 6": 0.831,
+    "Kreis 9": 0.792,
+    "Kreis 10": 0.8290000000000001,
+    "Kreis 11": 0.815,
+    "Kreis 12": 0.807
+   }
+  },
+  {
+   "text": "B. Gegenvorschlag des Gemeinderats zur Volksinitiative «Freier Sechseläutenplatz»",
+   "date": "2018-06-10",
+   "yes_share": {
+    "Kreis 3": 0.603,
+    "Kreis 6": 0.618,
+    "Kreis 9": 0.644,
+    "Kreis 10": 0.64,
+    "Kreis 11": 0.647,
+    "Kreis 12": 0.648
+   }
+  },
+  {
+   "text": "C. Stichfrage: Falls die Vorlagen A ('Freier Sechseläutenplatz') und B (Gegenvorschlag) angenommen werden: Welche Vorlage soll in Kraft treten? ('Ja'= Vorlage A).",
+   "date": "2018-06-10",
+   "yes_share": {
+    "Kreis 3": 0.341,
+    "Kreis 6": 0.32899999999999996,
+    "Kreis 9": 0.267,
+    "Kreis 10": 0.295,
+    "Kreis 11": 0.259,
+    "Kreis 12": 0.272
+   }
+  },
+  {
+   "text": "Volksinitiative «Mehr Geld für Zürich: 7 statt 9 Stadträtinnen und -räte»",
+   "date": "2018-09-23",
+   "yes_share": {
+    "Kreis 3": 0.319,
+    "Kreis 6": 0.374,
+    "Kreis 9": 0.39,
+    "Kreis 10": 0.37799999999999995,
+    "Kreis 11": 0.401,
+    "Kreis 12": 0.377
+   }
+  },
+  {
+   "text": "Erweiterung der Fernwärmeversorgung in der Stadt Zürich, Objektkredit von 235 Millionen Franken und Errichtung einer Vorfinanzierung von 50 Millionen Franken",
+   "date": "2018-09-23",
+   "yes_share": {
+    "Kreis 3": 0.857,
+    "Kreis 6": 0.8540000000000001,
+    "Kreis 9": 0.807,
+    "Kreis 10": 0.83,
+    "Kreis 11": 0.81,
+    "Kreis 12": 0.807
+   }
+  },
+  {
+   "text": "Gewährung von Baurechten für die Realisierung eines Fussballstadions, von gemeinnützigem Wohnungsbau und zwei Hochhäusern auf dem Areal Hardturm, Übertragung von zwei Grundstücken ",
+   "date": "2018-11-25",
+   "yes_share": {
+    "Kreis 3": 0.524,
+    "Kreis 6": 0.534,
+    "Kreis 9": 0.546,
+    "Kreis 10": 0.474,
+    "Kreis 11": 0.561,
+    "Kreis 12": 0.537
+   }
+  },
+  {
+   "text": "Neubau Alterszentrum und Wohnsiedlung Eichrain, Quartier Seebach, Objektkredit von 131,91 Millionen Franken",
+   "date": "2019-02-10",
+   "yes_share": {
+    "Kreis 3": 0.8809999999999999,
+    "Kreis 6": 0.877,
+    "Kreis 9": 0.853,
+    "Kreis 10": 0.862,
+    "Kreis 11": 0.853,
+    "Kreis 12": 0.8540000000000001
+   }
+  },
+  {
+   "text": "Energieverbund Altstetten und Höngg-West, Objektkredit von 128,7 Millionen Franken",
+   "date": "2019-02-10",
+   "yes_share": {
+    "Kreis 3": 0.89,
+    "Kreis 6": 0.895,
+    "Kreis 9": 0.8809999999999999,
+    "Kreis 10": 0.8959999999999999,
+    "Kreis 11": 0.845,
+    "Kreis 12": 0.8190000000000001
+   }
+  },
+  {
+   "text": "Neue kommunale Wohnsiedlung Leutschenbach, Quartier Seebach, Objektkredit von 213,205 Millionen Franken",
+   "date": "2019-05-19",
+   "yes_share": {
+    "Kreis 3": 0.807,
+    "Kreis 6": 0.76,
+    "Kreis 9": 0.727,
+    "Kreis 10": 0.748,
+    "Kreis 11": 0.721,
+    "Kreis 12": 0.7240000000000001
+   }
+  },
+  {
+   "text": "Ersatzneubau der Wache Wasserschutzpolizei, Quartier Enge, Objektkredit von 20,97 Millionen Franken",
+   "date": "2019-05-19",
+   "yes_share": {
+    "Kreis 3": 0.868,
+    "Kreis 6": 0.867,
+    "Kreis 9": 0.856,
+    "Kreis 10": 0.87,
+    "Kreis 11": 0.856,
+    "Kreis 12": 0.828
+   }
+  },
+  {
+   "text": "Neubau Schulanlage Freilager mit Energiezentrale, Quartier Albisrieden, Objektkredit von 63,3 Millionen Franken",
+   "date": "2019-05-19",
+   "yes_share": {
+    "Kreis 3": 0.861,
+    "Kreis 6": 0.868,
+    "Kreis 9": 0.7979999999999999,
+    "Kreis 10": 0.855,
+    "Kreis 11": 0.828,
+    "Kreis 12": 0.8059999999999999
+   }
+  },
+  {
+   "text": "Gegenvorschlag des Gemeinderats zur Volksinitiative «Ein Prozent gegen die globale Armut (1%-Initiative)»",
+   "date": "2019-11-17",
+   "yes_share": {
+    "Kreis 3": 0.758,
+    "Kreis 6": 0.721,
+    "Kreis 9": 0.682,
+    "Kreis 10": 0.7070000000000001,
+    "Kreis 11": 0.649,
+    "Kreis 12": 0.664
+   }
+  },
+  {
+   "text": "Liegenschaft Röschibachstrasse 24/26, Quartier Wipkingen, Instandsetzung und Umbau für das Sozialzentrum Hönggerstrasse, Übertragung vom Finanz- ins Verwaltungsvermögen, Objektkred",
+   "date": "2019-11-17",
+   "yes_share": {
+    "Kreis 3": 0.759,
+    "Kreis 6": 0.715,
+    "Kreis 9": 0.6759999999999999,
+    "Kreis 10": 0.696,
+    "Kreis 11": 0.647,
+    "Kreis 12": 0.6659999999999999
+   }
+  },
+  {
+   "text": "Neubau der Schulanlage Allmend im Gebiet Manegg, Quartier Wollishofen, Bau einer Passerelle, Übertragung vom Finanz- ins Verwaltungsvermögen, Objektkredit von 57,318875 Millionen F",
+   "date": "2019-11-17",
+   "yes_share": {
+    "Kreis 3": 0.919,
+    "Kreis 6": 0.903,
+    "Kreis 9": 0.87,
+    "Kreis 10": 0.893,
+    "Kreis 11": 0.868,
+    "Kreis 12": 0.8540000000000001
+   }
+  },
+  {
+   "text": "Vereinbarung zwischen dem Kanton Zürich und der Stadt Zürich über Errichtung und Betrieb des Forensischen Instituts Zürich (FOR)",
+   "date": "2019-11-17",
+   "yes_share": {
+    "Kreis 3": 0.9079999999999999,
+    "Kreis 6": 0.9059999999999999,
+    "Kreis 9": 0.872,
+    "Kreis 10": 0.892,
+    "Kreis 11": 0.862,
+    "Kreis 12": 0.84
+   }
+  },
+  {
+   "text": "Teilersatz Tramdepot Hard mit neuer kommunaler Wohnsiedlung, Industriequartier, Objektkredit von 203,525 Millionen Franken",
+   "date": "2020-02-09",
+   "yes_share": {
+    "Kreis 3": 0.7490000000000001,
+    "Kreis 6": 0.715,
+    "Kreis 9": 0.7,
+    "Kreis 10": 0.6809999999999999,
+    "Kreis 11": 0.69,
+    "Kreis 12": 0.687
+   }
+  },
+  {
+   "text": "Volksinitiative «Sichere Velorouten für Zürich»",
+   "date": "2020-09-27",
+   "yes_share": {
+    "Kreis 3": 0.778,
+    "Kreis 6": 0.748,
+    "Kreis 9": 0.664,
+    "Kreis 10": 0.706,
+    "Kreis 11": 0.647,
+    "Kreis 12": 0.621
+   }
+  },
+  {
+   "text": "Privater Gestaltungsplan «Areal Hardturm – Stadion»",
+   "date": "2020-09-27",
+   "yes_share": {
+    "Kreis 3": 0.58,
+    "Kreis 6": 0.598,
+    "Kreis 9": 0.614,
+    "Kreis 10": 0.51,
+    "Kreis 11": 0.62,
+    "Kreis 12": 0.614
+   }
+  },
+  {
+   "text": "Neuregelung Finanzkompetenzen für den Erwerb von Liegenschaften",
+   "date": "2020-09-27",
+   "yes_share": {
+    "Kreis 3": 0.741,
+    "Kreis 6": 0.685,
+    "Kreis 9": 0.659,
+    "Kreis 10": 0.6779999999999999,
+    "Kreis 11": 0.625,
+    "Kreis 12": 0.633
+   }
+  },
+  {
+   "text": "Instandsetzung und Optimierung ewz-Areal Herdern",
+   "date": "2020-09-27",
+   "yes_share": {
+    "Kreis 3": 0.902,
+    "Kreis 6": 0.895,
+    "Kreis 9": 0.871,
+    "Kreis 10": 0.897,
+    "Kreis 11": 0.85,
+    "Kreis 12": 0.828
+   }
+  },
+  {
+   "text": "Bau einer direkten Wasserleitung zwischen Limmat-, Glatt und Hangzone",
+   "date": "2020-09-27",
+   "yes_share": {
+    "Kreis 3": 0.937,
+    "Kreis 6": 0.9390000000000001,
+    "Kreis 9": 0.909,
+    "Kreis 10": 0.934,
+    "Kreis 11": 0.9129999999999999,
+    "Kreis 12": 0.897
+   }
+  },
+  {
+   "text": "Pro Senectute Kanton Zürich, Beiträge ab 2021",
+   "date": "2020-09-27",
+   "yes_share": {
+    "Kreis 3": 0.927,
+    "Kreis 6": 0.925,
+    "Kreis 9": 0.8859999999999999,
+    "Kreis 10": 0.9229999999999999,
+    "Kreis 11": 0.88,
+    "Kreis 12": 0.862
+   }
+  },
+  {
+   "text": "Gegenvorschlag des Gemeinderats zur Volksinitiative «Sportstadt Züri»",
+   "date": "2020-11-29",
+   "yes_share": {
+    "Kreis 3": 0.525,
+    "Kreis 6": 0.45799999999999996,
+    "Kreis 9": 0.444,
+    "Kreis 10": 0.467,
+    "Kreis 11": 0.41700000000000004,
+    "Kreis 12": 0.449
+   }
+  },
+  {
+   "text": "Öffentlicher Gestaltungsplan Thurgauerstrasse",
+   "date": "2020-11-29",
+   "yes_share": {
+    "Kreis 3": 0.626,
+    "Kreis 6": 0.603,
+    "Kreis 9": 0.597,
+    "Kreis 10": 0.589,
+    "Kreis 11": 0.5479999999999999,
+    "Kreis 12": 0.565
+   }
+  },
+  {
+   "text": "Neues Fördersystem Tanz und Theater",
+   "date": "2020-11-29",
+   "yes_share": {
+    "Kreis 3": 0.752,
+    "Kreis 6": 0.722,
+    "Kreis 9": 0.636,
+    "Kreis 10": 0.6940000000000001,
+    "Kreis 11": 0.599,
+    "Kreis 12": 0.588
+   }
+  },
+  {
+   "text": "Einhausung Schwamendingen mit Ueberlandpark",
+   "date": "2021-03-07",
+   "yes_share": {
+    "Kreis 3": 0.861,
+    "Kreis 6": 0.8640000000000001,
+    "Kreis 9": 0.8079999999999999,
+    "Kreis 10": 0.855,
+    "Kreis 11": 0.821,
+    "Kreis 12": 0.8490000000000001
+   }
+  },
+  {
+   "text": "Schulanlage und Quartierpark Areal Thurgauerstrasse",
+   "date": "2021-03-07",
+   "yes_share": {
+    "Kreis 3": 0.889,
+    "Kreis 6": 0.884,
+    "Kreis 9": 0.838,
+    "Kreis 10": 0.8759999999999999,
+    "Kreis 11": 0.828,
+    "Kreis 12": 0.8109999999999999
+   }
+  },
+  {
+   "text": "Wohnsiedlung Letzi",
+   "date": "2021-03-07",
+   "yes_share": {
+    "Kreis 3": 0.847,
+    "Kreis 6": 0.81,
+    "Kreis 9": 0.7879999999999999,
+    "Kreis 10": 0.805,
+    "Kreis 11": 0.73,
+    "Kreis 12": 0.72
+   }
+  },
+  {
+   "text": "Schulanlage und Quartierpark Areal Guggach",
+   "date": "2021-03-07",
+   "yes_share": {
+    "Kreis 3": 0.9009999999999999,
+    "Kreis 6": 0.894,
+    "Kreis 9": 0.851,
+    "Kreis 10": 0.8909999999999999,
+    "Kreis 11": 0.85,
+    "Kreis 12": 0.8170000000000001
+   }
+  },
+  {
+   "text": "Totalrevision der Gemeindeordnung",
+   "date": "2021-06-13",
+   "yes_share": {
+    "Kreis 3": 0.8059999999999999,
+    "Kreis 6": 0.785,
+    "Kreis 9": 0.73,
+    "Kreis 10": 0.76,
+    "Kreis 11": 0.708,
+    "Kreis 12": 0.691
+   }
+  },
+  {
+   "text": "Rahmenkredit von 200 Millionen Franken für den Ausbau von erneuerbaren Energien",
+   "date": "2021-06-13",
+   "yes_share": {
+    "Kreis 3": 0.868,
+    "Kreis 6": 0.8640000000000001,
+    "Kreis 9": 0.802,
+    "Kreis 10": 0.845,
+    "Kreis 11": 0.7859999999999999,
+    "Kreis 12": 0.762
+   }
+  },
+  {
+   "text": "Ausbau Stadttunnel als Veloverbindung",
+   "date": "2021-06-13",
+   "yes_share": {
+    "Kreis 3": 0.797,
+    "Kreis 6": 0.7909999999999999,
+    "Kreis 9": 0.675,
+    "Kreis 10": 0.752,
+    "Kreis 11": 0.6679999999999999,
+    "Kreis 12": 0.619
+   }
+  },
+  {
+   "text": "Volksinitiative zum Schutz der Besonnung des öffentlichen Grünraums am Seeufer",
+   "date": "2021-09-26",
+   "yes_share": {
+    "Kreis 3": 0.465,
+    "Kreis 6": 0.41700000000000004,
+    "Kreis 9": 0.41700000000000004,
+    "Kreis 10": 0.40700000000000003,
+    "Kreis 11": 0.402,
+    "Kreis 12": 0.445
+   }
+  },
+  {
+   "text": "Neubau Wache Nord mit zentraler Einsatzlogistik für Schutz & Rettung Zürich",
+   "date": "2021-09-26",
+   "yes_share": {
+    "Kreis 3": 0.924,
+    "Kreis 6": 0.9209999999999999,
+    "Kreis 9": 0.907,
+    "Kreis 10": 0.924,
+    "Kreis 11": 0.8959999999999999,
+    "Kreis 12": 0.894
+   }
+  },
+  {
+   "text": "Kommunaler Richtplan Siedlung, Landschaft, öffentliche Bauten und Anlagen",
+   "date": "2021-11-28",
+   "yes_share": {
+    "Kreis 3": 0.688,
+    "Kreis 6": 0.6559999999999999,
+    "Kreis 9": 0.565,
+    "Kreis 10": 0.619,
+    "Kreis 11": 0.562,
+    "Kreis 12": 0.544
+   }
+  },
+  {
+   "text": "Kommunaler Richtplan Verkehr",
+   "date": "2021-11-28",
+   "yes_share": {
+    "Kreis 3": 0.6509999999999999,
+    "Kreis 6": 0.626,
+    "Kreis 9": 0.517,
+    "Kreis 10": 0.5870000000000001,
+    "Kreis 11": 0.519,
+    "Kreis 12": 0.49200000000000005
+   }
+  },
+  {
+   "text": "Rahmenkredit von 330 Millionen Franken für den Ausbau der Fernwärmeversorgung",
+   "date": "2021-11-28",
+   "yes_share": {
+    "Kreis 3": 0.865,
+    "Kreis 6": 0.887,
+    "Kreis 9": 0.804,
+    "Kreis 10": 0.8540000000000001,
+    "Kreis 11": 0.804,
+    "Kreis 12": 0.7709999999999999
+   }
+  },
+  {
+   "text": "Ersatzneubau Wohnsiedlung Hardau I, Objektkredit von 70,714 Millionen Franken",
+   "date": "2021-11-28",
+   "yes_share": {
+    "Kreis 3": 0.836,
+    "Kreis 6": 0.8290000000000001,
+    "Kreis 9": 0.774,
+    "Kreis 10": 0.8059999999999999,
+    "Kreis 11": 0.75,
+    "Kreis 12": 0.722
+   }
+  },
+  {
+   "text": "Klimaschutzziel Netto-Null 2040",
+   "date": "2022-05-15",
+   "yes_share": {
+    "Kreis 3": 0.802,
+    "Kreis 6": 0.79,
+    "Kreis 9": 0.7140000000000001,
+    "Kreis 10": 0.76,
+    "Kreis 11": 0.6970000000000001,
+    "Kreis 12": 0.665
+   }
+  },
+  {
+   "text": "Koch-Park, Objektkredit von 22,883 Millionen Franken",
+   "date": "2022-05-15",
+   "yes_share": {
+    "Kreis 3": 0.823,
+    "Kreis 6": 0.797,
+    "Kreis 9": 0.777,
+    "Kreis 10": 0.779,
+    "Kreis 11": 0.7120000000000001,
+    "Kreis 12": 0.687
+   }
+  },
+  {
+   "text": "Schulanlage Borrweg, Objektkredit von 83,3 Millionen Franken",
+   "date": "2022-05-15",
+   "yes_share": {
+    "Kreis 3": 0.875,
+    "Kreis 6": 0.851,
+    "Kreis 9": 0.813,
+    "Kreis 10": 0.8320000000000001,
+    "Kreis 11": 0.8,
+    "Kreis 12": 0.769
+   }
+  },
+  {
+   "text": "Schulanlage Lavater, Objektkredit von 34,3 Millionen Franken",
+   "date": "2022-05-15",
+   "yes_share": {
+    "Kreis 3": 0.9129999999999999,
+    "Kreis 6": 0.904,
+    "Kreis 9": 0.867,
+    "Kreis 10": 0.895,
+    "Kreis 11": 0.865,
+    "Kreis 12": 0.84
+   }
+  },
+  {
+   "text": "Sekundarschule Radiostudio Brunnenhof, Objektkredit von 82,4 Millionen Franken",
+   "date": "2022-05-15",
+   "yes_share": {
+    "Kreis 3": 0.868,
+    "Kreis 6": 0.85,
+    "Kreis 9": 0.8079999999999999,
+    "Kreis 10": 0.843,
+    "Kreis 11": 0.809,
+    "Kreis 12": 0.777
+   }
+  },
+  {
+   "text": "Vorbereitungsarbeiten zur Einführung der Züri City-Card, Rahmenkredit von 3,2 Millionen Franken",
+   "date": "2022-05-15",
+   "yes_share": {
+    "Kreis 3": 0.605,
+    "Kreis 6": 0.555,
+    "Kreis 9": 0.48200000000000004,
+    "Kreis 10": 0.524,
+    "Kreis 11": 0.43700000000000006,
+    "Kreis 12": 0.436
+   }
+  },
+  {
+   "text": "A. Definitive Einführung der Tagesschule, Verordnung über die Tagesschulen (VTS), VTS Stadtrat (Variante des Stadtrats)",
+   "date": "2022-09-25",
+   "yes_share": {
+    "Kreis 3": 0.46,
+    "Kreis 6": 0.503,
+    "Kreis 9": 0.48200000000000004,
+    "Kreis 10": 0.47600000000000003,
+    "Kreis 11": 0.495,
+    "Kreis 12": 0.455
+   }
+  },
+  {
+   "text": "B. Definitive Einführung der Tagesschule, Verordnung über die Tagesschulen (VTS), VTS Gemeinderat (Variante des Gemeinderats)",
+   "date": "2022-09-25",
+   "yes_share": {
+    "Kreis 3": 0.726,
+    "Kreis 6": 0.6829999999999999,
+    "Kreis 9": 0.6579999999999999,
+    "Kreis 10": 0.675,
+    "Kreis 11": 0.632,
+    "Kreis 12": 0.618
+   }
+  },
+  {
+   "text": "C. Stichfrage: Welche der beiden Verordnungen über die Tagesschulen der städtischen Volksschule soll in Kraft treten, falls sowohl die VTS Stadtrat (Variante des Stadtrats) als auc",
+   "date": "2022-09-25",
+   "yes_share": {
+    "Kreis 3": 0.321,
+    "Kreis 6": 0.37200000000000005,
+    "Kreis 9": 0.381,
+    "Kreis 10": 0.373,
+    "Kreis 11": 0.41700000000000004,
+    "Kreis 12": 0.39799999999999996
+   }
+  },
+  {
+   "text": "Definitive Einführung der Tagesschule, Änderung der Gemeindeordnung",
+   "date": "2022-09-25",
+   "yes_share": {
+    "Kreis 3": 0.8290000000000001,
+    "Kreis 6": 0.831,
+    "Kreis 9": 0.78,
+    "Kreis 10": 0.81,
+    "Kreis 11": 0.7659999999999999,
+    "Kreis 12": 0.722
+   }
+  },
+  {
+   "text": "Sekundarschulanlage Im Isengrind, Objektkredit von 80,6 Millionen Franken",
+   "date": "2022-09-25",
+   "yes_share": {
+    "Kreis 3": 0.895,
+    "Kreis 6": 0.8909999999999999,
+    "Kreis 9": 0.856,
+    "Kreis 10": 0.879,
+    "Kreis 11": 0.855,
+    "Kreis 12": 0.825
+   }
+  },
+  {
+   "text": "Volksinitiative «Eine Europaallee genügt – jetzt SBB-Areal Neugasse kaufen»",
+   "date": "2022-09-25",
+   "yes_share": {
+    "Kreis 3": 0.579,
+    "Kreis 6": 0.498,
+    "Kreis 9": 0.493,
+    "Kreis 10": 0.514,
+    "Kreis 11": 0.461,
+    "Kreis 12": 0.49
+   }
+  },
+  {
+   "text": "Volksinitiative «Wissenschaftlicher Pilotversuch Grundeinkommen»",
+   "date": "2022-09-25",
+   "yes_share": {
+    "Kreis 3": 0.5429999999999999,
+    "Kreis 6": 0.479,
+    "Kreis 9": 0.441,
+    "Kreis 10": 0.469,
+    "Kreis 11": 0.405,
+    "Kreis 12": 0.413
+   }
+  },
+  {
+   "text": "Rahmenkredit von 573 Millionen Franken für den Ausbau der thermischen Netze",
+   "date": "2022-11-27",
+   "yes_share": {
+    "Kreis 3": 0.867,
+    "Kreis 6": 0.862,
+    "Kreis 9": 0.8290000000000001,
+    "Kreis 10": 0.85,
+    "Kreis 11": 0.8,
+    "Kreis 12": 0.792
+   }
+  },
+  {
+   "text": "Betriebsbeiträge Pestalozzi-Bibliothek Zürich",
+   "date": "2023-06-18",
+   "yes_share": {
+    "Kreis 3": 0.907,
+    "Kreis 6": 0.919,
+    "Kreis 9": 0.8640000000000001,
+    "Kreis 10": 0.907,
+    "Kreis 11": 0.8540000000000001,
+    "Kreis 12": 0.8220000000000001
+   }
+  },
+  {
+   "text": "Gegenvorschlag zur Volksinitiative «Ein Lohn zum Leben»",
+   "date": "2023-06-18",
+   "yes_share": {
+    "Kreis 3": 0.765,
+    "Kreis 6": 0.7040000000000001,
+    "Kreis 9": 0.7,
+    "Kreis 10": 0.703,
+    "Kreis 11": 0.6679999999999999,
+    "Kreis 12": 0.695
+   }
+  },
+  {
+   "text": "Schulanlage Saatlen, Ausgaben von 231 Millionen Franken",
+   "date": "2023-06-18",
+   "yes_share": {
+    "Kreis 3": 0.8370000000000001,
+    "Kreis 6": 0.818,
+    "Kreis 9": 0.7909999999999999,
+    "Kreis 10": 0.8,
+    "Kreis 11": 0.787,
+    "Kreis 12": 0.769
+   }
+  },
+  {
+   "text": "Wohnraumfonds, Objektkredit von 100 Millionen Franken und Rahmenkredit von 200 Millionen Franken",
+   "date": "2023-06-18",
+   "yes_share": {
+    "Kreis 3": 0.743,
+    "Kreis 6": 0.682,
+    "Kreis 9": 0.6579999999999999,
+    "Kreis 10": 0.674,
+    "Kreis 11": 0.61,
+    "Kreis 12": 0.649
+   }
+  },
+  {
+   "text": "Wohnraumfonds, Änderung der Gemeindeordnung",
+   "date": "2023-06-18",
+   "yes_share": {
+    "Kreis 3": 0.748,
+    "Kreis 6": 0.685,
+    "Kreis 9": 0.662,
+    "Kreis 10": 0.679,
+    "Kreis 11": 0.618,
+    "Kreis 12": 0.6509999999999999
+   }
+  },
+  {
+   "text": "A. Volksinitiative «Stadtgrün» (Änderung der Gemeindeordnung)",
+   "date": "2023-09-03",
+   "yes_share": {
+    "Kreis 3": 0.23800000000000002,
+    "Kreis 6": 0.217,
+    "Kreis 9": 0.21,
+    "Kreis 10": 0.204,
+    "Kreis 11": 0.201,
+    "Kreis 12": 0.222
+   }
+  },
+  {
+   "text": "B. Direkter Gegenvorschlag zur Volksinitiative «Stadtgrün» (Änderung der Gemeindeordnung)",
+   "date": "2023-09-03",
+   "yes_share": {
+    "Kreis 3": 0.752,
+    "Kreis 6": 0.713,
+    "Kreis 9": 0.679,
+    "Kreis 10": 0.6890000000000001,
+    "Kreis 11": 0.654,
+    "Kreis 12": 0.652
+   }
+  },
+  {
+   "text": "C. Stichfrage: Welche der beiden Teilvorlagen soll in Kraft treten, falls sowohl die Volksinitiative «Stadtgrün» (A.) als auch der direkte Gegenvorschlag (B.) angenommen werden?",
+   "date": "2023-09-03",
+   "yes_share": {
+    "Kreis 3": 0.179,
+    "Kreis 6": 0.158,
+    "Kreis 9": 0.168,
+    "Kreis 10": 0.162,
+    "Kreis 11": 0.172,
+    "Kreis 12": 0.195
+   }
+  },
+  {
+   "text": "D. Indirekter Gegenvorschlag zur Volksinitiative «Stadtgrün» (Rahmenkredit von 130 Millionen Franken)",
+   "date": "2023-09-03",
+   "yes_share": {
+    "Kreis 3": 0.708,
+    "Kreis 6": 0.659,
+    "Kreis 9": 0.63,
+    "Kreis 10": 0.642,
+    "Kreis 11": 0.604,
+    "Kreis 12": 0.606
+   }
+  },
+  {
+   "text": "Dritte Verbrennungslinie Kehrichtverwertungsanlage Hagenholz, Ausgaben von 367 Millionen Franken",
+   "date": "2023-09-03",
+   "yes_share": {
+    "Kreis 3": 0.929,
+    "Kreis 6": 0.9259999999999999,
+    "Kreis 9": 0.897,
+    "Kreis 10": 0.912,
+    "Kreis 11": 0.892,
+    "Kreis 12": 0.8690000000000001
+   }
+  },
+  {
+   "text": "Neubau und Erweiterung Schulanlage Triemli / In der Ey, Ausgaben von 151,5 Millionen Franken",
+   "date": "2023-09-03",
+   "yes_share": {
+    "Kreis 3": 0.841,
+    "Kreis 6": 0.797,
+    "Kreis 9": 0.8109999999999999,
+    "Kreis 10": 0.799,
+    "Kreis 11": 0.7709999999999999,
+    "Kreis 12": 0.772
+   }
+  },
+  {
+   "text": "A. Volksinitiative «Keine goldenen Fallschirme für abtretende Behördenmitglieder»",
+   "date": "2024-03-03",
+   "yes_share": {
+    "Kreis 3": 0.528,
+    "Kreis 6": 0.523,
+    "Kreis 9": 0.5820000000000001,
+    "Kreis 10": 0.5479999999999999,
+    "Kreis 11": 0.591,
+    "Kreis 12": 0.595
+   }
+  },
+  {
+   "text": "B. Gegenvorschlag zur Volksinitiative «Keine goldenen Fallschirme für abtretende Behördenmitglieder»",
+   "date": "2024-03-03",
+   "yes_share": {
+    "Kreis 3": 0.735,
+    "Kreis 6": 0.754,
+    "Kreis 9": 0.675,
+    "Kreis 10": 0.725,
+    "Kreis 11": 0.672,
+    "Kreis 12": 0.631
+   }
+  },
+  {
+   "text": "C. Stichfrage: Welche der beiden Vorlagen soll in Kraft treten, falls sowohl die Volksinitiative «Keine goldenen Fallschirme für abtretende Behördenmitglieder» (A.) als auch der Ge",
+   "date": "2024-03-03",
+   "yes_share": {
+    "Kreis 3": 0.426,
+    "Kreis 6": 0.41700000000000004,
+    "Kreis 9": 0.5,
+    "Kreis 10": 0.449,
+    "Kreis 11": 0.523,
+    "Kreis 12": 0.552
+   }
+  },
+  {
+   "text": "Volksinitiative «Mythen-Park»",
+   "date": "2024-03-03",
+   "yes_share": {
+    "Kreis 3": 0.409,
+    "Kreis 6": 0.353,
+    "Kreis 9": 0.326,
+    "Kreis 10": 0.35,
+    "Kreis 11": 0.302,
+    "Kreis 12": 0.3
+   }
+  },
+  {
+   "text": "Plus 2000 Alterswohnungen bis 2035, Änderung der Gemeindeordnung",
+   "date": "2024-06-09",
+   "yes_share": {
+    "Kreis 3": 0.9309999999999999,
+    "Kreis 6": 0.9109999999999999,
+    "Kreis 9": 0.9179999999999999,
+    "Kreis 10": 0.924,
+    "Kreis 11": 0.902,
+    "Kreis 12": 0.91
+   }
+  },
+  {
+   "text": "Rahmenkredit von 200 Millionen Franken für Energielösungen des ewz",
+   "date": "2024-06-09",
+   "yes_share": {
+    "Kreis 3": 0.9079999999999999,
+    "Kreis 6": 0.91,
+    "Kreis 9": 0.882,
+    "Kreis 10": 0.9059999999999999,
+    "Kreis 11": 0.8740000000000001,
+    "Kreis 12": 0.8490000000000001
+   }
+  },
+  {
+   "text": "Umbau und Erweiterung Wache Süd, Ausgaben von 69,75 Millionen Franken",
+   "date": "2024-06-09",
+   "yes_share": {
+    "Kreis 3": 0.904,
+    "Kreis 6": 0.898,
+    "Kreis 9": 0.8809999999999999,
+    "Kreis 10": 0.904,
+    "Kreis 11": 0.877,
+    "Kreis 12": 0.846
+   }
+  },
+  {
+   "text": "A. Volksinitiative «Uferschutz»",
+   "date": "2024-09-22",
+   "yes_share": {
+    "Kreis 3": 0.353,
+    "Kreis 6": 0.331,
+    "Kreis 9": 0.31,
+    "Kreis 10": 0.366,
+    "Kreis 11": 0.316,
+    "Kreis 12": 0.326
+   }
+  },
+  {
+   "text": "B. Gegenvorschlag zur Volksinitiative «Uferschutz»",
+   "date": "2024-09-22",
+   "yes_share": {
+    "Kreis 3": 0.6829999999999999,
+    "Kreis 6": 0.6509999999999999,
+    "Kreis 9": 0.608,
+    "Kreis 10": 0.645,
+    "Kreis 11": 0.595,
+    "Kreis 12": 0.579
+   }
+  },
+  {
+   "text": "C. Stichfrage: Welche der beiden Teilvorlagen soll in Kraft treten, falls sowohl die Volksinitiative «Uferschutz» (A.) als auch der Gegenvorschlag (B.) angenommen werden?",
+   "date": "2024-09-22",
+   "yes_share": {
+    "Kreis 3": 0.218,
+    "Kreis 6": 0.217,
+    "Kreis 9": 0.22399999999999998,
+    "Kreis 10": 0.26,
+    "Kreis 11": 0.22899999999999998,
+    "Kreis 12": 0.263
+   }
+  },
+  {
+   "text": "CO₂-Abscheidung auf dem Areal Werdhölzli, Ausgaben von 35,474 Millionen Franken einmalig und 14,212 Millionen Franken jährlich",
+   "date": "2024-09-22",
+   "yes_share": {
+    "Kreis 3": 0.8,
+    "Kreis 6": 0.775,
+    "Kreis 9": 0.747,
+    "Kreis 10": 0.769,
+    "Kreis 11": 0.711,
+    "Kreis 12": 0.688
+   }
+  },
+  {
+   "text": "Erweiterung Schulanlage Luchswiesen, Ausgaben von 102,4 Millionen Franken",
+   "date": "2024-09-22",
+   "yes_share": {
+    "Kreis 3": 0.794,
+    "Kreis 6": 0.764,
+    "Kreis 9": 0.732,
+    "Kreis 10": 0.7559999999999999,
+    "Kreis 11": 0.7090000000000001,
+    "Kreis 12": 0.745
+   }
+  },
+  {
+   "text": "Gegenvorschlag zur Volksinitiative «Initiative für ein gesundes Stadtklima (Gute-Luft-Initiative)»",
+   "date": "2024-09-22",
+   "yes_share": {
+    "Kreis 3": 0.74,
+    "Kreis 6": 0.687,
+    "Kreis 9": 0.638,
+    "Kreis 10": 0.664,
+    "Kreis 11": 0.617,
+    "Kreis 12": 0.604
+   }
+  },
+  {
+   "text": "Gegenvorschlag zur Volksinitiative «Initiative für eine zukunftsfähige Mobilität (Zukunfts-Initiative)»",
+   "date": "2024-09-22",
+   "yes_share": {
+    "Kreis 3": 0.711,
+    "Kreis 6": 0.659,
+    "Kreis 9": 0.6,
+    "Kreis 10": 0.629,
+    "Kreis 11": 0.569,
+    "Kreis 12": 0.535
+   }
+  },
+  {
+   "text": "Neubau Schulanlage Tüffenwies, Ausgaben von 111 Millionen Franken",
+   "date": "2024-09-22",
+   "yes_share": {
+    "Kreis 3": 0.792,
+    "Kreis 6": 0.759,
+    "Kreis 9": 0.737,
+    "Kreis 10": 0.7509999999999999,
+    "Kreis 11": 0.701,
+    "Kreis 12": 0.705
+   }
+  },
+  {
+   "text": "Rahmenkredit von 300 Millionen Franken für die Stromproduktion mit erneuerbarer Energie",
+   "date": "2024-09-22",
+   "yes_share": {
+    "Kreis 3": 0.863,
+    "Kreis 6": 0.851,
+    "Kreis 9": 0.8170000000000001,
+    "Kreis 10": 0.835,
+    "Kreis 11": 0.794,
+    "Kreis 12": 0.777
+   }
+  },
+  {
+   "text": "Umbau Liegenschaft Krähbühlstrasse 58 für Sekundarschule und Bau temporäre Sporthalle, Ausgaben von 22,9 Millionen Franken",
+   "date": "2024-09-22",
+   "yes_share": {
+    "Kreis 3": 0.672,
+    "Kreis 6": 0.654,
+    "Kreis 9": 0.637,
+    "Kreis 10": 0.652,
+    "Kreis 11": 0.612,
+    "Kreis 12": 0.611
+   }
+  },
+  {
+   "text": "A. Direkter Gegenvorschlag zur Volksinitiative «Bezahlbare Wohnungen für Zürich» (Änderung der Gemeindeordnung)",
+   "date": "2024-11-24",
+   "yes_share": {
+    "Kreis 3": 0.7120000000000001,
+    "Kreis 6": 0.639,
+    "Kreis 9": 0.645,
+    "Kreis 10": 0.65,
+    "Kreis 11": 0.589,
+    "Kreis 12": 0.633
+   }
+  },
+  {
+   "text": "Abgangsleistungen an Behördenmitglieder, Änderung der Verordnung über Abgangsleistungen für Behördenmitglieder und der Verordnung über das Arbeitsverhältnis des städtischen Persona",
+   "date": "2024-11-24",
+   "yes_share": {
+    "Kreis 3": 0.682,
+    "Kreis 6": 0.655,
+    "Kreis 9": 0.595,
+    "Kreis 10": 0.642,
+    "Kreis 11": 0.5760000000000001,
+    "Kreis 12": 0.56
+   }
+  },
+  {
+   "text": "B. Indirekter Gegenvorschlag zur Volksinitiative «Bezahlbare Wohnungen für Zürich» (Übertragung Vermögenswerte von 300 Millionen Franken zur Aufstockung der Stiftungskapitalien der",
+   "date": "2024-11-24",
+   "yes_share": {
+    "Kreis 3": 0.696,
+    "Kreis 6": 0.618,
+    "Kreis 9": 0.619,
+    "Kreis 10": 0.627,
+    "Kreis 11": 0.556,
+    "Kreis 12": 0.593
+   }
+  },
+  {
+   "text": "Ersatzneubau Rathausbrücke, Ausgaben von 58,345 Millionen Franken",
+   "date": "2024-11-24",
+   "yes_share": {
+    "Kreis 3": 0.802,
+    "Kreis 6": 0.7879999999999999,
+    "Kreis 9": 0.75,
+    "Kreis 10": 0.779,
+    "Kreis 11": 0.721,
+    "Kreis 12": 0.695
+   }
+  },
+  {
+   "text": "Privater Gestaltungsplan «Areal VZA1», UBS-Gebäude in Altstetten",
+   "date": "2024-11-24",
+   "yes_share": {
+    "Kreis 3": 0.622,
+    "Kreis 6": 0.664,
+    "Kreis 9": 0.616,
+    "Kreis 10": 0.624,
+    "Kreis 11": 0.639,
+    "Kreis 12": 0.596
+   }
+  },
+  {
+   "text": "Volksinitiative «Tschüss Genderstern!»",
+   "date": "2024-11-24",
+   "yes_share": {
+    "Kreis 3": 0.33299999999999996,
+    "Kreis 6": 0.391,
+    "Kreis 9": 0.442,
+    "Kreis 10": 0.39899999999999997,
+    "Kreis 11": 0.506,
+    "Kreis 12": 0.525
+   }
+  },
+  {
+   "text": "Entschädigungen des Gemeinderats (Totalrevision der Entschädigungsverordnung des Gemeinderats)",
+   "date": "2025-02-09",
+   "yes_share": {
+    "Kreis 3": 0.5479999999999999,
+    "Kreis 6": 0.503,
+    "Kreis 9": 0.439,
+    "Kreis 10": 0.489,
+    "Kreis 11": 0.415,
+    "Kreis 12": 0.401
+   }
+  },
+  {
+   "text": "Ersatzneubau Wohnsiedlung Salzweg mit Kindergarten, Ausgaben von 118,7 Millionen Franken",
+   "date": "2025-05-18",
+   "yes_share": {
+    "Kreis 3": 0.826,
+    "Kreis 6": 0.8,
+    "Kreis 9": 0.8,
+    "Kreis 10": 0.789,
+    "Kreis 11": 0.7559999999999999,
+    "Kreis 12": 0.75
+   }
+  },
+  {
+   "text": "Erweiterung Schulanlage Entlisberg, Ausgaben von 54 Millionen Franken",
+   "date": "2025-05-18",
+   "yes_share": {
+    "Kreis 3": 0.7490000000000001,
+    "Kreis 6": 0.685,
+    "Kreis 9": 0.6890000000000001,
+    "Kreis 10": 0.6859999999999999,
+    "Kreis 11": 0.657,
+    "Kreis 12": 0.659
+   }
+  },
+  {
+   "text": "Übertrag der Beteiligung an der Betreiberin des Flughafens vom Finanz- ins Verwaltungsvermögen, Objektkredit von rund 334,04 Millionen Franken",
+   "date": "2025-05-18",
+   "yes_share": {
+    "Kreis 3": 0.701,
+    "Kreis 6": 0.7440000000000001,
+    "Kreis 9": 0.7170000000000001,
+    "Kreis 10": 0.72,
+    "Kreis 11": 0.732,
+    "Kreis 12": 0.667
+   }
+  },
+  {
+   "text": "Einsatzbeschränkung Laubbläser und Laubsauger, Teilrevision der Allgemeinen Polizeiverordnung",
+   "date": "2025-09-28",
+   "yes_share": {
+    "Kreis 3": 0.655,
+    "Kreis 6": 0.6409999999999999,
+    "Kreis 9": 0.606,
+    "Kreis 10": 0.643,
+    "Kreis 11": 0.583,
+    "Kreis 12": 0.555
+   }
+  },
+  {
+   "text": "Ersatzneubau Sportzentrum Oerlikon, Ausgaben von 373 Millionen Franken",
+   "date": "2025-09-28",
+   "yes_share": {
+    "Kreis 3": 0.677,
+    "Kreis 6": 0.688,
+    "Kreis 9": 0.6579999999999999,
+    "Kreis 10": 0.6679999999999999,
+    "Kreis 11": 0.695,
+    "Kreis 12": 0.682
+   }
+  },
+  {
+   "text": "Ersatzneubau von Haus A des Gesundheitszentrums für das Alter Bachwiesen, Ausgaben von 92,4 Millionen Franken",
+   "date": "2025-09-28",
+   "yes_share": {
+    "Kreis 3": 0.9129999999999999,
+    "Kreis 6": 0.899,
+    "Kreis 9": 0.9129999999999999,
+    "Kreis 10": 0.909,
+    "Kreis 11": 0.8809999999999999,
+    "Kreis 12": 0.861
+   }
+  },
+  {
+   "text": "Parkkartenverordnung, Neuerlass der Verordnung über die Parkierungs- und Zufahrtsbewilligungen (PKV)",
+   "date": "2025-09-28",
+   "yes_share": {
+    "Kreis 3": 0.602,
+    "Kreis 6": 0.557,
+    "Kreis 9": 0.515,
+    "Kreis 10": 0.56,
+    "Kreis 11": 0.493,
+    "Kreis 12": 0.44799999999999995
+   }
+  },
+  {
+   "text": "Sportanlage Juchhof 3, Ersatzneubau Garderobengebäude und Umbau Rasenspielfelder, Ausgaben von 25,66 Millionen Franken",
+   "date": "2025-09-28",
+   "yes_share": {
+    "Kreis 3": 0.848,
+    "Kreis 6": 0.84,
+    "Kreis 9": 0.8270000000000001,
+    "Kreis 10": 0.846,
+    "Kreis 11": 0.8029999999999999,
+    "Kreis 12": 0.774
+   }
+  },
+  {
+   "text": "Volksinitiative «VBZ-Abo für 365 Franken»",
+   "date": "2025-09-28",
+   "yes_share": {
+    "Kreis 3": 0.68,
+    "Kreis 6": 0.619,
+    "Kreis 9": 0.648,
+    "Kreis 10": 0.625,
+    "Kreis 11": 0.634,
+    "Kreis 12": 0.6859999999999999
+   }
+  },
+  {
+   "text": "ELCH Familienzentren, jährliche Beiträge von 2,326 Millionen Franken ab 2027",
+   "date": "2025-11-30",
+   "yes_share": {
+    "Kreis 3": 0.789,
+    "Kreis 6": 0.784,
+    "Kreis 9": 0.718,
+    "Kreis 10": 0.764,
+    "Kreis 11": 0.733,
+    "Kreis 12": 0.6990000000000001
+   }
+  },
+  {
+   "text": "Ersatzneubau Wohnsiedlung Luchswiese und Betreuungsgebäude Schulanlage Luchswiesen, Ausgaben von 77,4 Millionen Franken",
+   "date": "2025-11-30",
+   "yes_share": {
+    "Kreis 3": 0.831,
+    "Kreis 6": 0.8190000000000001,
+    "Kreis 9": 0.779,
+    "Kreis 10": 0.804,
+    "Kreis 11": 0.777,
+    "Kreis 12": 0.7829999999999999
+   }
+  },
+  {
+   "text": "Erweiterung Schulanlage Riedhof, Ausgaben von 108 Millionen Franken",
+   "date": "2025-11-30",
+   "yes_share": {
+    "Kreis 3": 0.767,
+    "Kreis 6": 0.7559999999999999,
+    "Kreis 9": 0.7240000000000001,
+    "Kreis 10": 0.77,
+    "Kreis 11": 0.715,
+    "Kreis 12": 0.698
+   }
+  },
+  {
+   "text": "Neue Bestimmungen Wahlbüro und Mehrheitswahlen, Änderung Gemeindeordnung",
+   "date": "2025-11-30",
+   "yes_share": {
+    "Kreis 3": 0.917,
+    "Kreis 6": 0.92,
+    "Kreis 9": 0.875,
+    "Kreis 10": 0.912,
+    "Kreis 11": 0.87,
+    "Kreis 12": 0.8270000000000001
+   }
+  },
+  {
+   "text": "Privater Gestaltungsplan «Seebahn-Höfe»",
+   "date": "2025-11-30",
+   "yes_share": {
+    "Kreis 3": 0.7170000000000001,
+    "Kreis 6": 0.736,
+    "Kreis 9": 0.711,
+    "Kreis 10": 0.7290000000000001,
+    "Kreis 11": 0.7240000000000001,
+    "Kreis 12": 0.685
+   }
+  },
+  {
+   "text": "Rahmenkredit von 350 Millionen Franken für die Veloinfrastruktur",
+   "date": "2025-11-30",
+   "yes_share": {
+    "Kreis 3": 0.6459999999999999,
+    "Kreis 6": 0.603,
+    "Kreis 9": 0.517,
+    "Kreis 10": 0.573,
+    "Kreis 11": 0.488,
+    "Kreis 12": 0.449
+   }
+  },
+  {
+   "text": "Volksinitiative «Zur Entlastung der Bevölkerung von steigenden Krankenkassenprämien (Prämienentlastungs-Initiative)»",
+   "date": "2025-11-30",
+   "yes_share": {
+    "Kreis 3": 0.636,
+    "Kreis 6": 0.5489999999999999,
+    "Kreis 9": 0.591,
+    "Kreis 10": 0.574,
+    "Kreis 11": 0.5589999999999999,
+    "Kreis 12": 0.627
+   }
+  },
+  {
+   "text": "Ersatzneubau Schulanlage Utogrund und Instandsetzung Sportanlage Utogrund, Ausgaben von 138 Millionen Franken",
+   "date": "2026-06-14",
+   "yes_share": {
+    "Kreis 3": 0.833,
+    "Kreis 6": 0.8,
+    "Kreis 9": 0.8009999999999999,
+    "Kreis 10": 0.7929999999999999,
+    "Kreis 11": 0.74,
+    "Kreis 12": 0.721
+   }
+  },
+  {
+   "text": "Festlegung der Taxen in den Gesundheitszentren für das Alter, Änderung der Verordnung über städtische Einrichtungen für ältere unterstützungsbedürftige oder pflegebedürftige Person",
+   "date": "2026-06-14",
+   "yes_share": {
+    "Kreis 3": 0.5820000000000001,
+    "Kreis 6": 0.524,
+    "Kreis 9": 0.539,
+    "Kreis 10": 0.534,
+    "Kreis 11": 0.509,
+    "Kreis 12": 0.541
+   }
+  },
+  {
+   "text": "Neubau Recyclingzentrum Juch-Areal, Ausgaben von insgesamt 33,1 Millionen Franken",
+   "date": "2026-06-14",
+   "yes_share": {
+    "Kreis 3": 0.878,
+    "Kreis 6": 0.884,
+    "Kreis 9": 0.868,
+    "Kreis 10": 0.88,
+    "Kreis 11": 0.8420000000000001,
+    "Kreis 12": 0.8190000000000001
+   }
+  },
+  {
+   "text": "Neubau Schulanlage Höckler, Ausgaben von 141 Millionen Franken",
+   "date": "2026-06-14",
+   "yes_share": {
+    "Kreis 3": 0.604,
+    "Kreis 6": 0.5579999999999999,
+    "Kreis 9": 0.5660000000000001,
+    "Kreis 10": 0.547,
+    "Kreis 11": 0.535,
+    "Kreis 12": 0.54
+   }
+  },
+  {
+   "text": "Neuerlass der Verordnung über die Umsetzung von § 49 b Planungs- und Baugesetz (UmV § 49 b PBG)",
+   "date": "2026-06-14",
+   "yes_share": {
+    "Kreis 3": 0.634,
+    "Kreis 6": 0.579,
+    "Kreis 9": 0.581,
+    "Kreis 10": 0.586,
+    "Kreis 11": 0.542,
+    "Kreis 12": 0.5660000000000001
+   }
+  },
+  {
+   "text": "Rahmenkredit von 2,26 Milliarden Franken für thermische Netze",
+   "date": "2026-06-14",
+   "yes_share": {
+    "Kreis 3": 0.851,
+    "Kreis 6": 0.8390000000000001,
+    "Kreis 9": 0.785,
+    "Kreis 10": 0.821,
+    "Kreis 11": 0.765,
+    "Kreis 12": 0.74
+   }
+  },
+  {
+   "text": "Rahmenkredit von 40 Millionen Franken für den Jugendwohnkredit",
+   "date": "2026-06-14",
+   "yes_share": {
+    "Kreis 3": 0.841,
+    "Kreis 6": 0.8320000000000001,
+    "Kreis 9": 0.773,
+    "Kreis 10": 0.8140000000000001,
+    "Kreis 11": 0.746,
+    "Kreis 12": 0.723
+   }
+  },
+  {
+   "text": "Rahmenkredit von 69 Millionen Franken für ökologische Ersatzmassnahmen im Stadtzürcher Seebecken",
+   "date": "2026-06-14",
+   "yes_share": {
+    "Kreis 3": 0.727,
+    "Kreis 6": 0.688,
+    "Kreis 9": 0.647,
+    "Kreis 10": 0.6779999999999999,
+    "Kreis 11": 0.616,
+    "Kreis 12": 0.603
+   }
+  },
+  {
+   "text": "Tram Affoltern, Ausgaben von rund 159,1 Millionen Franken",
+   "date": "2026-06-14",
+   "yes_share": {
+    "Kreis 3": 0.7,
+    "Kreis 6": 0.71,
+    "Kreis 9": 0.65,
+    "Kreis 10": 0.675,
+    "Kreis 11": 0.6579999999999999,
+    "Kreis 12": 0.654
+   }
+  },
+  {
+   "text": "Verlängerung der Zwischennutzung des Areals Zentralwäscherei, Ausgaben von rund 7,98 Millionen Franken",
+   "date": "2026-06-14",
+   "yes_share": {
+    "Kreis 3": 0.768,
+    "Kreis 6": 0.738,
+    "Kreis 9": 0.706,
+    "Kreis 10": 0.737,
+    "Kreis 11": 0.6659999999999999,
+    "Kreis 12": 0.645
+   }
+  },
+  {
+   "text": "Volksinitiative «Parkplatz-Kompromiss JA»",
+   "date": "2026-06-14",
+   "yes_share": {
+    "Kreis 3": 0.33,
+    "Kreis 6": 0.365,
+    "Kreis 9": 0.429,
+    "Kreis 10": 0.387,
+    "Kreis 11": 0.462,
+    "Kreis 12": 0.496
+   }
+  },
+  {
+   "text": "Volksinitiative «ewz-Bonus für alle – 80 Millionen Franken Volksdividende»",
+   "date": "2026-06-14",
+   "yes_share": {
+    "Kreis 3": 0.275,
+    "Kreis 6": 0.231,
+    "Kreis 9": 0.312,
+    "Kreis 10": 0.261,
+    "Kreis 11": 0.316,
+    "Kreis 12": 0.35700000000000004
+   }
+  },
+  {
+   "text": "Übertrag des städtischen Grundstücks am Heidi-Abel-Weg vom Finanz- ins Verwaltungsvermögen, Objektkredit von rund 20,96 Millionen Franken",
+   "date": "2026-06-14",
+   "yes_share": {
+    "Kreis 3": 0.912,
+    "Kreis 6": 0.914,
+    "Kreis 9": 0.879,
+    "Kreis 10": 0.9159999999999999,
+    "Kreis 11": 0.8640000000000001,
+    "Kreis 12": 0.835
+   }
+  }
+ ]
+}

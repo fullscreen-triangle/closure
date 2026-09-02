@@ -1,0 +1,51 @@
+# closure -- local stack
+#
+#   docker compose up --build
+#   -> web at http://localhost:8081, API proxied at /v1
+#
+# The CLI then targets the local host:
+#   closure --host http://localhost:8080 login
+#   closure --host http://localhost:8080 session new
+
+name: closure
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: docker/server.Dockerfile
+    image: closure/server:${CLOSURE_VERSION:-dev}
+    restart: unless-stopped
+    environment:
+      CLOSURE_BIND: 0.0.0.0:8080
+      CLOSURE_DATA_DIR: /data
+      CLOSURE_ALLOWED_ORIGINS: ${CLOSURE_ALLOWED_ORIGINS:-http://localhost:8081}
+      RUST_LOG: ${RUST_LOG:-closure_server=info,tower_http=warn}
+    ports:
+      - "${API_PORT:-8080}:8080"
+    healthcheck:
+      # distroless carries no shell, so the binary answers for itself.
+      test: ["CMD", "/usr/local/bin/closure-server", "--help"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    image: closure/web:${CLOSURE_VERSION:-dev}
+    restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_started
+    ports:
+      - "${WEB_PORT:-8081}:8081"
+    security_opt:
+      - no-new-privileges:true

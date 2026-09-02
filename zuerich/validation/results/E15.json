@@ -1,0 +1,8 @@
+{
+ "passed": 1.0,
+ "max_abs_error": 2.220446049250313e-16,
+ "id": "E15",
+ "claim": "Multiplicative composition (Thm 7.3)",
+ "method": "randomised",
+ "seconds": 0.007
+}

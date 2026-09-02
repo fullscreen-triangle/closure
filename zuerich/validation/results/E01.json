@@ -1,0 +1,10 @@
+{
+ "passed": true,
+ "trials": 200,
+ "violations": 0,
+ "falsifier_failures": 109,
+ "id": "E01",
+ "claim": "Floor theorem (Thm 3.1)",
+ "method": "randomised + falsifier",
+ "seconds": 0.108
+}

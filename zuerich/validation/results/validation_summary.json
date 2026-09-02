@@ -1,0 +1,519 @@
+{
+ "suite": "closure/zuerich",
+ "seed": 20260902,
+ "generated": "2026-09-02T06:43:26",
+ "n_experiments": 24,
+ "n_passed": 24,
+ "negative_controls": [
+  "E21",
+  "E22"
+ ],
+ "pass_rate": "24/24",
+ "experiments": [
+  {
+   "passed": true,
+   "trials": 200,
+   "violations": 0,
+   "falsifier_failures": 109,
+   "id": "E01",
+   "claim": "Floor theorem (Thm 3.1)",
+   "method": "randomised + falsifier",
+   "seconds": 0.108
+  },
+  {
+   "passed": true,
+   "constructed_min_cut": 1.0,
+   "constructed_block_size": 3,
+   "best_singleton": 20.0,
+   "regional_fraction_random": 0.225,
+   "id": "E02",
+   "claim": "Individuation is regional (Thm 3.3)",
+   "method": "constructed + random",
+   "seconds": 0.059
+  },
+  {
+   "passed": true,
+   "quotients_valid": 150,
+   "trials": 150,
+   "id": "E03",
+   "claim": "No privileged level (Thm 3.6)",
+   "method": "randomised",
+   "seconds": 0.016
+  },
+  {
+   "passed": true,
+   "blocks_sufficient_level_not": true,
+   "level_sufficient_blocks_not": true,
+   "id": "E04",
+   "claim": "Sufficiency not inherited (Prop 3.8)",
+   "method": "constructed",
+   "seconds": 0.0
+  },
+  {
+   "passed": true,
+   "thresholds_met": true,
+   "closure_fails": true,
+   "falsifier_restores_closure": true,
+   "id": "E05",
+   "claim": "Closure > threshold (Thm 4.6)",
+   "method": "constructed + falsifier",
+   "seconds": 0.0
+  },
+  {
+   "passed": true,
+   "trials": 300,
+   "verdict_changed_by_label": 0,
+   "falsifier_failures": 160,
+   "note": "invariance under label, sensitivity under resolution",
+   "id": "E06",
+   "claim": "Provenance-blindness (Thm 4.9)",
+   "method": "randomised + falsifier",
+   "seconds": 0.022
+  },
+  {
+   "passed": true,
+   "flips_changing_verdict": 0,
+   "all_false_but_committed": 200,
+   "note": "commitment identical under wholesale falsity",
+   "id": "E07",
+   "claim": "Truth-blindness (Thm 4.11)",
+   "method": "randomised",
+   "seconds": 0.019
+  },
+  {
+   "passed": 1.0,
+   "max_kkt_violation": 4.440892098500626e-16,
+   "id": "E08",
+   "claim": "Water-filling optimality (Thm 5.2)",
+   "method": "convex cross-check",
+   "seconds": 0.067
+  },
+  {
+   "passed": true,
+   "acts_blocked_in_construction": 95,
+   "acts_allowed_in_commitment": 105,
+   "final_record": 105,
+   "id": "E09",
+   "claim": "Phase alternation (Thm 5.6)",
+   "method": "randomised",
+   "seconds": 0.001
+  },
+  {
+   "passed": true,
+   "source": "zurich",
+   "n_units": 597,
+   "sigma_omega": 0.9999999999939014,
+   "Kc_predicted": 1.5957691215959986,
+   "max_R_below_threshold": 0.10718628500808591,
+   "min_R_above_threshold": 0.9512055820612138,
+   "sweep": [
+    {
+     "K": 0.0,
+     "R": 0.10718628500808591,
+     "cost": 0.8928137149919141
+    },
+    {
+     "K": 0.3191538243191997,
+     "R": 0.038997015479640365,
+     "cost": 0.9610029845203596
+    },
+    {
+     "K": 0.6383076486383994,
+     "R": 0.0313623790882551,
+     "cost": 0.9686376209117449
+    },
+    {
+     "K": 0.9574614729575991,
+     "R": 0.1268972839668581,
+     "cost": 0.8731027160331419
+    },
+    {
+     "K": 1.2766152972767988,
+     "R": 0.12192683199966764,
+     "cost": 0.8780731680003324
+    },
+    {
+     "K": 1.5957691215959984,
+     "R": 0.4147276554615481,
+     "cost": 0.5852723445384519
+    },
+    {
+     "K": 1.9149229459151982,
+     "R": 0.6401263224761657,
+     "cost": 0.35987367752383426
+    },
+    {
+     "K": 2.234076770234398,
+     "R": 0.8236753616598342,
+     "cost": 0.17632463834016576
+    },
+    {
+     "K": 2.5532305945535976,
+     "R": 0.8734951663305552,
+     "cost": 0.12650483366944476
+    },
+    {
+     "K": 2.872384418872797,
+     "R": 0.9159003664043696,
+     "cost": 0.08409963359563044
+    },
+    {
+     "K": 3.1915382431919967,
+     "R": 0.9368266668687326,
+     "cost": 0.06317333313126738
+    },
+    {
+     "K": 3.510692067511197,
+     "R": 0.9512055820612138,
+     "cost": 0.04879441793878625
+    },
+    {
+     "K": 3.8298458918303964,
+     "R": 0.9605494625000025,
+     "cost": 0.039450537499997496
+    },
+    {
+     "K": 4.148999716149596,
+     "R": 0.9672627384362977,
+     "cost": 0.03273726156370227
+    },
+    {
+     "K": 4.468153540468796,
+     "R": 0.9723139983610822,
+     "cost": 0.027686001638917768
+    },
+    {
+     "K": 4.787307364787996,
+     "R": 0.9762360353020688,
+     "cost": 0.023763964697931184
+    },
+    {
+     "K": 5.106461189107195,
+     "R": 0.9793544163833285,
+     "cost": 0.02064558361667146
+    },
+    {
+     "K": 5.425615013426395,
+     "R": 0.9818811705473751,
+     "cost": 0.018118829452624885
+    },
+    {
+     "K": 5.744768837745594,
+     "R": 0.9839607470270654,
+     "cost": 0.016039252972934626
+    },
+    {
+     "K": 6.063922662064794,
+     "R": 0.9856950028518034,
+     "cost": 0.014304997148196552
+    },
+    {
+     "K": 6.383076486383994,
+     "R": 0.987157771820716,
+     "cost": 0.012842228179284043
+    }
+   ],
+   "id": "E10",
+   "claim": "Synchronisation threshold (Thm 6.7)",
+   "method": "integration, Zurich dw",
+   "seconds": 5.977
+  },
+  {
+   "passed": true,
+   "max_cost_at_lock": 3.3306690738754696e-16,
+   "min_cost_dispersed": 0.02344008246777407,
+   "id": "E11",
+   "claim": "Coordination cost vanishes at lock (Thm 6.5)",
+   "method": "randomised",
+   "seconds": 0.023
+  },
+  {
+   "passed": true,
+   "curve": [
+    {
+     "agents": 1,
+     "reach": 1
+    },
+    {
+     "agents": 2,
+     "reach": 2
+    },
+    {
+     "agents": 3,
+     "reach": 3
+    },
+    {
+     "agents": 4,
+     "reach": 4
+    },
+    {
+     "agents": 5,
+     "reach": 5
+    },
+    {
+     "agents": 6,
+     "reach": 6
+    },
+    {
+     "agents": 7,
+     "reach": 6
+    },
+    {
+     "agents": 8,
+     "reach": 6
+    },
+    {
+     "agents": 9,
+     "reach": 6
+    },
+    {
+     "agents": 10,
+     "reach": 6
+    }
+   ],
+   "reach_of_ten_identical": 1,
+   "pool_size": 6,
+   "id": "E12",
+   "claim": "Reach ceiling (Prop 4.16)",
+   "method": "randomised",
+   "seconds": 0.0
+  },
+  {
+   "passed": true,
+   "max_abs_error": 0.006049999999999944,
+   "rows": [
+    {
+     "M": 1,
+     "analytic": 0.7,
+     "empirical": 0.70235
+    },
+    {
+     "M": 2,
+     "analytic": 0.48999999999999994,
+     "empirical": 0.48395
+    },
+    {
+     "M": 3,
+     "analytic": 0.3429999999999999,
+     "empirical": 0.34065
+    },
+    {
+     "M": 4,
+     "analytic": 0.24009999999999995,
+     "empirical": 0.2398
+    },
+    {
+     "M": 5,
+     "analytic": 0.16806999999999994,
+     "empirical": 0.16945
+    },
+    {
+     "M": 6,
+     "analytic": 0.11764899999999996,
+     "empirical": 0.11875
+    },
+    {
+     "M": 7,
+     "analytic": 0.08235429999999996,
+     "empirical": 0.08025
+    },
+    {
+     "M": 8,
+     "analytic": 0.05764800999999997,
+     "empirical": 0.0563
+    },
+    {
+     "M": 9,
+     "analytic": 0.04035360699999998,
+     "empirical": 0.0397
+    },
+    {
+     "M": 10,
+     "analytic": 0.02824752489999998,
+     "empirical": 0.0285
+    }
+   ],
+   "id": "E13",
+   "claim": "Crowd sharpening (Thm 6.9)",
+   "method": "Monte Carlo",
+   "seconds": 0.496
+  },
+  {
+   "passed": true,
+   "closures_destroyed": 400,
+   "trials": 400,
+   "fraction": 1.0,
+   "note": "enlarging availability can un-close; invoked-monotonicity holds",
+   "id": "E14",
+   "claim": "Availability non-monotone (Rem 4.13)",
+   "method": "randomised",
+   "seconds": 0.006
+  },
+  {
+   "passed": 1.0,
+   "max_abs_error": 2.220446049250313e-16,
+   "id": "E15",
+   "claim": "Multiplicative composition (Thm 7.3)",
+   "method": "randomised",
+   "seconds": 0.007
+  },
+  {
+   "passed": true,
+   "rows": [
+    {
+     "n": 1,
+     "composite": 0.30000000000000004,
+     "residual": 0.7
+    },
+    {
+     "n": 2,
+     "composite": 0.51,
+     "residual": 0.48999999999999994
+    },
+    {
+     "n": 5,
+     "composite": 0.8319300000000001,
+     "residual": 0.16806999999999994
+    },
+    {
+     "n": 10,
+     "composite": 0.9717524751000001,
+     "residual": 0.02824752489999998
+    },
+    {
+     "n": 25,
+     "composite": 0.9998658931380336,
+     "residual": 0.00013410686196639628
+    },
+    {
+     "n": 50,
+     "composite": 0.9999999820153496,
+     "residual": 1.7984650426474064e-08
+    }
+   ],
+   "divergent_saturates": true,
+   "convergent_saturates": false,
+   "id": "E16",
+   "claim": "Saturation (Cor 7.4, Thm 7.6)",
+   "method": "exhaustive",
+   "seconds": 0.013
+  },
+  {
+   "passed": true,
+   "routes": [
+    "committed",
+    "ignorance",
+    "inertia",
+    "confusion"
+   ],
+   "id": "E17",
+   "claim": "Three routes to non-commitment (Prop 4.14)",
+   "method": "constructed",
+   "seconds": 0.0
+  },
+  {
+   "passed": true,
+   "digraphs_enumerated": 64,
+   "robust": 2,
+   "robust_with_cycle_lt_3": 0,
+   "falsifier_failures": 2,
+   "note": "exhaustive over all 3-node digraphs",
+   "id": "E18",
+   "claim": "Support cycle >= 3 (Thm 7.9)",
+   "method": "exhaustive + falsifier",
+   "seconds": 0.001
+  },
+  {
+   "passed": true,
+   "records_tested": 60,
+   "distinct_digests": 60,
+   "deterministic": true,
+   "irreversible_after_contact": true,
+   "id": "E19",
+   "claim": "Pruning is determined (Thm 8.7)",
+   "method": "Zurich substrate",
+   "seconds": 0.04
+  },
+  {
+   "passed": true,
+   "sample_minimum_with_floor": 0.5003595775967524,
+   "sample_minimum_no_floor": 8.092603518570856e-12,
+   "asymptotic_with_floor": 0.4999578187283739,
+   "asymptotic_no_floor": 0.0,
+   "sample_minimum_is_trivial": true,
+   "asymptotic_discriminates": true,
+   "falsifier_failures": 1,
+   "zurich": {
+    "observable": "mean inter-district separation over the full record",
+    "n_receiver_pairs": 15,
+    "n_questions": 275,
+    "sample_minimum": 0.019701818181818178,
+    "asymptotic_separation": 0.019701818181818178,
+    "median_pair_cost": 0.043559999999999995,
+    "single_question_ties": 30,
+    "single_question_tie_rate": 0.007272727272727273,
+    "declared_estimator": "asymptotic_separation",
+    "floor_positive": true,
+    "note": "single-question ties are a 0.1pp rounding artefact; no receiver pair is inseparable over the record"
+   },
+   "note": "sample_minimum is positive on a floorless process, so it discriminates nothing; the asymptotic estimator can return ~0 and therefore can be wrong",
+   "id": "E20",
+   "claim": "Floor estimators (Rem 8.2)",
+   "method": "Zurich + synthetic + falsifier",
+   "seconds": 0.078
+  },
+  {
+   "passed": true,
+   "negative_control": true,
+   "pearson_r": 0.9999999999999999,
+   "rmse": 6.772605724296185e-17,
+   "cascades": 2000,
+   "generating_process": "adversarial, violates Thm 7.3 by construction",
+   "note": "r=1 on data violating the law => the test has no null",
+   "id": "E21",
+   "claim": "Telescoping obstruction (Thm 11.2)",
+   "method": "adversarial",
+   "seconds": 0.075
+  },
+  {
+   "passed": true,
+   "negative_control": true,
+   "eta_flat_binding": 0.0022992791673247122,
+   "eta_separated_binding": 0.9937193328483319,
+   "prediction_constant_at_fixed_length": true,
+   "note": "eta~0 => negative result is about the observable, not the process",
+   "id": "E22",
+   "claim": "Uninformative binding, eta ~ 0 (Prop 11.7)",
+   "method": "constructed",
+   "seconds": 0.006
+  },
+  {
+   "passed": true,
+   "conforming_r": 0.9957829279457268,
+   "conforming_rmse": 0.013175163302711075,
+   "violating_r": 0.3377068928438517,
+   "violating_rmse": 0.1967105322165207,
+   "test_has_a_null": true,
+   "zurich": {
+    "eta": 0.0012751682810721123,
+    "n_events": 1644
+   },
+   "note": "unlike E21 the corrected test discriminates",
+   "id": "E23",
+   "claim": "Corrected type-averaged test (Thm 11.5)",
+   "method": "Zurich types",
+   "seconds": 0.098
+  },
+  {
+   "passed": true,
+   "distinct_protocol_fingerprints": 1,
+   "distinct_trajectories": 34,
+   "run_to_completion": true,
+   "no_exit_code": true,
+   "id": "E24",
+   "claim": "Runtime: convergence + emergence (Thm 11.4, 11.8)",
+   "method": "randomised",
+   "seconds": 0.006
+  }
+ ]
+}

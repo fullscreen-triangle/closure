@@ -1,0 +1,7 @@
+[toolchain]
+# Pinned so that CI, Docker and a contributor's machine agree. Raise this
+# deliberately, not incidentally: the workspace sets rust-version = "1.85"
+# and the edition is 2024.
+channel = "1.97.1"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

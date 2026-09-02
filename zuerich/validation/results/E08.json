@@ -1,0 +1,8 @@
+{
+ "passed": 1.0,
+ "max_kkt_violation": 4.440892098500626e-16,
+ "id": "E08",
+ "claim": "Water-filling optimality (Thm 5.2)",
+ "method": "convex cross-check",
+ "seconds": 0.067
+}

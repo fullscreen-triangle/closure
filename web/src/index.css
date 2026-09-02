@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+  --ink: #16130f;
+  --paper: #faf8f4;
+  --muted: #6b6459;
+  --rule: #d9d2c6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #ece7df;
+    --paper: #14120f;
+    --muted: #948b7d;
+    --rule: #302b24;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: theme('fontFamily.serif');
+  -webkit-font-smoothing: antialiased;
+}

@@ -1,0 +1,10 @@
+{
+ "passed": true,
+ "thresholds_met": true,
+ "closure_fails": true,
+ "falsifier_restores_closure": true,
+ "id": "E05",
+ "claim": "Closure > threshold (Thm 4.6)",
+ "method": "constructed + falsifier",
+ "seconds": 0.0
+}

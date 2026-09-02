@@ -1,0 +1,13 @@
+{
+ "passed": true,
+ "negative_control": true,
+ "pearson_r": 0.9999999999999999,
+ "rmse": 6.772605724296185e-17,
+ "cascades": 2000,
+ "generating_process": "adversarial, violates Thm 7.3 by construction",
+ "note": "r=1 on data violating the law => the test has no null",
+ "id": "E21",
+ "claim": "Telescoping obstruction (Thm 11.2)",
+ "method": "adversarial",
+ "seconds": 0.075
+}

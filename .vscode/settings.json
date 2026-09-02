@@ -1,0 +1,16 @@
+{
+  "editor.formatOnSave": true,
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "rust-analyzer.check.command": "clippy",
+  "rust-analyzer.check.extraArgs": ["--all-targets"],
+  "[rust]": { "editor.defaultFormatter": "rust-lang.rust-analyzer" },
+  "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[latex]": { "editor.formatOnSave": false },
+  "search.exclude": {
+    "**/target": true,
+    "**/node_modules": true,
+    "zuerich/data/raw": true
+  }
+}

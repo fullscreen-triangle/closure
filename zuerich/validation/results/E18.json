@@ -1,0 +1,12 @@
+{
+ "passed": true,
+ "digraphs_enumerated": 64,
+ "robust": 2,
+ "robust_with_cycle_lt_3": 0,
+ "falsifier_failures": 2,
+ "note": "exhaustive over all 3-node digraphs",
+ "id": "E18",
+ "claim": "Support cycle >= 3 (Thm 7.9)",
+ "method": "exhaustive + falsifier",
+ "seconds": 0.001
+}

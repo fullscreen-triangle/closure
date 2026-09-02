@@ -1,0 +1,33 @@
+name: Paper
+
+# The manuscript is a source artefact, so a change to it must still compile.
+
+on:
+  push:
+    paths:
+      - "zuerich/docs/**"
+      - ".github/workflows/paper.yml"
+  pull_request:
+    paths:
+      - "zuerich/docs/**"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build manuscript
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: zuerich-common-closure.tex
+          working_directory: zuerich/docs/zuerich-common-closure
+          latexmk_use_xelatex: false
+          args: -pdf -interaction=nonstopmode -halt-on-error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: manuscript
+          path: zuerich/docs/zuerich-common-closure/*.pdf

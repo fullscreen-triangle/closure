@@ -1,0 +1,9 @@
+{
+ "passed": true,
+ "max_cost_at_lock": 3.3306690738754696e-16,
+ "min_cost_dispersed": 0.02344008246777407,
+ "id": "E11",
+ "claim": "Coordination cost vanishes at lock (Thm 6.5)",
+ "method": "randomised",
+ "seconds": 0.023
+}

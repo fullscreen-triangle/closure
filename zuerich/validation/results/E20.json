@@ -1,0 +1,28 @@
+{
+ "passed": true,
+ "sample_minimum_with_floor": 0.5003595775967524,
+ "sample_minimum_no_floor": 8.092603518570856e-12,
+ "asymptotic_with_floor": 0.4999578187283739,
+ "asymptotic_no_floor": 0.0,
+ "sample_minimum_is_trivial": true,
+ "asymptotic_discriminates": true,
+ "falsifier_failures": 1,
+ "zurich": {
+  "observable": "mean inter-district separation over the full record",
+  "n_receiver_pairs": 15,
+  "n_questions": 275,
+  "sample_minimum": 0.019701818181818178,
+  "asymptotic_separation": 0.019701818181818178,
+  "median_pair_cost": 0.043559999999999995,
+  "single_question_ties": 30,
+  "single_question_tie_rate": 0.007272727272727273,
+  "declared_estimator": "asymptotic_separation",
+  "floor_positive": true,
+  "note": "single-question ties are a 0.1pp rounding artefact; no receiver pair is inseparable over the record"
+ },
+ "note": "sample_minimum is positive on a floorless process, so it discriminates nothing; the asymptotic estimator can return ~0 and therefore can be wrong",
+ "id": "E20",
+ "claim": "Floor estimators (Rem 8.2)",
+ "method": "Zurich + synthetic + falsifier",
+ "seconds": 0.078
+}

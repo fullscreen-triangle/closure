@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+title: "closure: a runtime for non-convergent social deliberation"
+message: "If you use this software or the accompanying manuscript, please cite it."
+type: software
+authors:
+  - family-names: Sachikonye
+    given-names: Kundai Farai
+    affiliation: Technical University of Munich
+    email: kundai.sachikonye@tum.de
+repository-code: "https://github.com/kundai/closure"
+license: AGPL-3.0-or-later
+version: 0.1.0
+keywords:
+  - agent-based simulation
+  - deliberation
+  - coordination
+  - bounded rationality
+  - research instrument
+preferred-citation:
+  type: article
+  title: "A Runtime for Non-Convergent Social Deliberation: Formal Specification of an Instrument in Which Agents Deliberate, Coordinate, and Decline, and in Which No Outcome Is Adjudicated"
+  authors:
+    - family-names: Sachikonye
+      given-names: Kundai Farai
+      affiliation: Technical University of Munich
+  year: 2026

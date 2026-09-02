@@ -1,0 +1,13 @@
+target/
+node_modules/
+web/dist/
+zuerich/data/raw/
+.git/
+.github/
+**/*.pdf
+**/*.aux
+**/*.log
+__pycache__/
+.venv/
+.env
+.env.*

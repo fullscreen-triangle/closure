@@ -1,0 +1,4 @@
+# The runtime executes long-lived sessions; a needless clone in a hot path is
+# worth flagging, but readability wins in the kernel where the proofs live.
+too-many-arguments-threshold = 8
+type-complexity-threshold = 300

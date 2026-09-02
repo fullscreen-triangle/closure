@@ -1,0 +1,17 @@
+{
+ "passed": true,
+ "conforming_r": 0.9957829279457268,
+ "conforming_rmse": 0.013175163302711075,
+ "violating_r": 0.3377068928438517,
+ "violating_rmse": 0.1967105322165207,
+ "test_has_a_null": true,
+ "zurich": {
+  "eta": 0.0012751682810721123,
+  "n_events": 1644
+ },
+ "note": "unlike E21 the corrected test discriminates",
+ "id": "E23",
+ "claim": "Corrected type-averaged test (Thm 11.5)",
+ "method": "Zurich types",
+ "seconds": 0.098
+}

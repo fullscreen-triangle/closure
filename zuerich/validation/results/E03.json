@@ -1,0 +1,9 @@
+{
+ "passed": true,
+ "quotients_valid": 150,
+ "trials": 150,
+ "id": "E03",
+ "claim": "No privileged level (Thm 3.6)",
+ "method": "randomised",
+ "seconds": 0.016
+}

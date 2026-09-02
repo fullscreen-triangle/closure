@@ -1,0 +1,13 @@
+{
+ "passed": true,
+ "routes": [
+  "committed",
+  "ignorance",
+  "inertia",
+  "confusion"
+ ],
+ "id": "E17",
+ "claim": "Three routes to non-commitment (Prop 4.14)",
+ "method": "constructed",
+ "seconds": 0.0
+}

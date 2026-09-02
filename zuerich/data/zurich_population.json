@@ -1,0 +1,182 @@
+{
+ "source": "Statistik Stadt Zurich, bev_bestand_jahr_quartier_alter_herkunft_geschlecht_od3903",
+ "url": "https://data.stadt-zuerich.ch/dataset/bev_bestand_jahr_quartier_alter_herkunft_geschlecht_od3903/download/BEV390OD3903.csv",
+ "n_rows_total": 408639,
+ "year": "2025",
+ "districts": [
+  "Kreis 1",
+  "Kreis 2",
+  "Kreis 3",
+  "Kreis 4",
+  "Kreis 5",
+  "Kreis 6",
+  "Kreis 7",
+  "Kreis 8",
+  "Kreis 9",
+  "Kreis 10",
+  "Kreis 11",
+  "Kreis 12"
+ ],
+ "total": {
+  "Kreis 1": 5747,
+  "Kreis 10": 41726,
+  "Kreis 11": 80964,
+  "Kreis 12": 32832,
+  "Kreis 2": 38360,
+  "Kreis 3": 51608,
+  "Kreis 4": 29380,
+  "Kreis 5": 15954,
+  "Kreis 6": 36584,
+  "Kreis 7": 40152,
+  "Kreis 8": 17936,
+  "Kreis 9": 61178
+ },
+ "age_bands": {
+  "Kreis 1": {
+   "0-19": 559,
+   "20-39": 2300,
+   "40-59": 1507,
+   "60-79": 1025,
+   "80-99": 356,
+   "100 u. älter": 0
+  },
+  "Kreis 10": {
+   "0-19": 7180,
+   "20-39": 13735,
+   "40-59": 12010,
+   "60-79": 6455,
+   "80-99": 2329,
+   "100 u. älter": 17
+  },
+  "Kreis 11": {
+   "0-19": 14815,
+   "20-39": 31045,
+   "40-59": 21031,
+   "60-79": 10754,
+   "80-99": 3300,
+   "100 u. älter": 19
+  },
+  "Kreis 12": {
+   "0-19": 6453,
+   "20-39": 11791,
+   "40-59": 8338,
+   "60-79": 4838,
+   "80-99": 1404,
+   "100 u. älter": 8
+  },
+  "Kreis 2": {
+   "0-19": 7832,
+   "20-39": 12589,
+   "40-59": 10812,
+   "60-79": 5242,
+   "80-99": 1867,
+   "100 u. älter": 18
+  },
+  "Kreis 3": {
+   "0-19": 8988,
+   "20-39": 19905,
+   "40-59": 14284,
+   "60-79": 6493,
+   "80-99": 1926,
+   "100 u. älter": 12
+  },
+  "Kreis 4": {
+   "0-19": 3121,
+   "20-39": 13827,
+   "40-59": 8423,
+   "60-79": 3417,
+   "80-99": 587,
+   "100 u. älter": 5
+  },
+  "Kreis 5": {
+   "0-19": 2095,
+   "20-39": 6645,
+   "40-59": 4983,
+   "60-79": 1925,
+   "80-99": 305,
+   "100 u. älter": 1
+  },
+  "Kreis 6": {
+   "0-19": 6394,
+   "20-39": 13947,
+   "40-59": 9885,
+   "60-79": 4950,
+   "80-99": 1403,
+   "100 u. älter": 5
+  },
+  "Kreis 7": {
+   "0-19": 7199,
+   "20-39": 11375,
+   "40-59": 11267,
+   "60-79": 7240,
+   "80-99": 3047,
+   "100 u. älter": 24
+  },
+  "Kreis 8": {
+   "0-19": 2694,
+   "20-39": 6183,
+   "40-59": 5348,
+   "60-79": 2883,
+   "80-99": 826,
+   "100 u. älter": 2
+  },
+  "Kreis 9": {
+   "0-19": 10688,
+   "20-39": 21434,
+   "40-59": 17310,
+   "60-79": 8801,
+   "80-99": 2932,
+   "100 u. älter": 13
+  }
+ },
+ "origin": {
+  "Kreis 1": {
+   "Schweizer*in": 3907,
+   "Ausländer*in": 1840
+  },
+  "Kreis 10": {
+   "Schweizer*in": 30390,
+   "Ausländer*in": 11336
+  },
+  "Kreis 11": {
+   "Schweizer*in": 49334,
+   "Ausländer*in": 31630
+  },
+  "Kreis 12": {
+   "Schweizer*in": 20325,
+   "Ausländer*in": 12507
+  },
+  "Kreis 2": {
+   "Schweizer*in": 25316,
+   "Ausländer*in": 13044
+  },
+  "Kreis 3": {
+   "Schweizer*in": 35288,
+   "Ausländer*in": 16320
+  },
+  "Kreis 4": {
+   "Schweizer*in": 18288,
+   "Ausländer*in": 11092
+  },
+  "Kreis 5": {
+   "Schweizer*in": 10855,
+   "Ausländer*in": 5099
+  },
+  "Kreis 6": {
+   "Schweizer*in": 25541,
+   "Ausländer*in": 11043
+  },
+  "Kreis 7": {
+   "Schweizer*in": 28257,
+   "Ausländer*in": 11895
+  },
+  "Kreis 8": {
+   "Schweizer*in": 11070,
+   "Ausländer*in": 6866
+  },
+  "Kreis 9": {
+   "Schweizer*in": 40257,
+   "Ausländer*in": 20921
+  }
+ }
+}

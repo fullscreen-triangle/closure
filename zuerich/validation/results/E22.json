@@ -1,0 +1,12 @@
+{
+ "passed": true,
+ "negative_control": true,
+ "eta_flat_binding": 0.0022992791673247122,
+ "eta_separated_binding": 0.9937193328483319,
+ "prediction_constant_at_fixed_length": true,
+ "note": "eta~0 => negative result is about the observable, not the process",
+ "id": "E22",
+ "claim": "Uninformative binding, eta ~ 0 (Prop 11.7)",
+ "method": "constructed",
+ "seconds": 0.006
+}

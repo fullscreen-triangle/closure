@@ -1,0 +1,60 @@
+{
+ "passed": true,
+ "max_abs_error": 0.006049999999999944,
+ "rows": [
+  {
+   "M": 1,
+   "analytic": 0.7,
+   "empirical": 0.70235
+  },
+  {
+   "M": 2,
+   "analytic": 0.48999999999999994,
+   "empirical": 0.48395
+  },
+  {
+   "M": 3,
+   "analytic": 0.3429999999999999,
+   "empirical": 0.34065
+  },
+  {
+   "M": 4,
+   "analytic": 0.24009999999999995,
+   "empirical": 0.2398
+  },
+  {
+   "M": 5,
+   "analytic": 0.16806999999999994,
+   "empirical": 0.16945
+  },
+  {
+   "M": 6,
+   "analytic": 0.11764899999999996,
+   "empirical": 0.11875
+  },
+  {
+   "M": 7,
+   "analytic": 0.08235429999999996,
+   "empirical": 0.08025
+  },
+  {
+   "M": 8,
+   "analytic": 0.05764800999999997,
+   "empirical": 0.0563
+  },
+  {
+   "M": 9,
+   "analytic": 0.04035360699999998,
+   "empirical": 0.0397
+  },
+  {
+   "M": 10,
+   "analytic": 0.02824752489999998,
+   "empirical": 0.0285
+  }
+ ],
+ "id": "E13",
+ "claim": "Crowd sharpening (Thm 6.9)",
+ "method": "Monte Carlo",
+ "seconds": 0.496
+}

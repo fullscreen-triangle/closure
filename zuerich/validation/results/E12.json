@@ -1,0 +1,51 @@
+{
+ "passed": true,
+ "curve": [
+  {
+   "agents": 1,
+   "reach": 1
+  },
+  {
+   "agents": 2,
+   "reach": 2
+  },
+  {
+   "agents": 3,
+   "reach": 3
+  },
+  {
+   "agents": 4,
+   "reach": 4
+  },
+  {
+   "agents": 5,
+   "reach": 5
+  },
+  {
+   "agents": 6,
+   "reach": 6
+  },
+  {
+   "agents": 7,
+   "reach": 6
+  },
+  {
+   "agents": 8,
+   "reach": 6
+  },
+  {
+   "agents": 9,
+   "reach": 6
+  },
+  {
+   "agents": 10,
+   "reach": 6
+  }
+ ],
+ "reach_of_ten_identical": 1,
+ "pool_size": 6,
+ "id": "E12",
+ "claim": "Reach ceiling (Prop 4.16)",
+ "method": "randomised",
+ "seconds": 0.0
+}

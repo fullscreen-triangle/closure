@@ -1,0 +1,81 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/closure-kernel",
+    "crates/closure-runtime",
+    "crates/closure-cli",
+    "crates/closure-server",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/kundai/closure"
+homepage = "https://github.com/kundai/closure"
+authors = ["Kundai Farai Sachikonye <kundai.sachikonye@tum.de>"]
+
+[workspace.dependencies]
+# --- internal ---------------------------------------------------------
+closure-kernel = { path = "crates/closure-kernel", version = "0.1.0" }
+closure-runtime = { path = "crates/closure-runtime", version = "0.1.0" }
+
+# --- error handling ---------------------------------------------------
+anyhow = "1.0"
+thiserror = "2.0"
+
+# --- serialisation ----------------------------------------------------
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.9"
+
+# --- async / web ------------------------------------------------------
+axum = { version = "0.8", features = ["macros", "ws"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal", "time", "sync"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["cors", "trace", "fs", "compression-gzip"] }
+
+# --- cli --------------------------------------------------------------
+clap = { version = "4.5", features = ["derive", "env"] }
+directories = "6.0"
+
+# --- numerics ---------------------------------------------------------
+rand = "0.9"
+rand_chacha = "0.9"
+
+# --- observability ----------------------------------------------------
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# --- misc -------------------------------------------------------------
+uuid = { version = "1", features = ["v4", "serde"] }
+time = { version = "0.3", features = ["formatting", "parsing", "serde"] }
+sha2 = "0.10"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_debug_implementations = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+# The runtime deliberately never compares an achieved state to an expected
+# one (Invariant 6, "no system verdict"); these lints guard the shape of the
+# code that keeps that true.
+todo = "warn"
+unimplemented = "warn"
+panic_in_result_fn = "warn"
+
+# Release builds are what players download; optimise for size and startup.
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
+panic = "abort"
+
+# The validation suite replays long simulations; keep debug builds usable.
+[profile.dev.package."*"]
+opt-level = 2

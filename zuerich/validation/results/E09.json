@@ -1,0 +1,10 @@
+{
+ "passed": true,
+ "acts_blocked_in_construction": 95,
+ "acts_allowed_in_commitment": 105,
+ "final_record": 105,
+ "id": "E09",
+ "claim": "Phase alternation (Thm 5.6)",
+ "method": "randomised",
+ "seconds": 0.001
+}

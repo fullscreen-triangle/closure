@@ -1,0 +1,26 @@
+[package]
+name = "closure-runtime"
+description = "The semantically inert node runtime: agents, scenes, and the induced trajectory"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+closure-kernel = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+rand = { workspace = true }
+rand_chacha = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true }
+sha2 = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+
+[lints]
+workspace = true

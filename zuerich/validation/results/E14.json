@@ -1,0 +1,11 @@
+{
+ "passed": true,
+ "closures_destroyed": 400,
+ "trials": 400,
+ "fraction": 1.0,
+ "note": "enlarging availability can un-close; invoked-monotonicity holds",
+ "id": "E14",
+ "claim": "Availability non-monotone (Rem 4.13)",
+ "method": "randomised",
+ "seconds": 0.006
+}
