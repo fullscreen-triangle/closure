@@ -1,0 +1,1199 @@
+% =====================================================================
+%  CLOSURE / ZUERICH  --  companion manuscript
+%  Psychon Phase Mechanics:
+%  The Interior State of a Pruned Agent
+%
+%  Companion to "A Runtime for Non-Convergent Social Deliberation".
+%  That manuscript constructs an agent by pruning a module against a
+%  demographic substrate and stops there. This one takes the resulting
+%  graph as given and asks what state the agent carries on it, what of
+%  that state is available to anyone else, and what one agent can do to
+%  another. Self-contained: every object is a finite weighted graph, a
+%  bounded convex program, or a construction on one.
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{bm}
+\usepackage{booktabs,array,multirow}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage[round,sort&compress]{natbib}
+\usepackage[colorlinks=true,linkcolor=blue!45!black,
+            citecolor=blue!45!black,urlcolor=blue!45!black]{hyperref}
+\usepackage[nameinlink,capitalise]{cleveref}
+
+% ---------- theorem environments (matching the parent manuscript) ----
+\newtheoremstyle{clstyle}{\topsep}{\topsep}{\itshape}{}{\bfseries}{.}{.5em}{}
+\theoremstyle{clstyle}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{construction}[theorem]{Construction}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{axiom}{Axiom}
+\newtheorem{binv}{Invariant}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{notation}[theorem]{Notation}
+
+\crefname{axiom}{Axiom}{Axioms}
+\Crefname{axiom}{Axiom}{Axioms}
+\crefname{binv}{Invariant}{Invariants}
+\Crefname{binv}{Invariant}{Invariants}
+
+% ---------- operators ----------
+\DeclareMathOperator{\wt}{w}
+\DeclareMathOperator{\cut}{cut}
+\newcommand{\sep}{\sigma}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+% ---------- symbols (parent-compatible) ----------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Gph}{\mathcal{G}}
+\newcommand{\flo}{\beta}
+\newcommand{\Ag}{\mathsf{A}}
+\newcommand{\Char}{\chi}
+\newcommand{\rec}{m}
+\newcommand{\Ord}{R}
+\newcommand{\Kc}{K_{c}}
+\newcommand{\abs}[1]{\lvert#1\rvert}
+\newcommand{\norm}[1]{\lVert#1\rVert}
+
+% ---------- symbols new to this companion ----------
+\newcommand{\Psy}{\Psi}                  % psychon
+\newcommand{\traj}{\gamma}               % trajectory
+\newcommand{\term}{v}                    % terminus
+\newcommand{\gap}{D}                     % residual gap
+\newcommand{\med}{\bot}                  % medium vertex
+\newcommand{\Rep}{\mathsf{r}}            % report-act
+\newcommand{\Qst}{\mathsf{q}}            % question-act
+\newcommand{\Acts}{\mathcal{A}}
+\newcommand{\Hist}{\mathcal{H}}
+\newcommand{\drive}{d}
+\newcommand{\Pot}{\Phi}
+
+\title{\textbf{Psychon Phase Mechanics}\\[6pt]
+\large The Interior State of a Pruned Agent, the Inaccessibility of Its Path,\\
+and the Gap-Direction Definition of a Question}
+
+\author{Kundai Farai Sachikonye\\
+\small Technical University of Munich\\
+\small \texttt{kundai.sachikonye@tum.de}}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+The companion specification constructs an individual by pruning a
+thought-pattern module against a demographic substrate, and stops at the
+resulting finite weighted graph. This paper takes that graph as given and
+asks three questions the construction leaves open: what state does an agent
+carry on it, how much of that state is available to any other agent, and
+what is the complete set of things one agent can do to another.
+
+We answer with a single object. A \emph{psychon} is a pair
+$\Psy=(\traj,\term)$ of a walk through the agent's graph and the vertex it
+ends at, subject to a monotone step count. We prove, in order:
+\textbf{(i)} a \emph{separation theorem}, that every vertex of a finite
+weighted graph with a distinguished medium vertex has a well-defined
+\emph{resting cut}---the minimum-weight boundary separating it from the
+rest---computable by max-flow, whose cost is bounded below by the floor
+$\flo>0$ inherited from the parent construction, so a psychon terminates
+somewhere definite and never on a boundary of zero thickness;
+\textbf{(ii)} a \emph{recognition--search identity}, that under a monotone
+record no operation on the graph has the signature of retrieval, so
+recalling is searching and the distinction between memory and inference is
+not expressible in the runtime;
+\textbf{(iii)} a \emph{path-opacity theorem}, that distinct trajectories
+reach identical termini with identical step counts, so the pair
+$(\traj,\term)$ is strictly finer than anything an agent can emit, and the
+emitted state is exactly the reduced pair $(\term,\rec)$ of terminus and
+count;
+\textbf{(iv)} a \emph{receiver-relativity theorem}, that one event
+registers a different resting cut in every agent that receives it, that
+each such registration is correct on its own graph, and that divergence
+between receivers is therefore not error and admits no adjudication;
+\textbf{(v)} a \emph{drift theorem}, that composed re-registrations across
+a chain of receivers have no author, since the composite differs from every
+individual contribution and no contribution is distinguished;
+\textbf{(vi)} an \emph{act-direction theorem}, that acts partition
+exhaustively into two kinds by their effect on the residual gap---a
+\emph{report} lowers the gap on the acting side, a \emph{question} raises it
+on the receiving side---and that this is the only non-vacuous distinction
+available, since neither content nor intent is expressible;
+\textbf{(vii)} an \emph{adoption theorem}, that two agents of unequal
+internal structure attain equal behaviour when their boundary conditions
+match, on a timescale set by coupling above a critical threshold, so that
+a practice propagates without any interior being shared or inspected.
+
+We close by fixing the correspondence between the discrete pair
+$(\term,\rec)$ and a continuous gradient flow on a bounded coordinate box,
+showing the two descriptions agree on the attracting set, and stating
+precisely which quantities of the continuous theory are \emph{not}
+observables of the instrument. Nine implementation invariants follow, each
+a decidable predicate on the runtime.
+\end{abstract}
+
+\tableofcontents
+
+% =====================================================================
+\section{Introduction}
+% =====================================================================
+
+\subsection{What the parent construction leaves open}
+
+The companion specification builds a population as a family of
+\emph{modules}---coarse regions of a shared substrate graph, each a
+thought-pattern held by many---and produces an individual by \emph{pruning}:
+intersecting the modules a demographic record admits, and taking the
+subgraph induced on what survives. The construction is deterministic before
+contact, and the resulting object is a finite weighted graph.
+
+It stops there, and it must, because at that point the agent has no history.
+Two agents pruned from identical records are identical graphs; the parent
+manuscript proves they are not yet individuals. What makes them individuals
+is what happens on the graph afterwards. That is the subject here.
+
+Three questions are open, and they are not independent.
+
+\begin{enumerate}[label=(\alph*),leftmargin=2em]
+\item \textbf{State.} An agent is somewhere on its graph and got there
+somehow. Is the ``somehow'' part of its state? If it is, the state is a walk
+and grows without bound. If it is not, two agents with different histories
+are the same agent, and the individuation claim of the parent manuscript
+fails.
+\item \textbf{Availability.} Whatever the state is, some function of it is
+emitted when the agent acts. If the emitted function were injective, an
+observer could reconstruct the interior, and the non-attribution results of
+the parent manuscript would be false. If it were constant, agents could not
+be told apart at all.
+\item \textbf{Acts.} The runtime has to enumerate what one agent can do to
+another. Content-based taxonomies (assert, ask, promise, deny) are
+unavailable: the parent manuscript proves the runtime cannot evaluate the
+truth of a content, and an agent cannot certify its own interior, so any
+classification appealing to what is said or meant is not a predicate the
+implementation can decide.
+\end{enumerate}
+
+We answer all three with one object, and the answers turn out to be forced
+rather than chosen.
+
+\subsection{The object}
+
+A \emph{psychon} is a pair
+\begin{equation}
+\Psy \;=\; (\traj,\term),
+\end{equation}
+where $\traj$ is a walk on the agent graph and $\term=\traj(k)$ is the
+vertex it currently occupies, carried together with a monotone count $\rec$
+of committed steps. The pair is the state of the agent. The count is what it
+emits. The walk is what nobody, including the agent, can report.
+
+This resolves (a) and (b) simultaneously, and in the only way consistent
+with the parent axioms. The walk is genuinely part of the state---so two
+agents that reached the same vertex by different routes are different
+agents, which is what individuation requires---while the emitted quantity is
+the reduced pair $(\term,\rec)$, which is strictly coarser, so reconstruction
+of the interior is impossible rather than merely difficult. Question (c) is
+answered in \Cref{sec:acts}: the only distinction between acts that survives
+the loss of content is the \emph{direction} in which an act moves the
+residual gap, and that distinction is exhaustive.
+
+\subsection{Relation to the parent manuscript, and to prior frameworks}
+\label{sec:relation}
+
+This paper is a companion, not a revision. It imports the floor, the agent
+construction, the attention allocator, and the coordination threshold, and
+adds no axiom that the parent does not already state or immediately imply.
+Where the parent proves that the instrument \emph{cannot} report a verdict
+or an attribution, this paper supplies the interior mechanics that make
+those impossibility results properties of the object rather than
+restrictions on the interface.
+
+A remark on scope is owed to the reader, because several results below have
+recognisable analogues in continuous and physical settings: order
+parameters, gradient flows, synchronisation thresholds. We use those
+analogues where they are load-bearing and name them where they are not.
+Specifically, we adopt a gradient-flow description of the attracting set
+(\Cref{sec:continuous}) because it supplies an explicit potential for an
+attractor that the parent manuscript proves exists but does not construct;
+and we adopt a coupling-threshold form of the adoption result
+(\Cref{sec:adoption}) because propagation without shared interiors is
+exactly the phenomenon the instrument is built to study. We do \emph{not}
+adopt any global order parameter as an observable, and
+\Cref{sec:notobservable} states precisely why: a quantity defined over the
+whole population is a world-state read-out, and \Cref{thm:receiver} forbids
+one. Every continuous object in this paper is defined on the pruned graph of
+a single agent and is receiver-relative by construction. Readers approaching
+from the physical literature should treat that restriction as the
+substantive claim of \Cref{sec:continuous}, not as a limitation of it.
+
+% =====================================================================
+\section{Primitives and axioms}
+\label{sec:axioms}
+% =====================================================================
+
+\begin{definition}[Agent graph]
+\label{def:agentgraph}
+An \emph{agent graph} is a finite, connected, weighted, undirected graph
+$G=(V,E,\wt)$ with $\wt:E\to\R_{>0}$, together with a distinguished vertex
+$\med\in V$ adjacent to every other vertex, called the \emph{medium}. We
+write $n=\abs{V}\ge 2$.
+\end{definition}
+
+The medium is not a thought. It is the vertex standing for everything the
+agent has not distinguished: the remainder of the world as it bears on this
+graph. Its role is to make ``separating something from the rest'' a
+well-posed finite question. In the runtime it is the vertex produced by
+pruning that carries no module of its own.
+
+\begin{axiom}[Distinction floor]
+\label{ax:floor}
+There is $\flo>0$ with $\wt(e)\ge\flo$ for every $e\in E$.
+\end{axiom}
+
+\begin{axiom}[Search]
+\label{ax:search}
+Every operation by which the agent arrives at a vertex is a walk along edges
+of $G$ from the vertex it currently occupies. There is no operation whose
+effect is to place the agent at a vertex not adjacent to its current one.
+\end{axiom}
+
+\begin{axiom}[Act floor]
+\label{ax:actfloor}
+There is $\varphi>0$ such that every committed step of a walk increments the
+record $\rec$ by at least $\varphi$. The record is monotone: no operation
+decrements it.
+\end{axiom}
+
+\begin{axiom}[Non-completion]
+\label{ax:noncompletion}
+No walk exhausts $G$: for every walk $\traj$ of finite length there is a
+vertex not on $\traj$ and an edge not traversed by $\traj$.
+\end{axiom}
+
+\Cref{ax:floor} is the floor of the parent manuscript, restricted to one
+pruned graph. \Cref{ax:search} is its locality of conversation.
+\Cref{ax:actfloor} is what makes the record a record: an act costing nothing
+would leave no trace and could be performed unboundedly often between two
+observations. \Cref{ax:noncompletion} holds in the runtime by construction,
+since the substrate is strictly larger than any pruned subgraph and the
+medium is always available as an unexhausted neighbour.
+
+\begin{remark}[The floor is not a modelling convenience]
+\label{rem:floornotconvenience}
+A boundary of weight zero is not a boundary: if some $e$ had $\wt(e)=0$, its
+endpoints would be separable at no cost and would not be two things. So
+\Cref{ax:floor} is constitutive of there being a graph with more than one
+vertex at all, rather than an assumption added for tractability. Note also
+that on a finite graph the floor is attained automatically, since
+$\flo=\min_{e\in E}\wt(e)$ exists and is positive; we state
+\Cref{ax:floor} separately only because the constant $\flo$ appears in the
+bounds below.
+\end{remark}
+
+% =====================================================================
+\section{The resting cut}
+\label{sec:resting}
+% =====================================================================
+
+Before we can say what a psychon terminates \emph{at}, we need the sense in
+which a vertex is a definite thing on its graph. That is a separation
+question, and it has an exact finite answer.
+
+\begin{definition}[Separation cost and resting cut]
+\label{def:sepcost}
+For $v\in V\setminus\{\med\}$, let
+\begin{equation}
+\sep(v) \;=\; \min\Bigl\{\, \wt(\cut(S)) \;:\; v\in S \subseteq V,\ \med\notin S \,\Bigr\},
+\label{eq:sepcost}
+\end{equation}
+where $\cut(S)=\{\,uv\in E : u\in S,\ v\notin S\,\}$ and
+$\wt(\cut(S))=\sum_{e\in\cut(S)}\wt(e)$. A minimising set $S^{\star}(v)$ is a
+\emph{resting cut} of $v$: the cheapest boundary separating $v$ from the
+medium.
+\end{definition}
+
+\begin{theorem}[Separation]
+\label{thm:separation}
+For every $v\in V\setminus\{\med\}$:
+\begin{enumerate}[label=(\roman*),leftmargin=2em]
+\item $\sep(v)$ is attained by at least one $S^{\star}(v)$;
+\item $\sep(v)\ \ge\ \flo\ >\ 0$;
+\item $\sep(v)$ equals the value of a maximum $v$--$\med$ flow, and is
+computable in strongly polynomial time.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) The feasible family $\{S : v\in S,\ \med\notin S\}$ is a nonempty
+subset of the finite power set $2^{V}$ (it contains $\{v\}$), and
+$\wt(\cut(\cdot))$ is a real-valued function on it, so a minimiser exists.
+
+(ii) Let $S$ be feasible. Since $\med$ is adjacent to every other vertex
+(\Cref{def:agentgraph}) and $v\in S$ while $\med\notin S$, the edge
+$v\med\in E$ has exactly one endpoint in $S$, hence $v\med\in\cut(S)$ and
+$\cut(S)\neq\emptyset$. Therefore
+$\wt(\cut(S))\ge \wt(v\med)\ge\flo$ by \Cref{ax:floor}. Taking the minimum
+over feasible $S$ preserves the bound.
+
+(iii) The right-hand side of \eqref{eq:sepcost} is by definition the minimum
+weight of a $v$--$\med$ cut in $G$ with capacities $\wt$. By the max-flow
+min-cut theorem \citep{fordfulkerson1956maximal} this equals the maximum
+$v$--$\med$ flow value, and it is computed in strongly polynomial time by,
+for instance, the Edmonds--Karp procedure \citep{edmondskarp1972theoretical}.
+\end{proof}
+
+\begin{remark}[What (ii) rules out]
+\label{rem:noinfinitesimal}
+Part (ii) is the reason a psychon has somewhere to be. Without it a vertex
+could be separated from the medium at cost approaching zero, and the
+statement ``the agent is at $v$'' would carry no information: the agent
+would be at $v$ and, to within any tolerance, equally at $\med$. The floor
+makes occupancy quantal. It is also what makes the record of
+\Cref{ax:actfloor} meaningful, since a step that crossed no boundary of
+positive weight would be a step between two things that were not two.
+\end{remark}
+
+\begin{proposition}[Resting cuts need not be unique, and this matters]
+\label{prop:nonunique}
+There exist agent graphs and vertices $v$ with two distinct minimisers
+$S_1^{\star}\neq S_2^{\star}$ of \eqref{eq:sepcost}.
+\end{proposition}
+
+\begin{proof}
+Take $V=\{\med,v,a,b\}$ with $ab\notin E$ and all remaining edges present,
+weighted $\wt(v\med)=3$, $\wt(a\med)=\wt(b\med)=1$, $\wt(va)=\wt(vb)=1$;
+every weight is at least $\flo=1$, so \Cref{ax:floor} holds. Then
+\begin{align*}
+\wt(\cut(\{v\}))      &= \wt(v\med)+\wt(va)+\wt(vb) = 3+1+1 = 5,\\
+\wt(\cut(\{v,a\}))    &= \wt(v\med)+\wt(vb)+\wt(a\med) = 3+1+1 = 5,\\
+\wt(\cut(\{v,b\}))    &= \wt(v\med)+\wt(va)+\wt(b\med) = 3+1+1 = 5,\\
+\wt(\cut(\{v,a,b\}))  &= \wt(v\med)+\wt(a\med)+\wt(b\med) = 3+1+1 = 5,
+\end{align*}
+and these are all the feasible sets. So all four are minimisers, and
+$\sep(v)=5$ is attained non-uniquely.
+\end{proof}
+
+Non-uniqueness is not a defect to be broken by a tie rule. It is the finite
+shadow of the fact that ``what counts as this thing rather than its
+surroundings'' can be genuinely underdetermined by the graph, and any
+implementation that silently canonicalises the choice is asserting a
+determination the graph does not make. We return to this in
+\Cref{binv:tiebreak}.
+
+% =====================================================================
+\section{Recognition is search}
+\label{sec:recognition}
+% =====================================================================
+
+\begin{definition}[Retrieval signature]
+\label{def:retrieval}
+An operation $\rho$ on the agent has the \emph{retrieval signature} if there
+exist vertices $u,v$ with $uv\notin E$ such that $\rho$ carries the agent
+from $u$ to $v$, and $\rho$ leaves the record $\rec$ unchanged.
+\end{definition}
+
+Retrieval, in the ordinary sense, is exactly this: going straight to the
+stored item, at a cost independent of where one was. The next result says
+the runtime has no such operation, and that this follows twice over.
+
+\begin{theorem}[Recognition--search identity]
+\label{thm:recognition}
+No operation of the runtime has the retrieval signature. Consequently, for
+every arrival at a vertex there is a walk realising it, and the record
+strictly increases along that walk.
+\end{theorem}
+
+\begin{proof}
+Suppose $\rho$ has the retrieval signature, carrying the agent from $u$ to
+$v$ with $uv\notin E$.
+
+First, $\rho$ violates \Cref{ax:search}, which permits arrival only at a
+vertex adjacent to the current one; since $uv\notin E$, $v$ is not adjacent
+to $u$.
+
+Second, and independently of \Cref{ax:search}: by \Cref{ax:actfloor} the
+record is monotone and every committed step increments it by at least
+$\varphi>0$, so an operation that changes the occupied vertex while leaving
+$\rec$ unchanged commits no step. But then the agent occupies $v$ having
+committed nothing, and by monotonicity of $\rec$ the runtime cannot
+distinguish the state after $\rho$ from the state before it. Two distinct
+occupancies with an identical record are, by \Cref{def:emitted} below, the
+same emitted state, so $\rho$ is not an operation of the runtime at all: it
+has no effect the runtime can represent.
+
+Hence no such $\rho$ exists. Every arrival is therefore an adjacency step
+(\Cref{ax:search}), a finite composition of which is a walk, and each step
+increments $\rec$ by at least $\varphi$.
+\end{proof}
+
+\begin{corollary}[Memory and inference are not distinguishable in the runtime]
+\label{cor:memoryinference}
+There is no predicate on runtime states that holds of arrivals-by-recall and
+fails of arrivals-by-derivation.
+\end{corollary}
+
+\begin{proof}
+By \Cref{thm:recognition} both are walks on $G$ satisfying
+\Cref{ax:search,ax:actfloor}. A predicate separating them would have to be a
+function of the walk beyond its status as a walk; the only such data are the
+identities of intermediate vertices, and by \Cref{thm:opacity} below these
+are not present in any emitted state. A predicate on runtime states is by
+definition a function of emitted state.
+\end{proof}
+
+\begin{remark}
+\Cref{cor:memoryinference} is not scepticism about the distinction. It is a
+statement about this instrument: an agent that answers ``I remember'' and an
+agent that answers ``I worked it out'' have performed the same kind of
+operation, and the runtime is not entitled to label one of them. The second
+argument in the proof of \Cref{thm:recognition} is worth isolating, because
+it does not use \Cref{ax:search} at all: even an implementation that
+permitted jumps would find retrieval incoherent, since under a monotone
+record a costless jump is invisible.
+\end{remark}
+
+% =====================================================================
+\section{The psychon and path opacity}
+\label{sec:psychon}
+% =====================================================================
+
+\begin{definition}[Psychon]
+\label{def:psychon}
+A \emph{psychon} on an agent graph $G$ is a pair $\Psy=(\traj,\term)$ where
+$\traj=(v_0,v_1,\dots,v_k)$ is a walk in $G$ (so $v_{i}v_{i+1}\in E$ for all
+$i<k$) and $\term=v_k$. Its \emph{record} is
+$\rec(\Psy)=\sum_{i<k}c(v_iv_{i+1})$ where $c(e)\ge\varphi$ is the committed
+cost of traversing $e$, per \Cref{ax:actfloor}.
+\end{definition}
+
+\begin{definition}[Emitted state]
+\label{def:emitted}
+The \emph{emitted state} of a psychon is the pair
+\begin{equation}
+\pi(\Psy) \;=\; \bigl(\term,\ \rec(\Psy)\bigr) \;\in\; V\times\R_{\ge0}.
+\end{equation}
+An agent acts only through $\pi$: no operation of the runtime takes as
+input, or produces as output, any function of $\traj$ not factoring through
+$\pi$.
+\end{definition}
+
+\begin{theorem}[Path opacity]
+\label{thm:opacity}
+Let $G$ be an agent graph with $n\ge3$. Then there exist psychons
+$\Psy_1=(\traj_1,\term)$ and $\Psy_2=(\traj_2,\term)$ with
+$\traj_1\neq\traj_2$, the same terminus $\term$, and
+$\rec(\Psy_1)=\rec(\Psy_2)$. Hence $\pi$ is not injective, and the interior
+of a psychon is not a function of its emitted state.
+\end{theorem}
+
+\begin{proof}
+Since $n\ge3$ there are distinct $a,b\in V\setminus\{\med\}$. The medium is
+adjacent to all vertices, so $\med a,\med b\in E$. Consider
+\begin{equation}
+\traj_1=(\med,a,\med,b,\med),\qquad \traj_2=(\med,b,\med,a,\med),
+\end{equation}
+both walks in $G$ with the same terminus $\term=\med$. They are distinct as
+sequences, since $a\neq b$ gives $\traj_1(1)=a\neq b=\traj_2(1)$.
+
+Both traverse the same multiset of edges, namely $\med a$ twice and $\med b$
+twice, differing only in the order. Since $\rec$ is by \Cref{def:psychon} the
+sum of committed costs over traversed edges, and addition is commutative,
+\begin{equation}
+\rec(\Psy_1) \;=\; 2c(\med a)+2c(\med b) \;=\; \rec(\Psy_2),
+\end{equation}
+for \emph{any} cost function $c$. Hence
+$\pi(\Psy_1)=(\med,\rec(\Psy_1))=(\med,\rec(\Psy_2))=\pi(\Psy_2)$ while
+$\Psy_1\neq\Psy_2$, so $\pi$ is not injective.
+\end{proof}
+
+\begin{corollary}[No self-certification]
+\label{cor:noselfcert}
+An agent cannot emit a warrant that its own terminus was reached by one walk
+rather than another.
+\end{corollary}
+
+\begin{proof}
+Any such warrant is an emission, hence by \Cref{def:emitted} a function of
+$\pi(\Psy)$. By \Cref{thm:opacity} there are $\Psi_1\neq\Psi_2$ with
+$\pi(\Psy_1)=\pi(\Psy_2)$; a function of $\pi$ takes the same value on both,
+so it does not distinguish them.
+\end{proof}
+
+\begin{corollary}[Individuation]
+\label{cor:individuation}
+Two agents pruned to the same graph, having emitted the same
+$(\term,\rec)$, may nonetheless be distinct psychons; and once
+$\rec>0$ the pair $(\traj,\term)$ is not reproducible from the pruning
+record.
+\end{corollary}
+
+\begin{proof}
+Immediate from \Cref{thm:opacity} for the first claim. For the second: the
+pruning record determines $G$ and hence the set of available walks, but by
+\Cref{ax:actfloor} the record is monotone and by \Cref{ax:noncompletion} no
+walk is forced, so the particular walk taken is not a function of $G$.
+\end{proof}
+
+This is the promised completion of the parent construction. Before contact,
+pruning is deterministic and two agents from the same record are the same
+object; after the first committed step, they are psychons with different
+interiors, and no emission recovers the difference.
+
+% =====================================================================
+\section{Receiver relativity and drift}
+\label{sec:receiver}
+% =====================================================================
+
+So far one agent. We now put two or more on the same event and ask what they
+end up holding.
+
+\begin{definition}[Registration]
+\label{def:registration}
+Let $\Ag_1,\dots,\Ag_N$ be agents with graphs $G_1,\dots,G_N$, and let $x$
+be an event. A \emph{registration} of $x$ in $\Ag_i$ is a vertex
+$\term_i\in V_i$ at which a walk prompted by $x$ terminates, together with
+its resting cut $S^{\star}(\term_i)\subseteq V_i$ (\Cref{def:sepcost}).
+\end{definition}
+
+\begin{theorem}[Receiver relativity]
+\label{thm:receiver}
+Let $x$ be a single event received by agents $\Ag_1,\Ag_2$ with
+$G_1\neq G_2$. Then:
+\begin{enumerate}[label=(\roman*),leftmargin=2em]
+\item the registrations $S^{\star}(\term_1)\subseteq V_1$ and
+$S^{\star}(\term_2)\subseteq V_2$ are subsets of different vertex sets and
+need not correspond under any graph morphism;
+\item each is a correct minimiser of \eqref{eq:sepcost} on its own graph;
+\item there is no graph on which both are cuts, hence no third party
+relative to which one is nearer to $x$ than the other.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) By construction $S^{\star}(\term_i)$ is defined as a subset of $V_i$.
+Since $G_1\neq G_2$ there need be no bijection $V_1\to V_2$ preserving
+$\wt$; pruning against distinct demographic records produces distinct
+induced subgraphs, and \Cref{prop:nonunique} shows minimisers are not even
+unique within one graph.
+
+(ii) Correctness is a property internal to \eqref{eq:sepcost}: $S^{\star}
+(\term_i)$ minimises $\wt(\cut(\cdot))$ over the feasible family of $G_i$.
+That is a finite optimisation with an attained minimum by
+\Cref{thm:separation}(i), and it makes no reference to $G_{3-i}$.
+
+(iii) Suppose $H$ were a graph on which both $S^{\star}(\term_1)$ and
+$S^{\star}(\term_2)$ are cuts, so that their weights are comparable as
+separations in $H$. Then $H$ contains $V_1\cup V_2$ and assigns weights to
+edges within each; but the weight of $\cut(S^{\star}(\term_1))$ computed in
+$H$ includes edges to $V_2\setminus V_1$, which are absent from $G_1$ and
+whose weights are not determined by either agent graph. So the comparison
+requires data not contained in $G_1$, $G_2$, or the event; by
+\Cref{ax:noncompletion} no agent holds it, and by \Cref{def:emitted} no
+emission supplies it.
+\end{proof}
+
+\begin{corollary}[Divergence is not error]
+\label{cor:divergence}
+If $\Ag_1$ and $\Ag_2$ register the same event differently, no predicate of
+the runtime marks either registration as incorrect.
+\end{corollary}
+
+\begin{proof}
+By \Cref{thm:receiver}(ii) both are correct on their own graphs, and by
+(iii) there is no graph relative to which they can be jointly scored. A
+predicate marking one incorrect would be a function of data the runtime does
+not hold.
+\end{proof}
+
+\begin{remark}[Falsity is an exterior relation]
+\label{rem:falsity}
+\Cref{cor:divergence} does not say nothing is ever false. It says falsity is
+not a unary predicate on an agent state. To call a registration false is to
+compare a pair---the agent and something else---and the something else is
+always another graph, held by another agent, with the same standing. An
+observer may of course fix a reference graph and grade everything against
+it; that observer is then a further agent, and \Cref{thm:receiver} applies
+to them too. What the runtime must not do is privilege one such graph
+internally, which is the content of \Cref{binv:noreference}.
+\end{remark}
+
+\begin{definition}[Reshaping and drift]
+\label{def:drift}
+A \emph{reshaping} of an agent graph is a map $g:G\mapsto G'$ altering
+weights, arising from a registration. For a chain of receivers
+$\Ag_1\to\Ag_2\to\cdots\to\Ag_n$, each passing on what it registered, the
+\emph{composed drift} is
+\begin{equation}
+G_n \;=\; (g_n\circ g_{n-1}\circ\cdots\circ g_1)(G_0).
+\end{equation}
+\end{definition}
+
+\begin{theorem}[Drift has no author]
+\label{thm:drift}
+Let $n\ge2$ and suppose each $g_i$ is non-trivial, i.e.\ $g_i\neq\mathrm{id}$.
+Then in general $G_n\neq g_i(G_0)$ for every $i$, and no $g_i$ is
+distinguished by any function of the emitted states
+$\{\pi_i\}_{i=1}^{n}$.
+\end{theorem}
+
+\begin{proof}
+The first claim is immediate: composition of non-identity weight maps
+differs from each factor unless the others cancel, which is non-generic.
+
+For the second, suppose $F$ is a function of $\{\pi_i\}$ selecting some
+index $j$ as the author. Each $\pi_i=(\term_i,\rec_i)$ by
+\Cref{def:emitted}. Consider the chain in which $\Ag_j$ and $\Ag_{j+1}$
+exchange their reshapings, $g_j'=g_{j+1}$ and $g_{j+1}'=g_j$. Because
+composition of weight maps on disjoint edge supports commutes, the composite
+$G_n$ is unchanged; and because \Cref{thm:opacity} makes $\pi_i$ independent
+of which walk produced it, the emitted states can be arranged identical
+under the exchange. Then $F$ returns $j$ in both, but the reshaping
+performed by $\Ag_j$ differs between them. So $F$ does not select the agent
+that performed a given reshaping.
+\end{proof}
+
+\begin{corollary}[Rumour]
+\label{cor:rumour}
+A registration that has passed through $n\ge2$ receivers is a composed
+drift: it is held by all of them, originated by none identifiably, and is
+not false in the sense of \Cref{cor:divergence}.
+\end{corollary}
+
+This is the formal content of the phenomenon the instrument is built to
+observe. A proposal circulates, everyone who holds it holds something
+slightly different, each holding is correct on its own graph, and no
+participant is the source. The parent manuscript proves the runtime cannot
+attribute; \Cref{thm:drift} says there is nothing to attribute.
+
+% =====================================================================
+\section{Acts and the direction of the gap}
+\label{sec:acts}
+% =====================================================================
+
+We can now answer question (c) of the introduction. The difficulty is that
+the obvious taxonomies are unavailable: by \Cref{cor:noselfcert} an agent
+cannot certify its own interior, so intent is not emitted; by
+\Cref{cor:divergence} the runtime cannot evaluate a content; and by
+\Cref{thm:opacity} the walk is not visible. What remains is the effect an
+act has, and it turns out that is enough---and that it yields exactly two
+kinds.
+
+\begin{definition}[Residual gap]
+\label{def:gap}
+For an agent $\Ag$ engaged with a matter, the \emph{residual gap}
+$\gap(\Ag)\ge0$ is the total weight of the resting cut at its current
+terminus that remains untraversed:
+\begin{equation}
+\gap(\Ag) \;=\; \wt\bigl(\cut(S^{\star}(\term))\bigr) \;-\; \rho(\Ag),
+\end{equation}
+where $\rho(\Ag)$ is the weight already committed against that cut.
+\end{definition}
+
+By \Cref{thm:separation}(ii), $\wt(\cut(S^{\star}(\term)))\ge\flo>0$, so the
+gap starts positive; by \Cref{ax:noncompletion} it is never exhausted by any
+finite walk.
+
+\begin{theorem}[Exchange does not close]
+\label{thm:forcedact}
+Let two agents exchange acts about a matter. While $\gap>0$ on either side,
+a further act is available, and no state of the exchange is a terminal state
+in which both gaps are zero.
+\end{theorem}
+
+\begin{proof}
+Suppose $\gap(\Ag_1)=\gap(\Ag_2)=0$. Then each agent has committed weight
+equal to the full resting cut at its terminus, so each has traversed every
+edge of $\cut(S^{\star}(\term_i))$. By \Cref{ax:noncompletion} there remains
+in $G_i$ a vertex not on the walk and an edge not traversed; take such an
+edge $e$ incident to $S^{\star}(\term_i)$ if one exists. If none exists,
+$S^{\star}(\term_i)$ is a connected component separated from the rest, and
+since $\med\notin S^{\star}(\term_i)$ while $\med$ is adjacent to every
+vertex (\Cref{def:agentgraph}), some edge from $S^{\star}(\term_i)$ to
+$\med$ is present and by \Cref{ax:floor} has weight at least $\flo>0$;
+traversing it is an available act that returns the gap to a positive value.
+Either way an act is available, contradicting terminality.
+\end{proof}
+
+\begin{remark}
+\Cref{thm:forcedact} is why the instrument does not terminate on agreement.
+Exchange ends by exhaustion of what the participants are willing to spend,
+not by the matter closing, because the matter does not close. This is the
+non-convergence of the parent title, localised to a pair.
+\end{remark}
+
+\begin{definition}[Report and question]
+\label{def:reportquestion}
+Let $\Ag$ act toward $\Ag'$, and write $\gap$, $\gap'$ for the gaps
+immediately before and $\widehat{\gap}$, $\widehat{\gap}'$ immediately after.
+The act is a
+\begin{itemize}[leftmargin=2em]
+\item \emph{report}, written $\Rep$, if $\widehat{\gap}<\gap$: it lowers the
+gap on the acting side;
+\item \emph{question}, written $\Qst$, if $\widehat{\gap}'>\gap'$: it raises
+the gap on the receiving side.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Act direction]
+\label{thm:actdirection}
+\Cref{def:reportquestion} is well posed and exhaustive:
+\begin{enumerate}[label=(\roman*),leftmargin=2em]
+\item every act with any effect is a report, a question, or both;
+\item the two are independent, i.e.\ each of the four combinations of
+$\{\text{is}/\text{is not a report}\}\times\{\text{is}/\text{is not a
+question}\}$ is realisable except the doubly-negative one, which has no
+effect;
+\item the classification is decidable from emitted states alone, without
+reference to content, intent, or interior.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(iii) first, since it constrains the rest. By \Cref{def:gap}, $\gap$ is a
+function of $\term$ and the committed weight $\rho$, both components of the
+emitted state $\pi$ of \Cref{def:emitted} (the resting cut is computed from
+$\term$ and $G$ by \Cref{thm:separation}(iii)). So the sign of
+$\widehat{\gap}-\gap$ is computable from $\pi$ before and after, which is
+what the runtime holds.
+
+(i) Let $\alpha$ be an act with some effect. By \Cref{ax:actfloor} it
+commits at least $\varphi>0$, so it changes $\rho$ on at least one side. If
+it changes $\rho(\Ag)$ upward, then by \Cref{def:gap} $\widehat{\gap}<\gap$
+and $\alpha$ is a report. If it changes the receiving side, it does so by
+prompting a walk in $\Ag'$ (\Cref{ax:search}), which by
+\Cref{thm:recognition} moves $\term'$; a move of terminus changes
+$S^{\star}(\term')$ and hence $\wt(\cut(S^{\star}(\term')))$. If that weight
+rises, $\widehat{\gap}'>\gap'$ and $\alpha$ is a question. If it does not
+rise, the receiving side has committed against its cut without the cut
+growing, which is a report by $\Ag'$ rather than an effect of $\alpha$. So
+an act with an effect falls in at least one class.
+
+(ii) Realisability. A report that is not a question: $\Ag$ traverses an edge
+of its own resting cut and $\Ag'$ takes no step, so $\gap$ falls and $\gap'$
+is unchanged. A question that is not a report: $\Ag$ acts so as to move
+$\term'$ to a vertex of larger separation cost while committing nothing
+against its own cut, possible since by \Cref{prop:nonunique} distinct
+vertices of $G'$ have distinct $\sep$ values in general. Both at once: an
+act doing each of the above. Neither: an act committing nothing, excluded by
+\Cref{ax:actfloor} from having an effect.
+\end{proof}
+
+\begin{corollary}[A question is not a request for content]
+\label{cor:questioncontent}
+The predicate ``$\alpha$ is a question'' is invariant under relabelling of
+what $\alpha$ says.
+\end{corollary}
+
+\begin{proof}
+By \Cref{thm:actdirection}(iii) the predicate is a function of emitted
+states, which by \Cref{def:emitted} contain $(\term,\rec)$ and no content.
+\end{proof}
+
+\begin{remark}[Why this is the definition worth having]
+\label{rem:whydirection}
+An agent that asks in order to learn and an agent that asks in order to
+unsettle perform the same act under \Cref{def:reportquestion}, and the
+instrument is right not to separate them: by \Cref{cor:noselfcert} neither
+could certify which it was doing, including to itself. What the definition
+does capture is the asymmetry that matters for a deliberation: a report
+spends the speaker down, a question spends the hearer up. A population of
+agents that only report converges to silence by exhaustion; a population
+that also questions does not, and \Cref{thm:forcedact} says it cannot. This
+is the mechanism by which the agents of the instrument ask questions
+\emph{for their own graph} rather than on a script: raising $\gap'$ is the
+only act whose cost is paid by someone else.
+\end{remark}
+
+% =====================================================================
+\section{Adoption without shared interiors}
+\label{sec:adoption}
+% =====================================================================
+
+The instrument must be able to represent a practice spreading: one agent
+comes to do what another does. \Cref{thm:opacity} and \Cref{thm:receiver}
+between them forbid this happening by transfer of interior state. The
+following says it happens anyway, through boundaries.
+
+\begin{definition}[Boundary condition]
+\label{def:boundary}
+The \emph{boundary condition} of agent $\Ag$ at terminus $\term$ is the
+weighted edge set $\partial(\Ag)=\cut(S^{\star}(\term))$ together with the
+map $e\mapsto\wt(e)$ on it. Two agents \emph{match} at tolerance
+$\varepsilon$ if their boundary conditions agree, as weighted multisets, to
+within $\varepsilon$.
+\end{definition}
+
+\begin{theorem}[Behavioural adoption]
+\label{thm:adoption}
+Let $\Ag_1,\Ag_2$ have graphs $G_1\neq G_2$ and match at tolerance
+$\varepsilon$. Then for every act $\alpha$ classified by
+\Cref{def:reportquestion}, the classification of $\alpha$ agrees between
+$\Ag_1$ and $\Ag_2$ up to $O(\varepsilon)$. In particular, matching
+boundaries induce matching behaviour without any correspondence between
+$V_1$ and $V_2$.
+\end{theorem}
+
+\begin{proof}
+By \Cref{thm:actdirection}(iii) the classification of $\alpha$ is the sign
+of a difference of gaps, and by \Cref{def:gap} the gap is
+$\wt(\cut(S^{\star}(\term)))-\rho$. The first term is a function of the
+boundary condition alone (\Cref{def:boundary}); the second is the committed
+record, which is emitted. If the boundary conditions agree to within
+$\varepsilon$ as weighted multisets, the first terms agree to within
+$\varepsilon$, so the gaps agree to within $\varepsilon$ at equal $\rho$,
+and the signs of their differences agree wherever those differences exceed
+$\varepsilon$ in magnitude. By \Cref{ax:actfloor} every act moves $\rho$ by
+at least $\varphi$, so for $\varepsilon<\varphi$ the classification agrees
+exactly. No step of this argument refers to $V_1$, $V_2$, or any map between
+them.
+\end{proof}
+
+\begin{corollary}[Adoption is not inspection]
+\label{cor:adoptionnotinspection}
+$\Ag_2$ may come to behave as $\Ag_1$ does without any emission of $\Ag_1$
+having determined any interior of $\Ag_2$.
+\end{corollary}
+
+\begin{proof}
+By \Cref{thm:adoption} matching $\partial(\Ag_1)$ and $\partial(\Ag_2)$
+suffices for matching behaviour, and $\partial$ is a function of the resting
+cut, which by \Cref{thm:opacity} does not determine the walk. Distinct
+interiors are compatible with identical boundaries.
+\end{proof}
+
+\begin{proposition}[Threshold]
+\label{prop:threshold}
+Let a population of $N$ agents be coupled with strength $K$ and let
+$\Delta$ measure the spread of their boundary conditions. Matching at
+tolerance $\varepsilon$ is attained for all pairs only if $K>\Kc$ with
+$\Kc=\Theta(\Delta)$; below $\Kc$ the unmatched configuration is stable.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+This is the coordination theorem of the parent manuscript applied to
+$\partial$ rather than to internal state, and the argument is unchanged:
+coupling must overcome heterogeneity, the critical value scales linearly in
+the spread, and below it the incoherent configuration is linearly stable. We
+do not reproduce it; we note only that the quantity being locked here is a
+boundary, which is exactly the quantity \Cref{thm:adoption} shows is
+sufficient.
+\end{proof}
+
+\begin{remark}[Erosion under replacement]
+\label{rem:erosion}
+Adoption is not free. Replacing a part of an agent graph is a removal
+followed by an addition, and each leaves a residue: the removal discards the
+weights of edges between the removed part and the remainder, and the
+addition must fix weights not determined by either. By \Cref{ax:actfloor}
+these are committed operations, so the record grows monotonically under
+replacement and never returns. After $n$ replacements the accumulated
+residue is $\Theta(n)$ under statistically similar replacements. An agent
+that has adopted much is therefore not the agent that began, and by
+\Cref{cor:individuation} there is no operation restoring it. We record this
+because it is the honest cost of \Cref{thm:adoption}: a population that
+converges behaviourally has paid for it in individuation, and the instrument
+should display that rather than hide it.
+\end{remark}
+
+% =====================================================================
+\section{The continuous correspondence}
+\label{sec:continuous}
+% =====================================================================
+
+The discrete account above is complete as it stands. This section adds a
+continuous description of the \emph{attracting set} of an agent, because the
+parent manuscript proves such an attractor exists without constructing one,
+and because an explicit potential is useful for implementation. Everything
+here is defined on one agent graph. \Cref{sec:notobservable} states what
+this does \emph{not} license.
+
+\begin{definition}[Interior coordinates]
+\label{def:coords}
+Fix an agent $\Ag$ with graph $G$. Its \emph{interior coordinates} are
+\begin{equation}
+q \;=\; (\Ord,\ \sigma^2,\ s) \;\in\; \mathcal{M} \;=\; [0,1]\times[\sigma^2_{\min},\sigma^2_{\max}]\times[0,1]^{d},
+\end{equation}
+where $\Ord$ is the coherence of the agent walk (the fraction of recent
+steps lying inside the current resting cut), $\sigma^2$ is the dispersion of
+its terminus over recent steps, and $s$ collects $d$ bounded summaries of
+the emitted record. $\mathcal{M}$ is compact and convex.
+\end{definition}
+
+\begin{definition}[Drive potential]
+\label{def:potential}
+A \emph{drive potential} for $\Ag$ is a function
+$\Pot:\mathcal{M}\to\R$ of the form
+\begin{equation}
+\Pot(q) \;=\; \underbrace{\tfrac{1}{2}(\Kc-K)\Ord^{2}+\tfrac{1}{4}K\Ord^{4}}_{\text{coherence}}
+\;+\;\underbrace{\theta\,\sigma^{2}+\frac{\theta}{K\sigma^{2}}}_{\text{dispersion floor}}
+\;-\;\underbrace{a\,\Ord\,e^{-\sigma^{2}/\tau}}_{\text{coupling}}
+\;+\;\underbrace{V(s)}_{\text{boundary}},
+\label{eq:potential}
+\end{equation}
+with $K,\theta,a,\tau>0$ and $V$ smooth, bounded and convex on $[0,1]^d$.
+\end{definition}
+
+\begin{theorem}[Attractor]
+\label{thm:attractor}
+Suppose $\Pot$ is $\lambda$-strongly convex on $\mathcal{M}$ for some
+$\lambda>0$. Then the gradient flow
+\begin{equation}
+\dot q \;=\; -\,\nabla\Pot(q)
+\label{eq:flow}
+\end{equation}
+has a unique fixed point $q^{\star}\in\mathcal{M}$, and every trajectory
+converges to it exponentially:
+\begin{equation}
+\norm{q(t)-q^{\star}} \;\le\; e^{-\lambda t}\,\norm{q(0)-q^{\star}}.
+\end{equation}
+Moreover the discretisation $q_{k+1}=q_k-\delta\nabla\Pot(q_k)$ satisfies
+$\norm{q_k-q^{\star}}\le(1-\lambda\delta)^{k}\norm{q_0-q^{\star}}$ for
+$\delta\le1/L$, where $L$ is the Lipschitz constant of $\nabla\Pot$.
+\end{theorem}
+
+\begin{proof}
+$\mathcal{M}$ is compact and convex and $\Pot$ is $\lambda$-strongly convex
+on it, so $\Pot$ attains its minimum at a unique $q^{\star}$, which is the
+unique stationary point and hence the unique fixed point of \eqref{eq:flow}.
+Let $W(t)=\tfrac12\norm{q(t)-q^{\star}}^2$. Then
+$\dot W=-\langle q-q^{\star},\nabla\Pot(q)\rangle\le-\lambda\norm{q-q^\star}^2=-2\lambda W$
+by strong convexity together with $\nabla\Pot(q^{\star})=0$, and Gr\"onwall
+gives the stated bound. The discrete estimate is the standard contraction
+bound for gradient descent on a $\lambda$-strongly convex, $L$-smooth
+objective with step $\delta\le1/L$ \citep{boyd2004convex}.
+\end{proof}
+
+\begin{proposition}[Agreement with the discrete account]
+\label{prop:agreement}
+The step bound $\delta\le1/L$ of \Cref{thm:attractor} is compatible with
+\Cref{ax:actfloor}: the act floor $\varphi$ bounds $\delta$ from below, so
+the admissible range is $\varphi\le\delta\le1/L$, nonempty whenever
+$L\le1/\varphi$. Within it, the fixed point $q^{\star}$ is the continuous
+image of the set of termini at which the residual gap is stationary.
+\end{proposition}
+
+\begin{proof}
+By \Cref{ax:actfloor} no committed step is smaller than $\varphi$, so a
+discretisation of \eqref{eq:flow} realisable by the runtime has
+$\delta\ge\varphi$. Stationarity of $\Pot$ means $\nabla\Pot(q^\star)=0$; by
+\Cref{def:coords} the components of $q$ are functions of the terminus and
+the record, so a stationary $q$ is one at which further committed steps do
+not change the coherence or dispersion of the walk, which by \Cref{def:gap}
+is the condition that $\gap$ is stationary.
+\end{proof}
+
+\begin{remark}[What the potential adds and what it does not]
+\label{rem:potentialadds}
+\Cref{thm:attractor} supplies a constructive $\Pot$ for the attractor the
+parent manuscript proves abstractly. It does not weaken
+\Cref{thm:forcedact}: $q^\star$ is a stationary point of the coherence of a
+walk, not a state of zero gap. By \Cref{ax:noncompletion} the gap remains
+positive at $q^{\star}$, so an agent at its attractor is still acting. The
+attractor is a habit, not a conclusion.
+\end{remark}
+
+\subsection{What is not an observable}
+\label{sec:notobservable}
+
+\begin{proposition}[No global order parameter]
+\label{prop:noglobal}
+Let $\Ord_i$ be the coherence of agent $\Ag_i$ per \Cref{def:coords}. Then
+no aggregate $\Ord_{\mathrm{pop}}=F(\Ord_1,\dots,\Ord_N)$ is an observable of
+the runtime.
+\end{proposition}
+
+\begin{proof}
+Each $\Ord_i$ is defined relative to the resting cut of $\Ag_i$ on $G_i$
+(\Cref{def:coords}). By \Cref{thm:receiver}(iii) there is no graph on which
+the resting cuts of two distinct agents are jointly cuts, so the $\Ord_i$
+are not commensurable quantities and $F$ is not well defined on them. Even
+granting a fixed normalisation, $F$ would be a function of the interiors of
+all agents; by \Cref{thm:opacity} interiors are not emitted, so $F$ is not
+computable from what the runtime holds.
+\end{proof}
+
+\begin{corollary}[The instrument still reports nothing it should not]
+\label{cor:stillnothing}
+Adjoining \Cref{def:potential} to the runtime introduces no verdict, no
+progress measure, and no attribution.
+\end{corollary}
+
+\begin{proof}
+A verdict or progress measure over the population is an aggregate of the
+kind excluded by \Cref{prop:noglobal}. A per-agent $\Pot$ is not one: it is
+defined on $G_i$ alone, is receiver-relative by
+\Cref{thm:receiver}, and by \Cref{rem:potentialadds} its minimum is not a
+terminal state. Attribution is excluded by \Cref{thm:drift}.
+\end{proof}
+
+\begin{remark}[On the temptation]
+\label{rem:temptation}
+The result above is the whole reason this section is written as carefully as
+it is. A potential and an order parameter are exactly the objects one
+reaches for when asked how the population is doing, and computing
+$\Ord_{\mathrm{pop}}$ would be a few lines. \Cref{prop:noglobal} says the
+resulting number would not mean anything: not that it would be imprecise,
+but that the quantities averaged are defined on incommensurable graphs.
+The instrument may compute $\Pot$ per agent because each such $\Pot$ is that
+agent view; it may not compute the population figure, because there is no
+agent whose view it would be.
+\end{remark}
+
+% =====================================================================
+\section{Implementation invariants}
+\label{sec:invariants}
+% =====================================================================
+
+Each invariant is a decidable predicate on the runtime, paired with the
+result it enforces.
+
+\begin{binv}[Floor]
+\label{binv:floor}
+Every edge weight in every pruned graph is at least $\flo>0$, checked at
+construction. Enforces \Cref{ax:floor} and hence
+\Cref{thm:separation}(ii).
+\end{binv}
+
+\begin{binv}[Monotone record]
+\label{binv:record}
+The record $\rec$ of every agent is non-decreasing across every operation.
+No interface decrements it. Enforces \Cref{ax:actfloor} and
+\Cref{thm:recognition}.
+\end{binv}
+
+\begin{binv}[No retrieval]
+\label{binv:noretrieval}
+No operation sets an agent terminus to a vertex non-adjacent to its current
+terminus. Enforces \Cref{ax:search}; violation would reintroduce the
+retrieval signature of \Cref{def:retrieval}.
+\end{binv}
+
+\begin{binv}[Emission is the reduced pair]
+\label{binv:emission}
+Every value crossing the agent boundary factors through
+$\pi(\Psy)=(\term,\rec)$. No serialisation exposes $\traj$. Enforces
+\Cref{thm:opacity} and \Cref{cor:noselfcert}.
+\end{binv}
+
+\begin{binv}[Explicit non-uniqueness]
+\label{binv:tiebreak}
+Where \eqref{eq:sepcost} has multiple minimisers, the implementation records
+that fact rather than silently selecting one; any selection is marked as a
+choice of the implementation and not a determination of the graph. Enforces
+the reading of \Cref{prop:nonunique}.
+\end{binv}
+
+\begin{binv}[No reference graph]
+\label{binv:noreference}
+No agent graph is designated as the standard against which others are
+scored, and no code path compares registrations across agents for
+correctness. Enforces \Cref{thm:receiver} and \Cref{cor:divergence}.
+\end{binv}
+
+\begin{binv}[No authorship field]
+\label{binv:noauthor}
+No representation of a circulating registration carries an originator, and
+none is reconstructible from stored state. Enforces \Cref{thm:drift}.
+\end{binv}
+
+\begin{binv}[Acts classified by direction only]
+\label{binv:direction}
+The report/question classification is computed from gaps before and after,
+never from content or a declared intent field. Enforces
+\Cref{thm:actdirection}(iii) and \Cref{cor:questioncontent}.
+\end{binv}
+
+\begin{binv}[No population aggregate]
+\label{binv:noaggregate}
+No route, log line, or stored value aggregates a per-agent coherence,
+potential, or gap across agents. Enforces \Cref{prop:noglobal} and
+\Cref{cor:stillnothing}.
+\end{binv}
+
+% =====================================================================
+\section{Limitations}
+\label{sec:limitations}
+% =====================================================================
+
+\paragraph{The continuous section is optional.}
+\Cref{sec:continuous} is a convenience for implementation, not a load-bearing
+part of the argument. Deleting it leaves
+\Cref{thm:separation,thm:recognition,thm:opacity,thm:receiver,thm:drift,thm:actdirection,thm:adoption}
+intact. We flag this because the continuous apparatus is the part most
+likely to be over-read.
+
+\paragraph{The threshold is imported.}
+\Cref{prop:threshold} is stated as a sketch because its proof is the
+coordination theorem of the parent manuscript. We have applied it to a new
+quantity---the boundary condition rather than internal state---and that
+application is ours; the underlying threshold result is not.
+
+\paragraph{Tolerance in adoption is a parameter.}
+\Cref{thm:adoption} gives exact agreement only for $\varepsilon<\varphi$.
+For coarser matching the classification agrees only up to $O(\varepsilon)$,
+and the instrument should expose $\varepsilon$ rather than fix it.
+
+\paragraph{Non-uniqueness is under-explored.}
+\Cref{prop:nonunique} establishes that resting cuts may fail to be unique
+and \Cref{binv:tiebreak} says what to do about it, but we do not
+characterise when non-uniqueness occurs, nor how often it does on graphs
+produced by pruning against the Z\"urich substrate. That is an empirical
+question this paper does not answer.
+
+% =====================================================================
+\section{Conclusion}
+% =====================================================================
+
+We took the graph the parent construction produces and asked what lives on
+it. The answer is a psychon: a walk together with the vertex it has reached,
+carrying a monotone record. The walk is the agent individuality and is
+inaccessible; the pair of terminus and record is everything anyone else
+gets; and those two facts are the same fact, since it is precisely the
+non-injectivity of the emission map that makes two identically-pruned agents
+into two agents.
+
+From this the conversational mechanics follow without further assumption.
+Recalling is searching, because a costless jump under a monotone record is
+invisible. One event registers differently in every receiver, each correctly,
+with no graph on which the registrations compete. A registration passed
+along a chain becomes a drift with no author. And an act is a report or a
+question according to which side of the exchange its cost falls on---the
+only distinction that survives when content, intent and interior are all
+unavailable, and, we have argued, the one that was doing the work anyway.
+
+Finally, practices spread. Agents whose boundaries match behave alike
+regardless of what is behind those boundaries, which is how something can
+propagate through a population that shares no interior and inspects nothing.
+It is not free: every adoption is a replacement, every replacement commits
+record, and the record does not run backwards. A population that comes to
+agree has spent individuation to do it. The instrument is built to show that
+transaction rather than to score its outcome, and
+\Cref{sec:invariants} is the list of places where we have had to say so in
+code.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

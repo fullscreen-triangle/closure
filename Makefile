@@ -18,6 +18,7 @@ NPM     ?= npm
 PYTHON  ?= python
 WEB     := web
 DOCS    := zuerich/docs/zuerich-common-closure
+PSYCHON := zuerich/docs/psychon-phase-mechanics
 VALID   := zuerich/validation
 PROTO   := zuerich/prototype
 
@@ -130,9 +131,17 @@ panels: ## Regenerate the eight publication panels
 paper: ## Build the manuscript
 	cd $(DOCS) && latexmk -pdf -interaction=nonstopmode zuerich-common-closure.tex
 
+.PHONY: paper-psychon
+paper-psychon: ## Build the psychon phase mechanics companion
+	cd $(PSYCHON) && latexmk -pdf -interaction=nonstopmode psychon-phase-mechanics.tex
+
+.PHONY: papers
+papers: paper paper-psychon ## Build every manuscript
+
 .PHONY: paper-clean
 paper-clean: ## Remove LaTeX build products
 	cd $(DOCS) && latexmk -C
+	cd $(PSYCHON) && latexmk -C
 
 ##@ Container
 
