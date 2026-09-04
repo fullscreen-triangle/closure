@@ -1,9 +1,19 @@
-//! The city substrate: regions, modules, and what the square says.
+//! The city substrate: regions, characters, and what the square says.
 //!
-//! Everything here is coarse by construction. A module is a pattern of
-//! disposition and never a person (see [`closure_runtime::population`]), and
-//! a subgroup is a set of positions with a label. Neither is derived from any
-//! identified individual, and no combination of them recovers one.
+//! Everything here is coarse by construction. A subgroup is a set of
+//! positions with a label, and the [`Moderator`] over it is one character
+//! with an incomplete graph — not a roster, not a catalogue, and not derived
+//! from any identified individual.
+//!
+//! ## Why there is no population here any more
+//!
+//! There was a list of modules a voice could be matched against. Matching a
+//! voice to an entry in a list is retrieval whatever the entries are called,
+//! and Theorem 4.3 says no operation has that signature. What replaced it is
+//! not a better list: it is the absence of one. A voice is a split of the
+//! character talking in its region, and the character behind a voice is built
+//! by capping and amalgamating those moderators — from where the voice
+//! actually spoke, never from a table.
 //!
 //! ## Why the bodies are templates
 //!
@@ -16,10 +26,9 @@
 //! what it produces.
 
 use closure_kernel::ContactGraph;
-use closure_runtime::population::Module;
+use closure_runtime::Square;
+use closure_runtime::moderator::Moderator;
 use closure_runtime::voice::{Subgroup, Utterance};
-use closure_runtime::{Population, Square};
-use std::collections::BTreeSet;
 
 /// Zürich's regions, in the graph the city is cut from.
 ///
@@ -73,57 +82,23 @@ pub fn city_graph() -> ContactGraph {
     g
 }
 
-/// The coarse population of `city`.
+/// The characters talking in `city`: one moderator per region.
 ///
-/// One module per region, plus three that span several. The spanning modules
-/// are what make a fit non-unique in the ordinary case: a voice heard only in
-/// watersports is consistent with the swimmer, the sailing engineer, and the
-/// generalist alike, and the square does not choose between them.
+/// This is what replaced a population catalogue. A catalogue listed profiles
+/// a voice could be matched against, which is a lookup table however it is
+/// dressed — the retrieval Theorem 4.3 denies. A moderator is not a list of
+/// anyone; it is one character with an incomplete graph, and the voices in
+/// its region are its own splits.
+///
+/// A region too thin to have a separation cost yields no moderator, and none
+/// is invented for it.
 #[must_use]
-pub fn population(_city: &str) -> Population {
-    let region = |name: &str| -> BTreeSet<u32> {
-        REGIONS
-            .iter()
-            .find(|(n, _, _)| *n == name)
-            .map_or_else(BTreeSet::new, |(_, lo, hi)| (*lo..*hi).collect())
-    };
-    let union =
-        |names: &[&str]| -> BTreeSet<u32> { names.iter().flat_map(|n| region(n)).collect() };
-
-    let mut modules: Vec<Module> = REGIONS
-        .iter()
-        .map(|(name, lo, hi)| Module {
-            name: (*name).to_owned(),
-            members: (*lo..*hi).collect(),
-            matches: Vec::new(),
-        })
-        .collect();
-
-    modules.push(Module {
-        name: "sailing-engineer".to_owned(),
-        members: union(&["watersports", "carbon-composites", "eth-materials"]),
-        matches: Vec::new(),
-    });
-    modules.push(Module {
-        name: "lake-commuter".to_owned(),
-        members: union(&["lake-transport", "commuting"]),
-        matches: Vec::new(),
-    });
-    modules.push(Module {
-        name: "board-rider".to_owned(),
-        members: union(&["watersports", "extreme-sports"]),
-        matches: Vec::new(),
-    });
-    modules.push(Module {
-        name: "generalist".to_owned(),
-        members: (0..ORDER).collect(),
-        matches: Vec::new(),
-    });
-
-    Population {
-        modules,
-        shared: city_graph(),
-    }
+pub fn moderators(city: &str) -> Vec<Moderator> {
+    let g = city_graph();
+    subgroups(city)
+        .into_iter()
+        .filter_map(|s| Moderator::new(&g, s.members))
+        .collect()
 }
 
 /// What a seeded utterance says.
@@ -157,40 +132,36 @@ mod tests {
     }
 
     #[test]
-    fn a_region_voice_admits_several_profiles() {
-        // A module set where a single-region footprint is genuinely
-        // ambiguous: this is Prop. 3.4 arriving in the substrate rather than
-        // being arranged in a test.
-        let pop = population("zuerich");
-        let foot: BTreeSet<u32> = [1u32].into_iter().collect();
-        let fits: Vec<&str> = pop
-            .modules
-            .iter()
-            .filter(|m| foot.is_subset(&m.members))
-            .map(|m| m.name.as_str())
-            .collect();
-        assert!(
-            fits.len() > 1,
-            "one post should not single out a person: {fits:?}"
-        );
+    fn every_region_has_a_character_that_cannot_close_its_goal() {
+        let mods = moderators("zuerich");
+        assert!(!mods.is_empty());
+        for m in &mods {
+            assert!(
+                m.is_open(),
+                "a moderator that closed its goal would be an oracle (Thm 7.4)"
+            );
+        }
     }
 
     #[test]
-    fn no_module_is_a_person() {
-        // Every module is defined by a region, never by an attribute
-        // constraint identifying anyone.
-        for m in population("zuerich").modules {
-            assert!(
-                m.matches.is_empty(),
-                "module {} carries an identifying constraint",
-                m.name
-            );
-            assert!(
-                m.members.len() > 1,
-                "module {} is a single position",
-                m.name
-            );
+    fn a_moderator_is_not_a_roster() {
+        // The only thing a moderator holds is a region and a graph over it.
+        // There is nowhere for a list of people to be.
+        for m in moderators("zuerich") {
+            assert!(m.region.len() > 1);
+            assert_eq!(m.graph.order() as usize, m.region.len());
         }
+    }
+
+    #[test]
+    fn splitting_a_region_character_gives_it_someone_to_ask() {
+        let m = &moderators("zuerich")[0];
+        let parts = m.split(3);
+        assert!(
+            parts.iter().any(|i| i.is_short_of(m)),
+            "a split that costs nothing gives nobody a reason to speak"
+        );
+        assert!(!m.round(&parts).is_empty());
     }
 
     #[test]

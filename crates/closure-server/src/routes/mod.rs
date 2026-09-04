@@ -37,11 +37,12 @@ pub fn router(state: AppState) -> Router {
             "/v1/session/{token}/subgroups/{name}/voices",
             get(square::voices),
         )
-        .route("/v1/session/{token}/voices/{id}/fit", get(square::fit))
         .route(
-            "/v1/session/{token}/voices/{id}/realise",
-            post(square::realise),
+            "/v1/session/{token}/voices/{id}/character",
+            get(square::character),
         )
+        .route("/v1/session/{token}/voices/{id}/prune", post(square::prune))
+        .route("/v1/session/{token}/voices/{id}/ask", post(square::ask))
         .with_state(state)
 }
 
@@ -243,7 +244,7 @@ mod tests {
     /// reports success, progress, or attribution would require editing this
     /// constant, which is the point: the check is a tripwire on the API
     /// surface rather than a grep over prose.
-    const DECLARED_ROUTES: [&str; 12] = [
+    const DECLARED_ROUTES: [&str; 13] = [
         "/health",
         "/v1/cities",
         "/v1/invariants",
@@ -254,8 +255,9 @@ mod tests {
         "/v1/session/{token}/tick",
         "/v1/session/{token}/subgroups",
         "/v1/session/{token}/subgroups/{name}/voices",
-        "/v1/session/{token}/voices/{id}/fit",
-        "/v1/session/{token}/voices/{id}/realise",
+        "/v1/session/{token}/voices/{id}/character",
+        "/v1/session/{token}/voices/{id}/prune",
+        "/v1/session/{token}/voices/{id}/ask",
     ];
 
     #[test]

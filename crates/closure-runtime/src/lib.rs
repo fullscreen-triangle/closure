@@ -24,16 +24,16 @@
 pub mod act;
 pub mod attention;
 pub mod forum;
+pub mod moderator;
 pub mod node;
-pub mod population;
 pub mod voice;
 
 pub use act::{Act, Gaps, classify, gap_at, residual_gap};
 pub use attention::{Allocation, Scene, water_fill};
 pub use forum::{Feed, Forum, Order, Post, PostId, Speaker, Visible, can_see, feed, visible_to};
+pub use moderator::{Cap, Character, Identity, Instance, InstanceId, Moderator, amalgamate};
 pub use node::{Node, Runtime, Value};
-pub use population::{Module, Population};
-pub use voice::{Fit, Seeding, Square, Subgroup, Voice, VoiceId};
+pub use voice::{Seeding, Square, Subgroup, Voice, VoiceId};
 
 /// Errors the runtime can return.
 #[derive(Debug, thiserror::Error)]

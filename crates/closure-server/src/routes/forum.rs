@@ -183,12 +183,9 @@ pub async fn tick(
     Path(token): Path<String>,
 ) -> Result<Json<Tick>, (StatusCode, Json<super::ApiError>)> {
     let token = SessionToken::parse(&token).map_err(super::bad_request)?;
-    st.with_forum(&token, |f| Tick {
-        tick: f.advance(),
-        posts: f.posts().len(),
-    })
-    .map(Json)
-    .ok_or_else(super::not_found)
+    st.advance(&token)
+        .map(|(tick, posts)| Json(Tick { tick, posts }))
+        .ok_or_else(super::not_found)
 }
 
 #[cfg(test)]

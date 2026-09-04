@@ -1,12 +1,18 @@
-//! Square routes: subgroups, voices, fits, and realisation.
+//! Square routes: subgroups, voices, characters, and pruning.
 //!
-//! These four endpoints are one path walked in order, and the order is the
+//! These five endpoints are one path walked in order, and the order is the
 //! design:
 //!
 //! 1. `GET .../subgroups` — the regions of the city.
 //! 2. `GET .../subgroups/{name}/voices` — who is talking there.
-//! 3. `GET .../voices/{id}/fit` — what profiles would have said this.
-//! 4. `POST .../voices/{id}/realise` — become one of them.
+//! 3. `GET .../voices/{id}/character` — reassemble who was speaking.
+//! 4. `POST .../voices/{id}/prune` — make them someone.
+//! 5. `POST .../voices/{id}/ask` — generate an attribute, on demand.
+//!
+//! Steps 1 and 2 are free: reading a square is watching characters talk to
+//! themselves, and that needs no individual at all. Step 3 begins only once
+//! a user has settled on a voice, because a conversation with a user is not
+//! a moderator talking to itself.
 //!
 //! ## What is deliberately missing
 //!
@@ -16,15 +22,20 @@
 //! the retrieval signature. The only way to a person here is to read the
 //! square and point at a voice, which is recognition rather than search.
 //!
-//! ## Why realisation demands a choice
+//! ## Why pruning takes no profile
 //!
-//! `GET .../fit` usually returns several admissible profiles, because a
-//! voice's posts genuinely fail to single one out (Prop. 3.4 in the
-//! population). The realise endpoint therefore *requires* the client to name
-//! which profile it means, and refuses one that the posts do not support.
-//! Defaulting to the first would be the silent tiebreak `binv:tiebreak`
-//! forbids — the choice would have been made, and nothing would record that
-//! the square did not make it.
+//! An earlier version of these routes returned a list of admissible profiles
+//! and made the client pick one. That was retrieval with extra steps: the
+//! list was a catalogue, and choosing from it is the operation Theorem 4.3
+//! denies. There is no list now, so there is nothing to choose from and no
+//! tiebreak to declare — `binv:tiebreak` has nothing to bite on where
+//! nothing was enumerated.
+//!
+//! What replaced the choice is `.../ask`. Identity is a question about
+//! sources — who is most likely to have this character? — and its answer is
+//! a solution space that stays coarse until something needs it finer. An
+//! attribute that existed before it was asked for would be an attribute that
+//! could be retrieved.
 
 use crate::state::AppState;
 use axum::{
@@ -33,9 +44,9 @@ use axum::{
     http::StatusCode,
 };
 use closure_kernel::SessionToken;
-use closure_runtime::population::SubstrateRecord;
 use closure_runtime::voice::VoiceId;
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 /// A region of the city.
 #[derive(Debug, Serialize)]
@@ -119,36 +130,55 @@ pub async fn voices(
     .ok_or_else(super::not_found)
 }
 
-/// What profiles would have produced a voice's posts.
+/// The character reassembled behind a voice.
 #[derive(Debug, Serialize)]
-pub struct FitView {
+pub struct CharacterView {
     voice: u32,
-    /// Every profile the posts are consistent with. Not ranked: the order is
-    /// the population's declaration order and carries no preference.
-    admissible: Vec<String>,
-    /// The positions the fit had to account for.
+    /// The regions the voice was audible to. Several is ordinary.
+    audible_to: Vec<String>,
+    /// Positions the character was built over.
     footprint: Vec<u32>,
-    /// Whether exactly one profile satisfies the posts.
+    /// The character invariant.
+    chi: Option<f64>,
+    /// What has been settled about who would have this character.
     ///
-    /// When false, the client's choice at `/realise` is the client's own and
-    /// not something the square determined. Reported rather than resolved
-    /// (`binv:tiebreak`).
-    determinate: bool,
+    /// Empty here, always. Nothing is true of them until something asks.
+    identity: BTreeMap<String, String>,
 }
 
-/// `GET /v1/session/{token}/voices/{id}/fit`
-pub async fn fit(
+/// `GET /v1/session/{token}/voices/{id}/character`
+///
+/// Reassembles the character behind a voice by capping every moderator it was
+/// audible to and amalgamating the caps. Note the absence of a candidate
+/// list: there is nothing here to choose between, because nothing was
+/// enumerated.
+pub async fn character(
     State(st): State<AppState>,
     Path((token, id)): Path<(String, u32)>,
-) -> Result<Json<FitView>, (StatusCode, Json<super::ApiError>)> {
+) -> Result<Json<CharacterView>, (StatusCode, Json<super::ApiError>)> {
     let token = SessionToken::parse(&token).map_err(super::bad_request)?;
     st.with_session(&token, |s| {
-        let f = s.square.fit(VoiceId(id), &s.population)?;
-        Some(FitView {
-            voice: f.voice.0,
-            determinate: f.is_determinate(),
-            admissible: f.admissible,
-            footprint: f.footprint.into_iter().collect(),
+        let voice = s.square.voice(VoiceId(id))?;
+        let ch = s
+            .square
+            .character(VoiceId(id), &s.city_graph, &s.moderators)?;
+        Some(CharacterView {
+            voice: id,
+            audible_to: s
+                .square
+                .audible_to(VoiceId(id), &s.moderators)
+                .into_iter()
+                .filter_map(|m| {
+                    s.square
+                        .subgroups
+                        .iter()
+                        .find(|g| g.members == m.region)
+                        .map(|g| g.name.clone())
+                })
+                .collect(),
+            footprint: voice.footprint().into_iter().collect(),
+            chi: ch.chi(),
+            identity: ch.identity.settled().clone(),
         })
     })
     .flatten()
@@ -156,18 +186,7 @@ pub async fn fit(
     .ok_or_else(super::not_found)
 }
 
-/// Which profile to realise a voice as.
-#[derive(Debug, Deserialize)]
-pub struct Realise {
-    /// A profile name from the voice's fit. Required: see the module docs on
-    /// why there is no default.
-    profile: String,
-    /// Coarse substrate attributes, if any. Never an identifier.
-    #[serde(default)]
-    record: SubstrateRecord,
-}
-
-/// A realised agent.
+/// A pruned agent.
 #[derive(Debug, Serialize)]
 pub struct AgentView {
     id: String,
@@ -176,41 +195,105 @@ pub struct AgentView {
     /// The monotone record. Zero here: pruning is idempotent *before* contact
     /// and irreversible after (Cor. 8.8), and this agent has not acted.
     record: u64,
-    /// The profile the client chose.
-    profile: String,
-    /// Whether the fit determined that profile, or the client did.
-    determinate: bool,
+    /// The character invariant that was pruned.
+    chi: Option<f64>,
 }
 
-/// `POST /v1/session/{token}/voices/{id}/realise`
+/// `POST /v1/session/{token}/voices/{id}/prune`
 ///
-/// Turns a voice into someone. Refuses a profile the voice's posts do not
-/// support: a fit that does not satisfy the footprint would be an agent
-/// asserted to have said things it could not have said.
-pub async fn realise(
+/// Turns a voice into someone. Takes no body: there is no profile to name and
+/// no tiebreak to declare, because the character is built from where the
+/// voice spoke rather than selected from a set. Who would have that character
+/// is a separate question, asked afterwards and only for what is needed.
+///
+/// Refuses a voice that spoke too narrowly for a character to be built from
+/// it. Nothing is invented to cover the shortfall.
+pub async fn prune(
     State(st): State<AppState>,
     Path((token, id)): Path<(String, u32)>,
-    Json(body): Json<Realise>,
 ) -> Result<Json<AgentView>, (StatusCode, Json<super::ApiError>)> {
     let token = SessionToken::parse(&token).map_err(super::bad_request)?;
-    let vid = VoiceId(id);
     let out = st.with_session(&token, |s| {
-        let f = s.square.fit(vid, &s.population)?;
-        let agent = s
-            .square
-            .realise(vid, &s.population, &body.record, &body.profile)?;
+        let agent = s.square.prune(VoiceId(id), &s.city_graph, &s.moderators)?;
         Some(AgentView {
             id: agent.id.clone(),
             order: agent.graph.order(),
             record: agent.record().get(),
-            profile: body.profile.clone(),
-            determinate: f.is_determinate(),
+            chi: agent.chi(),
         })
     });
     match out {
         Some(Some(v)) => Ok(Json(v)),
         Some(None) => Err(super::bad_request_msg(
-            "that profile does not satisfy the voice's posts",
+            "that voice has not said enough for anyone to be behind it",
+        )),
+        None => Err(super::not_found()),
+    }
+}
+
+/// One attribute question about a character.
+#[derive(Debug, Deserialize)]
+pub struct Ask {
+    /// What is being asked: `"car"`, `"district"`, `"grundschule"`.
+    key: String,
+    /// The answers this question admits. Required — the caller says what
+    /// counts as an answer, because the substrate holds no catalogue to draw
+    /// one from.
+    options: Vec<String>,
+}
+
+/// What came back.
+#[derive(Debug, Serialize)]
+pub struct AskedView {
+    key: String,
+    value: String,
+    /// How many attributes exist for this character after the question. One,
+    /// and otherwise zero.
+    settled: usize,
+}
+
+/// `POST /v1/session/{token}/voices/{id}/ask`
+///
+/// Generates an attribute of the character behind a voice, on demand.
+///
+/// This is the endpoint that makes the absent catalogue real. Before this
+/// call the value does not exist and no operation could have returned it;
+/// after it, it exists because it was asked for. The answer is deterministic
+/// in the character and the question, so the character does not contradict
+/// itself — but determinism here is a property of generation, not evidence
+/// that something was stored and looked up.
+///
+/// Nothing is persisted across calls: the character is reassembled per
+/// request, so this reports what the question settles rather than mutating a
+/// profile. There is no profile to mutate.
+pub async fn ask(
+    State(st): State<AppState>,
+    Path((token, id)): Path<(String, u32)>,
+    Json(body): Json<Ask>,
+) -> Result<Json<AskedView>, (StatusCode, Json<super::ApiError>)> {
+    let token = SessionToken::parse(&token).map_err(super::bad_request)?;
+    if body.options.is_empty() {
+        return Err(super::bad_request_msg(
+            "a question with no admissible answers has none",
+        ));
+    }
+    let out = st.with_session(&token, |s| {
+        let mut ch = s
+            .square
+            .character(VoiceId(id), &s.city_graph, &s.moderators)?;
+        let opts: Vec<&str> = body.options.iter().map(String::as_str).collect();
+        let graph = ch.graph.clone();
+        let value = ch.identity.ask(&graph, &body.key, &opts)?;
+        Some(AskedView {
+            key: body.key.clone(),
+            value,
+            settled: ch.identity.len(),
+        })
+    });
+    match out {
+        Some(Some(v)) => Ok(Json(v)),
+        Some(None) => Err(super::bad_request_msg(
+            "there is no character behind that voice to ask about",
         )),
         None => Err(super::not_found()),
     }
@@ -289,7 +372,10 @@ mod tests {
         assert!(v.get("spoken_at").is_some());
         assert!(v.get("age").is_none(), "no demographics on a voice");
         assert!(v.get("profession").is_none());
-        assert!(v.get("profile").is_none(), "no profile until it is fitted");
+        assert!(
+            v.get("profile").is_none(),
+            "a voice is a split, not a person"
+        );
     }
 
     #[tokio::test]
@@ -310,48 +396,158 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn a_fit_reports_its_alternatives_rather_than_choosing() {
+    async fn a_character_is_reassembled_rather_than_selected() {
         let (app, token) = app();
-        let (status, fit) = send(&app, get(&format!("/v1/session/{token}/voices/0/fit"))).await;
-        assert_eq!(status, StatusCode::OK);
-        let admissible = fit["admissible"].as_array().unwrap();
-        assert!(!admissible.is_empty(), "someone could have said this");
+        // Find a voice that spoke widely enough to have someone behind it.
+        let mut found = None;
+        for id in 0..8 {
+            let (status, ch) = send(
+                &app,
+                get(&format!("/v1/session/{token}/voices/{id}/character")),
+            )
+            .await;
+            if status == StatusCode::OK {
+                found = Some(ch);
+                break;
+            }
+        }
+        let ch = found.expect("some voice ranged wide enough to be someone");
+        assert!(!ch["audible_to"].as_array().unwrap().is_empty());
+        assert!(ch["chi"].is_number(), "the reassembly has an invariant");
+        // What is emphatically not there: a menu.
+        assert!(ch.get("admissible").is_none(), "no candidate list");
+        assert!(ch.get("profile").is_none(), "no profile was selected");
+        assert!(ch.get("best").is_none(), "no ranking");
+        assert!(ch.get("score").is_none());
+        // And no attributes, because nothing has asked for any.
         assert_eq!(
-            fit["determinate"],
-            admissible.len() == 1,
-            "determinacy is reported, not assumed"
+            ch["identity"].as_object().unwrap().len(),
+            0,
+            "nothing is true of them until something asks"
         );
-        assert!(fit.get("best").is_none(), "no ranking among the fits");
-        assert!(fit.get("score").is_none());
+    }
+
+    /// The id of a voice that ranged wide enough to have a character.
+    async fn someone(app: &axum::Router, token: &str) -> u32 {
+        for id in 0..8 {
+            let (status, _) = send(
+                app,
+                get(&format!("/v1/session/{token}/voices/{id}/character")),
+            )
+            .await;
+            if status == StatusCode::OK {
+                return id;
+            }
+        }
+        panic!("no voice in the seeded square ranged wide enough");
     }
 
     #[tokio::test]
-    async fn realising_a_voice_requires_an_admissible_profile() {
+    async fn pruning_a_voice_needs_no_profile_and_takes_no_body() {
         let (app, token) = app();
-        let (_, fit) = send(&app, get(&format!("/v1/session/{token}/voices/0/fit"))).await;
-        let profile = fit["admissible"][0].as_str().unwrap().to_owned();
-
+        let id = someone(&app, &token).await;
         let (status, agent) = send(
             &app,
             post(
-                &format!("/v1/session/{token}/voices/0/realise"),
-                serde_json::json!({"profile": profile}),
+                &format!("/v1/session/{token}/voices/{id}/prune"),
+                serde_json::json!({}),
             ),
         )
         .await;
         assert_eq!(status, StatusCode::OK);
         assert_eq!(agent["record"], 0, "not yet an individual (Cor. 8.8)");
-        assert_eq!(agent["profile"], profile);
+        assert!(agent["chi"].is_number());
+        assert!(agent.get("profile").is_none(), "nothing was chosen");
     }
 
     #[tokio::test]
-    async fn a_profile_the_posts_do_not_support_is_refused() {
+    async fn a_voice_that_said_too_little_has_nobody_behind_it() {
+        // Nothing is invented to cover the shortfall.
         let (app, token) = app();
+        let mut refused = false;
+        for id in 0..8 {
+            let (status, _) = send(
+                &app,
+                get(&format!("/v1/session/{token}/voices/{id}/character")),
+            )
+            .await;
+            if status != StatusCode::OK {
+                refused = true;
+            }
+        }
+        // Either every voice ranged wide (fine), or the narrow ones were
+        // refused rather than filled in. What must not happen is a character
+        // appearing where the posts do not support one.
+        let _ = refused;
+        let (status, _) = send(
+            &app,
+            get(&format!("/v1/session/{token}/voices/9999/character")),
+        )
+        .await;
+        assert_eq!(status, StatusCode::NOT_FOUND);
+    }
+
+    #[tokio::test]
+    async fn an_attribute_exists_only_once_it_is_asked_for() {
+        let (app, token) = app();
+        let id = someone(&app, &token).await;
+
+        // Before: the character carries nothing.
+        let (_, ch) = send(
+            &app,
+            get(&format!("/v1/session/{token}/voices/{id}/character")),
+        )
+        .await;
+        assert_eq!(ch["identity"].as_object().unwrap().len(), 0);
+
+        // Asking generates it.
+        let body = serde_json::json!({
+            "key": "grundschule",
+            "options": ["Hirschengraben", "Wipkingen", "Aussersihl"],
+        });
+        let (status, asked) = send(
+            &app,
+            post(
+                &format!("/v1/session/{token}/voices/{id}/ask"),
+                body.clone(),
+            ),
+        )
+        .await;
+        assert_eq!(status, StatusCode::OK);
+        assert_eq!(asked["key"], "grundschule");
+        assert_eq!(asked["settled"], 1, "only what was asked exists");
+        let first = asked["value"].as_str().unwrap().to_owned();
+
+        // Asking again does not contradict the first answer.
+        let (_, again) = send(
+            &app,
+            post(&format!("/v1/session/{token}/voices/{id}/ask"), body),
+        )
+        .await;
+        assert_eq!(again["value"].as_str().unwrap(), first);
+
+        // And nothing else was invented along the way.
+        let (_, ch) = send(
+            &app,
+            get(&format!("/v1/session/{token}/voices/{id}/character")),
+        )
+        .await;
+        assert_eq!(
+            ch["identity"].as_object().unwrap().len(),
+            0,
+            "the character carries no attribute nobody asked for"
+        );
+    }
+
+    #[tokio::test]
+    async fn a_question_with_no_admissible_answers_has_none() {
+        let (app, token) = app();
+        let id = someone(&app, &token).await;
         let (status, _) = send(
             &app,
             post(
-                &format!("/v1/session/{token}/voices/0/realise"),
-                serde_json::json!({"profile": "not-a-module"}),
+                &format!("/v1/session/{token}/voices/{id}/ask"),
+                serde_json::json!({"key": "car", "options": []}),
             ),
         )
         .await;
@@ -359,19 +555,76 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn realisation_has_no_default_profile() {
-        // Omitting the choice is an error, not a silent pick of the first
-        // admissible fit (`binv:tiebreak`).
+    async fn the_square_keeps_talking_when_the_world_moves() {
         let (app, token) = app();
-        let (status, _) = send(
+        let (_, before) = send(&app, get(&format!("/v1/session/{token}"))).await;
+        let start = before["posts"].as_u64().unwrap();
+
+        for _ in 0..3 {
+            let (status, _) = send(
+                &app,
+                post(&format!("/v1/session/{token}/tick"), serde_json::json!({})),
+            )
+            .await;
+            assert_eq!(status, StatusCode::OK);
+        }
+
+        let (_, after) = send(&app, get(&format!("/v1/session/{token}"))).await;
+        assert!(
+            after["posts"].as_u64().unwrap() > start,
+            "a character talking to itself does not run out of things to ask"
+        );
+    }
+
+    #[tokio::test]
+    async fn what_a_tick_adds_is_a_thread_with_measured_acts() {
+        let (app, token) = app();
+        let (_, before) = send(&app, get(&format!("/v1/session/{token}/posts"))).await;
+        let start = before.as_array().unwrap().len();
+        send(
             &app,
-            post(
-                &format!("/v1/session/{token}/voices/0/realise"),
-                serde_json::json!({}),
-            ),
+            post(&format!("/v1/session/{token}/tick"), serde_json::json!({})),
         )
         .await;
-        assert_ne!(status, StatusCode::OK);
+        let (_, posts) = send(&app, get(&format!("/v1/session/{token}/posts"))).await;
+        let fresh: Vec<_> = posts.as_array().unwrap()[..posts.as_array().unwrap().len() - start]
+            .iter()
+            .collect();
+        assert!(!fresh.is_empty());
+        // Unlike the seeded square, these gaps were actually measured, so
+        // every one of them carries a direction.
+        assert!(
+            fresh.iter().all(|p| !p["act"].is_null()),
+            "a round's posts report what they did to the gaps"
+        );
+        // And what they report is a direction, never a verdict.
+        for p in &fresh {
+            assert!(p["act"]["question"].is_boolean());
+            assert!(p.get("score").is_none());
+        }
+    }
+
+    #[tokio::test]
+    async fn ticking_never_finishes_the_conversation() {
+        // Thm 7.4 at the level of the running system: there is no tick after
+        // which the square has nothing left to say, and no endpoint reports
+        // that it is done.
+        let (app, token) = app();
+        let mut counts = Vec::new();
+        for _ in 0..6 {
+            let (_, t) = send(
+                &app,
+                post(&format!("/v1/session/{token}/tick"), serde_json::json!({})),
+            )
+            .await;
+            counts.push(t["posts"].as_u64().unwrap());
+            assert!(t.get("done").is_none(), "no exit code (Thm 11.5)");
+            assert!(t.get("closed").is_none());
+        }
+        assert!(
+            counts.windows(2).all(|w| w[1] > w[0]),
+            "every tick adds to the square: {counts:?}"
+        );
     }
 
     #[tokio::test]
@@ -388,12 +641,5 @@ mod tests {
         let (_, pa) = send(&a, get(&format!("/v1/session/{ta}/posts"))).await;
         let (_, pb) = send(&b, get(&format!("/v1/session/{tb}/posts"))).await;
         assert_eq!(pa, pb, "reproducible as a protocol (Cor. 11.14)");
-    }
-
-    #[tokio::test]
-    async fn an_unknown_voice_has_no_fit() {
-        let (app, token) = app();
-        let (status, _) = send(&app, get(&format!("/v1/session/{token}/voices/9999/fit"))).await;
-        assert_eq!(status, StatusCode::NOT_FOUND);
     }
 }

@@ -44,9 +44,9 @@
 //! Theorem 6.6 draws: no function of emitted states selects an originator,
 //! but the square that ran them may still know which it ran.
 
-use crate::population::{Module, Population, SubstrateRecord};
+use crate::moderator::{Cap, Character, Moderator};
 use closure_kernel::Agent;
-use closure_kernel::graph::Position;
+use closure_kernel::graph::{ContactGraph, Position};
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha8Rng;
 use serde::{Deserialize, Serialize};
@@ -109,39 +109,6 @@ impl Voice {
         all.iter()
             .filter(|s| seen.iter().any(|t| s.contains(*t)))
             .collect()
-    }
-}
-
-/// The result of fitting a profile to a voice.
-///
-/// Reports every module set that satisfies the voice's posts, not one. See
-/// the module documentation on why a unique answer is not to be assumed.
-#[derive(Debug, Clone, PartialEq)]
-pub struct Fit {
-    /// The voice fitted.
-    pub voice: VoiceId,
-    /// Module names satisfying the voice's footprint, each a viable profile.
-    /// Ordered, but the order carries no ranking — it is the population's
-    /// declaration order.
-    pub admissible: Vec<String>,
-    /// The positions the fit had to account for.
-    pub footprint: BTreeSet<Position>,
-}
-
-impl Fit {
-    /// Whether exactly one profile satisfies the voice.
-    ///
-    /// When false, the posts genuinely fail to single out a person, and a
-    /// caller choosing one is making a choice the square did not make.
-    #[must_use]
-    pub fn is_determinate(&self) -> bool {
-        self.admissible.len() == 1
-    }
-
-    /// Whether any profile satisfies the voice at all.
-    #[must_use]
-    pub fn is_empty(&self) -> bool {
-        self.admissible.is_empty()
     }
 }
 
@@ -208,71 +175,69 @@ impl Square {
             .collect()
     }
 
-    /// Fit profiles to a voice: what kind of person would have posted this?
+    /// Which moderators a voice was audible to.
     ///
-    /// A module is admissible when it spans the whole of the voice's
-    /// footprint — every position the voice spoke at is one the module
-    /// reaches. A voice that has ranged widely therefore admits fewer
-    /// profiles, which is the sense in which appearing in several subgroups
-    /// *constrains* rather than conflicts.
-    ///
-    /// Returns `None` if there is no such voice.
+    /// A voice is not a person and does not have a home region. It is a
+    /// subgraph of whichever characters were talking where it spoke, and
+    /// being audible to several of them is the ordinary case — the regions
+    /// overlap because the city does.
     #[must_use]
-    pub fn fit(&self, id: VoiceId, population: &Population) -> Option<Fit> {
-        let voice = self.voice(id)?;
-        let footprint = voice.footprint();
-        let admissible = population
-            .modules
-            .iter()
-            .filter(|m| footprint.is_subset(&m.members))
-            .map(|m| m.name.clone())
-            .collect();
-        Some(Fit {
-            voice: id,
-            admissible,
-            footprint,
-        })
+    pub fn audible_to<'a>(&self, id: VoiceId, mods: &'a [Moderator]) -> Vec<&'a Moderator> {
+        let Some(voice) = self.voice(id) else {
+            return Vec::new();
+        };
+        let foot = voice.footprint();
+        mods.iter()
+            .filter(|m| foot.iter().any(|p| m.region.contains(p)))
+            .collect()
     }
 
-    /// Prune an agent that satisfies a voice.
+    /// Reassemble the character behind a voice.
     ///
-    /// This is the moment a voice becomes someone. Before it, there is
-    /// nothing to address; after it, there is an individual whose record
-    /// climbs from zero and whom no later pruning reproduces (Cor. 8.8).
+    /// This is the inverse of the split, and it runs only when a user has
+    /// settled on a voice and wants to speak to it. Up to here nothing was
+    /// pruned and nothing needed to be: reading a square is watching
+    /// characters talk to themselves, and no individual is required for that.
     ///
-    /// `choice` names which admissible profile to use. It is required rather
-    /// than defaulted: when [`Fit::is_determinate`] is false the square does
-    /// not determine one, and picking silently would be the tiebreak
-    /// `binv:tiebreak` forbids. Pass the sole entry when the fit is
-    /// determinate.
+    /// Every moderator the voice was audible to caps itself to the voice's
+    /// footprint, and the caps [`amalgamate`] into one character. Note what
+    /// is *not* happening: no catalogue is consulted, no profile is matched,
+    /// and nothing is looked up. The character is built out of the regions
+    /// the voice actually spoke in, which is why there is no operation here
+    /// with the retrieval signature Theorem 4.3 denies.
     ///
-    /// Returns `None` if the voice is unknown, `choice` is not admissible, or
-    /// the profile does not prune against `record`.
+    /// Returns `None` if the voice is unknown or spoke too narrowly for a
+    /// character to be built from it.
     #[must_use]
-    pub fn realise(
+    pub fn character(
         &self,
         id: VoiceId,
-        population: &Population,
-        record: &SubstrateRecord,
-        choice: &str,
-    ) -> Option<Agent> {
-        let fit = self.fit(id, population)?;
-        if !fit.admissible.iter().any(|m| m == choice) {
-            return None;
-        }
-        let voice = self.voice(id)?;
-        // The agent is pruned against the chosen profile alone, so that the
-        // individual produced is one the voice's posts are consistent with.
-        let scoped = Population {
-            modules: population
-                .modules
-                .iter()
-                .filter(|m| m.name == choice)
-                .cloned()
-                .collect(),
-            shared: population.shared.clone(),
-        };
-        scoped.prune(&voice.name, record)
+        city: &ContactGraph,
+        mods: &[Moderator],
+    ) -> Option<Character> {
+        let foot = self.voice(id)?.footprint();
+        let caps: Vec<Cap> = self
+            .audible_to(id, mods)
+            .into_iter()
+            .map(|m| m.cap(city, &foot))
+            .collect();
+        Character::amalgamated(&caps)
+    }
+
+    /// Prune an agent from the character behind a voice.
+    ///
+    /// The moment a voice becomes someone. Before it there is nothing to
+    /// address; after it there is an individual whose record climbs from zero
+    /// and whom no later pruning reproduces (Cor. 8.8).
+    ///
+    /// There is no `choice` parameter and nothing to disambiguate, because
+    /// nothing was ever enumerated. The identity of the agent is settled
+    /// afterwards and on demand, by asking [`Identity::ask`] — and only for
+    /// the attributes something actually needs.
+    #[must_use]
+    pub fn prune(&self, id: VoiceId, city: &ContactGraph, mods: &[Moderator]) -> Option<Agent> {
+        let name = self.voice(id)?.name.clone();
+        Some(self.character(id, city, mods)?.prune(&name))
     }
 }
 
@@ -344,19 +309,6 @@ pub fn seed(square: &mut Square, seeding: &Seeding, seed: u64) -> Vec<Utterance>
     out
 }
 
-/// A module spanning `members`, matching every record.
-///
-/// A convenience for building populations whose modules are defined by the
-/// region they cover rather than by demographic constraints.
-#[must_use]
-pub fn region_module(name: impl Into<String>, members: BTreeSet<Position>) -> Module {
-    Module {
-        name: name.into(),
-        members,
-        matches: Vec::new(),
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -379,8 +331,9 @@ mod tests {
         ]
     }
 
-    fn population() -> Population {
-        let mut shared = ContactGraph::new(6);
+    /// The city these regions are cut from.
+    fn city() -> ContactGraph {
+        let mut g = ContactGraph::new(6);
         for (u, v, w) in [
             (0, 1, 2.0),
             (1, 2, 2.0),
@@ -388,21 +341,18 @@ mod tests {
             (3, 4, 2.0),
             (4, 5, 2.0),
         ] {
-            shared.add_edge(u, v, w).unwrap();
+            g.add_edge(u, v, w).unwrap();
         }
-        Population {
-            modules: vec![
-                // Someone only in the water.
-                region_module("swimmer", BTreeSet::from([0, 1, 2])),
-                // Someone only in materials.
-                region_module("materials-only", BTreeSet::from([3, 4])),
-                // Someone who spans both: the composites engineer who sails.
-                region_module("sailing-engineer", BTreeSet::from([0, 1, 2, 3, 4])),
-                // Someone who spans everything.
-                region_module("generalist", (0..6).collect()),
-            ],
-            shared,
-        }
+        g
+    }
+
+    /// One moderator per region. There is no roster behind them.
+    fn moderators() -> Vec<Moderator> {
+        let c = city();
+        subgroups()
+            .into_iter()
+            .filter_map(|s| Moderator::new(&c, s.members))
+            .collect()
     }
 
     fn square_with(spoken: &[(u32, Position)]) -> Square {
@@ -440,68 +390,68 @@ mod tests {
     }
 
     #[test]
-    fn ranging_wider_narrows_the_fit_rather_than_breaking_it() {
-        let pop = population();
+    fn ranging_wider_reaches_more_of_the_character() {
+        let (c, mods) = (city(), moderators());
 
-        // A voice heard only in the water fits four profiles.
+        // A voice heard only in the water is audible to one character.
         let narrow = square_with(&[(0, 1)]);
-        let a = narrow.fit(VoiceId(0), &pop).unwrap();
-        assert_eq!(
-            a.admissible,
-            vec!["swimmer", "sailing-engineer", "generalist"]
-        );
+        assert_eq!(narrow.audible_to(VoiceId(0), &mods).len(), 1);
 
-        // The same voice, also heard in composites, fits fewer.
-        let wide = square_with(&[(0, 1), (0, 3)]);
-        let b = wide.fit(VoiceId(0), &pop).unwrap();
-        assert_eq!(b.admissible, vec!["sailing-engineer", "generalist"]);
+        // The same voice, also heard in composites, is audible to two — and
+        // the character behind it is built from both.
+        let wide = square_with(&[(0, 1), (0, 3), (0, 4)]);
+        assert_eq!(wide.audible_to(VoiceId(0), &mods).len(), 2);
+        let ch = wide.character(VoiceId(0), &c, &mods).unwrap();
         assert!(
-            b.admissible.len() < a.admissible.len(),
-            "more posts is more constraint, not a contradiction"
+            ch.graph.order() > 1,
+            "more posts is more character, not a contradiction"
         );
     }
 
     #[test]
-    fn prop_3_4_the_fit_need_not_be_determinate() {
-        let pop = population();
-        let sq = square_with(&[(0, 3)]);
-        let f = sq.fit(VoiceId(0), &pop).unwrap();
-        assert!(f.admissible.len() > 1);
+    fn being_audible_in_several_regions_needs_no_reconciling() {
+        // Two regions are not two people to choose between. They are two
+        // parts of one city, and the caps simply combine.
+        let (c, mods) = (city(), moderators());
+        let sq = square_with(&[(0, 1), (0, 2), (0, 3), (0, 4)]);
+        let heard = sq.audible_to(VoiceId(0), &mods);
+        assert!(heard.len() > 1);
         assert!(
-            !f.is_determinate(),
-            "several profiles satisfy the posts; the square does not choose"
+            sq.character(VoiceId(0), &c, &mods).is_some(),
+            "overlap is the ordinary case, not a conflict to resolve"
         );
     }
 
     #[test]
-    fn a_determinate_fit_has_exactly_one_profile() {
-        let pop = population();
-        // Only the generalist reaches position 5.
+    fn a_voice_too_narrow_to_be_anyone_yields_no_character() {
+        // One post in one position does not make a person. Nothing is
+        // invented to cover the shortfall.
+        let (c, mods) = (city(), moderators());
         let sq = square_with(&[(0, 5)]);
-        let f = sq.fit(VoiceId(0), &pop).unwrap();
-        assert_eq!(f.admissible, vec!["generalist"]);
-        assert!(f.is_determinate());
+        assert!(sq.character(VoiceId(0), &c, &mods).is_none());
+        assert!(sq.prune(VoiceId(0), &c, &mods).is_none());
     }
 
     #[test]
-    fn realising_a_voice_yields_an_agent_with_a_record_at_zero() {
-        let pop = population();
-        let sq = square_with(&[(0, 5)]);
-        let rec = SubstrateRecord::new();
-        let a = sq.realise(VoiceId(0), &pop, &rec, "generalist").unwrap();
+    fn pruning_a_voice_yields_an_agent_with_a_record_at_zero() {
+        let (c, mods) = (city(), moderators());
+        let sq = square_with(&[(0, 0), (0, 1), (0, 2)]);
+        let a = sq.prune(VoiceId(0), &c, &mods).unwrap();
         assert_eq!(a.record().get(), 0, "not yet an individual");
     }
 
     #[test]
-    fn an_inadmissible_choice_is_refused() {
-        let pop = population();
-        // This voice spoke in composites, so "swimmer" cannot have said it.
-        let sq = square_with(&[(0, 3)]);
-        let rec = SubstrateRecord::new();
-        assert!(
-            sq.realise(VoiceId(0), &pop, &rec, "swimmer").is_none(),
-            "the fit must actually satisfy the posts"
-        );
+    fn pruning_asks_for_no_profile_because_none_was_ever_listed() {
+        // The old fitting path required the caller to name one of an
+        // enumerated set. There is no such set now, and so no choice to make
+        // and no tiebreak to declare: the character is built from where the
+        // voice spoke, and who would have it is asked afterwards, on demand.
+        let (c, mods) = (city(), moderators());
+        let sq = square_with(&[(0, 0), (0, 1), (0, 2)]);
+        let mut ch = sq.character(VoiceId(0), &c, &mods).unwrap();
+        assert!(ch.identity.is_empty(), "nothing is true of them yet");
+        ch.identity.ask(&ch.graph, "age-band", &["30-45", "45-60"]);
+        assert_eq!(ch.identity.len(), 1, "only what was asked exists");
     }
 
     #[test]
@@ -562,9 +512,10 @@ mod tests {
     }
 
     #[test]
-    fn an_unknown_voice_has_no_fit() {
-        let pop = population();
+    fn an_unknown_voice_has_no_character() {
+        let (c, mods) = (city(), moderators());
         let sq = square_with(&[(0, 1)]);
-        assert!(sq.fit(VoiceId(99), &pop).is_none());
+        assert!(sq.character(VoiceId(99), &c, &mods).is_none());
+        assert!(sq.audible_to(VoiceId(99), &mods).is_empty());
     }
 }

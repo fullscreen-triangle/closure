@@ -1,13 +1,21 @@
 //! Server state: sessions and the worlds they inhabit.
 
 use closure_kernel::SessionToken;
+use closure_runtime::forum::Speaker;
 use closure_runtime::forum::open_square;
+use closure_runtime::moderator::{Moderator, post_round};
 use closure_runtime::voice::{Seeding, Square, seed};
-use closure_runtime::{Forum, Population, Runtime};
+use closure_runtime::{Forum, Runtime};
 use serde::Serialize;
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::{Arc, RwLock};
+
+/// How many instances a character splits into when it takes a turn.
+///
+/// Three is enough for the deficit to be visible without the thread
+/// becoming a wall. Nothing depends on the number being this one.
+const SPLITS: u32 = 3;
 
 /// One player's session in one city.
 #[derive(Debug)]
@@ -20,8 +28,12 @@ pub struct Session {
     pub forum: Forum,
     /// The square: who is talking, and in which regions.
     pub square: Square,
-    /// The coarse population voices are fitted against.
-    pub population: Population,
+    /// The characters talking in this city, one per region. A voice is a
+    /// split of one of these, never an entry looked up among them.
+    pub moderators: Vec<Moderator>,
+    /// The graph the city is cut from. Needed to cap a moderator when a
+    /// character has to be reassembled.
+    pub city_graph: closure_kernel::ContactGraph,
     /// The seed this square was opened with. Part of the protocol, so a run
     /// is reproducible as a sequence of requests (Cor. 11.14).
     pub seed: u64,
@@ -40,7 +52,8 @@ impl Session {
     #[must_use]
     pub fn new(city: impl Into<String>, seed: u64) -> Self {
         let city = city.into();
-        let population = crate::substrate::population(&city);
+        let moderators = crate::substrate::moderators(&city);
+        let city_graph = crate::substrate::city_graph();
         let mut square = Square::new(crate::substrate::subgroups(&city));
         let utterances = seed_square(&mut square, seed);
         let mut forum = Forum::new();
@@ -52,7 +65,8 @@ impl Session {
             runtime: Runtime::new(),
             forum,
             square,
-            population,
+            moderators,
+            city_graph,
             seed,
             opened: time::OffsetDateTime::now_utc(),
         }
@@ -197,6 +211,43 @@ impl AppState {
     ) -> Option<T> {
         let mut guard = self.inner.sessions.write().ok()?;
         guard.get_mut(token.as_str()).map(|s| f(&mut s.forum))
+    }
+
+    /// Advance a session and let one character take a turn talking to itself.
+    ///
+    /// Each tick, one moderator — chosen by the tick itself, so the square
+    /// does not favour a region — splits, questions its own instances
+    /// privately, and their answers land in the forum as a thread. Nothing
+    /// closes: the round is guaranteed to leave the character's gap where it
+    /// was or worse (Thm 7.4), which is why there is always another tick
+    /// worth taking.
+    ///
+    /// Returns the new tick and the post count after it.
+    pub fn advance(&self, token: &SessionToken) -> Option<(u64, usize)> {
+        let mut guard = self.inner.sessions.write().ok()?;
+        let session = guard.get_mut(token.as_str())?;
+        let tick = session.forum.advance();
+        if !session.moderators.is_empty() {
+            // Which character speaks is a function of the tick alone. No
+            // region is preferred, and none is starved.
+            let i = (tick as usize) % session.moderators.len();
+            let m = session.moderators[i].clone();
+            let instances = m.split(SPLITS);
+            let turns = m.round(&instances);
+            let region = session
+                .square
+                .subgroups
+                .iter()
+                .find(|g| g.members == m.region)
+                .map_or_else(|| "the square".to_owned(), |g| g.name.clone());
+            post_round(
+                &mut session.forum,
+                |id| Speaker::Agent(format!("{region}/{}", id.0)),
+                &turns,
+                |t| format!("[{region}] about {}", t.about),
+            );
+        }
+        Some((tick, session.forum.posts().len()))
     }
 
     /// Read a session's forum without mutating it.
