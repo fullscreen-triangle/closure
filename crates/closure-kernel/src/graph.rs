@@ -55,6 +55,21 @@ impl ContactGraph {
         Ok(())
     }
 
+    /// Weight of the contact `{u, v}`, if it exists.
+    ///
+    /// The companion's separation algorithm needs adjacency, not just cut
+    /// weights; this is the accessor it reads through.
+    #[must_use]
+    pub fn weight(&self, u: Position, v: Position) -> Option<EdgeWeight> {
+        let key = if u < v { (u, v) } else { (v, u) };
+        self.weights.get(&key).copied()
+    }
+
+    /// Every contact, as `(u, v, w)` with `u < v`.
+    pub fn edges(&self) -> impl Iterator<Item = (Position, Position, EdgeWeight)> + '_ {
+        self.weights.iter().map(|((u, v), w)| (*u, *v, *w))
+    }
+
     /// The floor: the least edge weight (Axiom 3).
     #[must_use]
     pub fn floor(&self) -> Option<EdgeWeight> {

@@ -26,6 +26,8 @@ pub mod graph;
 pub mod identity;
 pub mod invariants;
 pub mod outcome;
+pub mod psychon;
+pub mod separation;
 pub mod token;
 
 pub use closure::{Consideration, Reach, is_closed, reach};
@@ -33,6 +35,8 @@ pub use graph::{ContactGraph, EdgeWeight, Position};
 pub use identity::{Agent, Phase, Record};
 pub use invariants::{INVARIANTS, InvariantViolation};
 pub use outcome::{Outcome, Route};
+pub use psychon::{Emitted, Psychon};
+pub use separation::{Medium, MediumGraph, Separation};
 pub use token::SessionToken;
 
 /// Errors this crate can return.

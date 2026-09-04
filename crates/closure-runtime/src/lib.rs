@@ -21,10 +21,12 @@
 
 #![doc(html_root_url = "https://docs.rs/closure-runtime/0.1.0")]
 
+pub mod act;
 pub mod attention;
 pub mod node;
 pub mod population;
 
+pub use act::{Act, Gaps, classify, gap_at, residual_gap};
 pub use attention::{Allocation, Scene, water_fill};
 pub use node::{Node, Runtime, Value};
 pub use population::{Module, Population};
