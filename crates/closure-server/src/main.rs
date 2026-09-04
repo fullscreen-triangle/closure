@@ -19,6 +19,7 @@
 
 mod routes;
 mod state;
+mod substrate;
 
 use anyhow::Result;
 use clap::Parser;

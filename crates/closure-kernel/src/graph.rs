@@ -91,9 +91,15 @@ impl ContactGraph {
     /// Exhaustive by design. The manuscript's first validation convention is
     /// that structures are built by brute force from the definitions, so that
     /// agreement between theorem and computation is not an artefact of shared
-    /// cleverness. Callers needing scale should quotient first (Thm 3.6).
+    /// cleverness.
+    ///
+    /// **Exponential in the order**, so it is the oracle and not the working
+    /// routine. Anything on a hot path wants [`Self::separation_cost_fast`],
+    /// which computes the same number in cubic time; the two are asserted
+    /// equal in this module's tests, which is what keeps the convention
+    /// honest rather than merely stated.
     #[must_use]
-    pub fn separation_cost(&self) -> Option<EdgeWeight> {
+    pub fn separation_cost_exhaustive(&self) -> Option<EdgeWeight> {
         if self.order < 2 || self.weights.is_empty() {
             return None;
         }
@@ -109,6 +115,94 @@ impl ContactGraph {
             best = best.min(self.cut_weight(&part));
         }
         (best.is_finite()).then_some(best)
+    }
+
+    /// Separation cost, in cubic time.
+    ///
+    /// The same quantity as [`Self::separation_cost_exhaustive`] — the global
+    /// minimum cut — computed by Stoer–Wagner rather than by enumerating
+    /// subsets. Theorem 3.2(iii) is what licenses the substitution: the
+    /// separation of a vertex is a max flow, hence the global minimum over
+    /// vertices is a minimum cut, and a minimum cut is strongly polynomial.
+    /// Nothing about the *definition* changes; only the route to the number.
+    ///
+    /// This matters because the character invariant is computed on every
+    /// pruning, and an agent cut from a city of thirty positions would
+    /// otherwise cost a billion subset evaluations to construct.
+    #[must_use]
+    pub fn separation_cost_fast(&self) -> Option<EdgeWeight> {
+        let n = self.order as usize;
+        if n < 2 || self.weights.is_empty() {
+            return None;
+        }
+        // Dense adjacency over merged vertices. Stoer–Wagner contracts the
+        // last two vertices of each maximum-adjacency ordering and keeps the
+        // best cut-of-the-phase seen.
+        let mut w = vec![vec![0.0f64; n]; n];
+        for ((u, v), x) in &self.weights {
+            let (a, b) = (*u as usize, *v as usize);
+            w[a][b] += *x;
+            w[b][a] += *x;
+        }
+        let mut alive: Vec<usize> = (0..n).collect();
+        let mut best = f64::INFINITY;
+
+        while alive.len() > 1 {
+            let mut added = vec![false; alive.len()];
+            let mut weight = vec![0.0f64; alive.len()];
+            // The maximum-adjacency order, built one vertex at a time. Only
+            // its final two entries are needed: the last is the cut of the
+            // phase, and it contracts into the one before it.
+            let mut order: Vec<usize> = Vec::with_capacity(alive.len());
+            for i in 0..alive.len() {
+                // Take the unadded vertex most tightly attached so far.
+                let mut sel = usize::MAX;
+                for j in 0..alive.len() {
+                    if !added[j] && (sel == usize::MAX || weight[j] > weight[sel]) {
+                        sel = j;
+                    }
+                }
+                added[sel] = true;
+                order.push(sel);
+                if i + 1 == alive.len() {
+                    // The cut-of-the-phase: `last` alone against the rest.
+                    best = best.min(weight[sel]);
+                    let last = sel;
+                    let Some(prev) = order.len().checked_sub(2).map(|k| order[k]) else {
+                        break;
+                    };
+                    // Contract `last` into `prev`. Skip both endpoints: a
+                    // merged vertex has no edge to itself, and folding one in
+                    // would invent contact where the graph has none.
+                    let (p, l) = (alive[prev], alive[last]);
+                    for (j, &b) in alive.iter().enumerate() {
+                        if j == prev || j == last {
+                            continue;
+                        }
+                        w[p][b] += w[l][b];
+                        w[b][p] = w[p][b];
+                    }
+                    alive.remove(last);
+                    break;
+                }
+                for j in 0..alive.len() {
+                    if !added[j] {
+                        weight[j] += w[alive[sel]][alive[j]];
+                    }
+                }
+            }
+        }
+        best.is_finite().then_some(best)
+    }
+
+    /// Separation cost `Res(G)` (Def. 2.3).
+    ///
+    /// Delegates to [`Self::separation_cost_fast`]. The exhaustive routine
+    /// remains available as [`Self::separation_cost_exhaustive`] and is the
+    /// oracle the fast one is checked against.
+    #[must_use]
+    pub fn separation_cost(&self) -> Option<EdgeWeight> {
+        self.separation_cost_fast()
     }
 
     /// Whether every position is reachable from position 0 (Axiom 2).
@@ -154,6 +248,59 @@ impl ContactGraph {
 
 #[cfg(test)]
 mod tests {
+
+    /// The oracle and the working routine must agree, on every graph we can
+    /// afford to ask both. This is the whole justification for delegating
+    /// `separation_cost` to the cubic one: the brute-force convention is
+    /// preserved as a *check* rather than abandoned for speed.
+    #[test]
+    fn the_fast_separation_cost_agrees_with_brute_force() {
+        // Deterministic pseudo-random graphs, small enough to enumerate.
+        let mut state: u64 = 0x2545_f491_4f6c_dd1d;
+        let mut next = || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state
+        };
+        for order in 2u32..9 {
+            for _ in 0..12 {
+                let mut g = ContactGraph::new(order);
+                // A spanning path keeps it connected (Axiom 2), then extra
+                // contacts at random.
+                for u in 0..order - 1 {
+                    let w = 1.0 + f64::from((next() % 5) as u32);
+                    g.add_edge(u, u + 1, w).unwrap();
+                }
+                for _ in 0..order {
+                    let u = (next() % u64::from(order)) as u32;
+                    let v = (next() % u64::from(order)) as u32;
+                    if u != v {
+                        let w = 1.0 + f64::from((next() % 5) as u32);
+                        g.add_edge(u, v, w).unwrap();
+                    }
+                }
+                let slow = g.separation_cost_exhaustive().unwrap();
+                let fast = g.separation_cost_fast().unwrap();
+                assert!(
+                    (slow - fast).abs() < 1e-9,
+                    "order {order}: brute force {slow}, Stoer-Wagner {fast}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn separation_cost_is_computable_on_a_city_sized_graph() {
+        // The case that motivated the fast routine: a graph of thirty
+        // positions is a billion subsets for the oracle and instant here.
+        let mut g = ContactGraph::new(31);
+        for u in 0..30 {
+            g.add_edge(u, u + 1, if u % 6 == 0 { 1.0 } else { 2.0 })
+                .unwrap();
+        }
+        assert_eq!(g.separation_cost(), Some(1.0), "the thinnest join");
+    }
     use super::*;
 
     /// The two-triangle witness of Theorem 3.3: the minimum cut is attained

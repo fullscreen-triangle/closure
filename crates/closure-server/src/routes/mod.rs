@@ -6,6 +6,7 @@
 //! the crate documentation for why those are absent rather than pending.
 
 pub mod forum;
+pub mod square;
 
 use crate::state::AppState;
 use axum::{
@@ -31,6 +32,16 @@ pub fn router(state: AppState) -> Router {
         )
         .route("/v1/session/{token}/thread/{id}", get(forum::thread))
         .route("/v1/session/{token}/tick", post(forum::tick))
+        .route("/v1/session/{token}/subgroups", get(square::subgroups))
+        .route(
+            "/v1/session/{token}/subgroups/{name}/voices",
+            get(square::voices),
+        )
+        .route("/v1/session/{token}/voices/{id}/fit", get(square::fit))
+        .route(
+            "/v1/session/{token}/voices/{id}/realise",
+            post(square::realise),
+        )
         .with_state(state)
 }
 
@@ -105,6 +116,14 @@ struct OpenSession {
     /// Which city to inhabit.
     #[serde(default = "default_city")]
     city: String,
+    /// The seed the square opens at. Omitted means one is drawn.
+    ///
+    /// The seed is always reported back, because a run is reproducible as a
+    /// protocol and the seed is part of it (Cor. 11.14). A session whose
+    /// starting square could not be restated would not be reproducible at
+    /// all.
+    #[serde(default)]
+    seed: Option<u64>,
 }
 
 fn default_city() -> String {
@@ -115,6 +134,8 @@ fn default_city() -> String {
 struct Opened {
     token: String,
     city: String,
+    /// The seed this square opened at. Restate it to reopen the same square.
+    seed: u64,
 }
 
 /// Exchange a CLI-minted token for a live session.
@@ -123,10 +144,14 @@ async fn open_session(
     Json(body): Json<OpenSession>,
 ) -> Result<Json<Opened>, (StatusCode, Json<ApiError>)> {
     let token = SessionToken::parse(&body.token).map_err(bad_request)?;
-    st.open(&token, &body.city);
+    // A drawn seed is derived from the token, so the pair (token, city) is
+    // the whole of what a run needs to be restated.
+    let seed = body.seed.unwrap_or_else(|| seed_from(token.as_str()));
+    st.open(&token, &body.city, seed);
     Ok(Json(Opened {
         token: token.as_str().to_owned(),
         city: body.city,
+        seed,
     }))
 }
 
@@ -163,6 +188,29 @@ fn not_found() -> (StatusCode, Json<ApiError>) {
     )
 }
 
+/// A stable seed from a token: FNV-1a over its bytes.
+///
+/// Deliberately not random. A session opened twice with the same token opens
+/// on the same square, which is what makes the token alone sufficient to
+/// restate a run.
+fn seed_from(token: &str) -> u64 {
+    let mut h: u64 = 0xcbf2_9ce4_8422_2325;
+    for b in token.as_bytes() {
+        h ^= u64::from(*b);
+        h = h.wrapping_mul(0x0000_0100_0000_01b3);
+    }
+    h
+}
+
+fn bad_request_msg(msg: &str) -> (StatusCode, Json<ApiError>) {
+    (
+        StatusCode::BAD_REQUEST,
+        Json(ApiError {
+            error: msg.to_owned(),
+        }),
+    )
+}
+
 fn bad_request(e: closure_kernel::Error) -> (StatusCode, Json<ApiError>) {
     (
         StatusCode::BAD_REQUEST,
@@ -182,7 +230,7 @@ mod tests {
         let mut rng = rand::rng();
         let token = SessionToken::generate(&mut rng);
         assert!(!st.contains(&token));
-        st.open(&token, "zuerich");
+        st.open(&token, "zuerich", 20260904);
         assert!(st.contains(&token));
         let view = st.view(&token).expect("session exists");
         assert_eq!(view.city, "zuerich");
@@ -195,7 +243,7 @@ mod tests {
     /// reports success, progress, or attribution would require editing this
     /// constant, which is the point: the check is a tripwire on the API
     /// surface rather than a grep over prose.
-    const DECLARED_ROUTES: [&str; 8] = [
+    const DECLARED_ROUTES: [&str; 12] = [
         "/health",
         "/v1/cities",
         "/v1/invariants",
@@ -204,6 +252,10 @@ mod tests {
         "/v1/session/{token}/posts",
         "/v1/session/{token}/thread/{id}",
         "/v1/session/{token}/tick",
+        "/v1/session/{token}/subgroups",
+        "/v1/session/{token}/subgroups/{name}/voices",
+        "/v1/session/{token}/voices/{id}/fit",
+        "/v1/session/{token}/voices/{id}/realise",
     ];
 
     #[test]

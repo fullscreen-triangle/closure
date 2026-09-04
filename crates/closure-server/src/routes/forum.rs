@@ -204,7 +204,7 @@ mod tests {
         let st = AppState::new(std::path::PathBuf::from("."));
         let mut rng = rand::rng();
         let token = SessionToken::generate(&mut rng);
-        st.open(&token, "zuerich");
+        st.open(&token, "zuerich", 20260904);
         (crate::routes::router(st), token.as_str().to_owned())
     }
 

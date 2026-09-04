@@ -42,6 +42,7 @@
 //! graphs reach. Nothing special implements it.
 
 use crate::act::{Act, Gaps, classify};
+use crate::voice::{Square, Utterance, VoiceId};
 use closure_kernel::graph::Position;
 use closure_kernel::identity::Record;
 use closure_kernel::psychon::Emitted;
@@ -60,12 +61,40 @@ pub struct PostId(pub u64);
 /// does not deny that the runtime knows which agent it just ran. The
 /// distinction is enforced downstream: [`Feed`] never sorts or filters on
 /// this field, and [`classify_post`] does not receive it.
+///
+/// The three variants are three stages of being someone, and the ordering
+/// between them is the whole of the townsquare model:
+///
+/// * [`Speaker::Voice`] — something is talking and there is no person behind
+///   it. Most of the square is this. A voice carries a handle and a posting
+///   history and nothing else; see [`crate::voice`].
+/// * [`Speaker::Agent`] — a voice the player has picked out and had fitted
+///   into an individual. Only voices ever become agents, and only by being
+///   read first.
+/// * [`Speaker::Player`] — themselves an agent, and not privileged here.
+///
+/// There is no constructor path from a description to an [`Speaker::Agent`],
+/// which is Theorem 4.3 expressed as a missing capability rather than a
+/// comment.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Speaker {
     /// The player. Themselves an agent, and not privileged here.
     Player,
-    /// A pruned agent, by its handle.
+    /// A voice in the square, by handle. Not yet a person.
+    Voice(VoiceId),
+    /// A pruned agent, by its handle. Was a voice first.
     Agent(String),
+}
+
+impl Speaker {
+    /// The voice behind this speaker, if it is still only a voice.
+    #[must_use]
+    pub fn voice(&self) -> Option<VoiceId> {
+        match self {
+            Self::Voice(v) => Some(*v),
+            _ => None,
+        }
+    }
 }
 
 /// A post: content registered at a terminus.
@@ -370,6 +399,52 @@ pub fn at(terminus: Position, record: Record) -> Emitted {
     Emitted { terminus, record }
 }
 
+/// Open a square into a forum: register the seeded conversation as posts.
+///
+/// The player arrives at a square that is already talking. That is not
+/// decoration — it is what makes reading precede pruning. If the forum were
+/// empty until the player addressed someone, the only way to reach a person
+/// would be to describe one, and describing one is the retrieval Theorem 4.3
+/// denies. A square with prior activity gives the player something to
+/// *recognise* instead.
+///
+/// `body` supplies what each utterance says; this module never reads it.
+/// Posts are registered at the current tick, in seeding order. Replies are
+/// threaded onto whichever earlier post in the same subgroup came last, so
+/// the square arrives as conversations rather than as a wall of roots.
+pub fn open_square(
+    forum: &mut Forum,
+    square: &Square,
+    utterances: &[Utterance],
+    mut body: impl FnMut(&Utterance) -> String,
+) -> Vec<PostId> {
+    // The last root registered in each region, so a later utterance there
+    // lands as a reply. Threads therefore form the way Cor. 6.7 describes:
+    // by re-registration onto an existing chain, not by declaration.
+    let mut last_in_region: BTreeMap<usize, PostId> = BTreeMap::new();
+    let mut out = Vec::new();
+    for u in utterances {
+        let region = square.subgroups.iter().position(|s| s.contains(u.terminus));
+        let parent = region.and_then(|r| last_in_region.get(&r).copied());
+        let text = body(u);
+        let id = forum.register(
+            parent,
+            Speaker::Voice(u.voice),
+            text,
+            at(u.terminus, Record::new()),
+            // Seeded posts carry no act: no gaps were measured, and
+            // fabricating a classification would be asserting a verdict the
+            // run never computed.
+            None,
+        );
+        if let Some(r) = region {
+            last_in_region.entry(r).or_insert(id);
+        }
+        out.push(id);
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -530,6 +605,62 @@ mod tests {
         f.advance();
         assert_eq!(f.get(id).unwrap().body, "said");
         assert_eq!(f.posts().len(), 1);
+    }
+
+    #[test]
+    fn the_square_is_talking_before_the_player_posts() {
+        use crate::voice::{Seeding, Square, Subgroup, seed};
+        let mut sq = Square::new(vec![
+            Subgroup {
+                name: "watersports".into(),
+                members: [0, 1, 2].into_iter().collect(),
+            },
+            Subgroup {
+                name: "carbon-composites".into(),
+                members: [3, 4].into_iter().collect(),
+            },
+        ]);
+        let utterances = seed(&mut sq, &Seeding::default(), 11);
+        let mut f = Forum::new();
+        let ids = open_square(&mut f, &sq, &utterances, |u| {
+            format!("{:?} at {}", u.voice, u.terminus)
+        });
+
+        assert_eq!(ids.len(), utterances.len());
+        assert!(
+            f.posts()
+                .iter()
+                .all(|p| matches!(p.speaker, Speaker::Voice(_))),
+            "nobody in the opening square is a person yet"
+        );
+        assert!(
+            f.posts().iter().any(|p| !p.is_root()),
+            "the square arrives as conversations, not a wall of roots"
+        );
+        assert!(
+            f.posts().iter().all(|p| p.act.is_none()),
+            "no gaps were measured, so no verdict is fabricated"
+        );
+    }
+
+    #[test]
+    fn a_voice_is_not_an_agent_and_the_type_says_so() {
+        use crate::voice::VoiceId;
+        let mut f = Forum::new();
+        let v = f.register(None, Speaker::Voice(VoiceId(3)), "heard", e(0), None);
+        assert_eq!(f.get(v).unwrap().speaker.voice(), Some(VoiceId(3)));
+        let a = f.register(
+            None,
+            Speaker::Agent("realised".into()),
+            "spoken",
+            e(0),
+            None,
+        );
+        assert_eq!(
+            f.get(a).unwrap().speaker.voice(),
+            None,
+            "a realised agent is no longer merely a voice"
+        );
     }
 
     #[test]

@@ -1,7 +1,9 @@
 //! Server state: sessions and the worlds they inhabit.
 
 use closure_kernel::SessionToken;
-use closure_runtime::{Forum, Runtime};
+use closure_runtime::forum::open_square;
+use closure_runtime::voice::{Seeding, Square, seed};
+use closure_runtime::{Forum, Population, Runtime};
 use serde::Serialize;
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -16,21 +18,49 @@ pub struct Session {
     pub runtime: Runtime,
     /// The forum: posts, threads, and the world tick.
     pub forum: Forum,
+    /// The square: who is talking, and in which regions.
+    pub square: Square,
+    /// The coarse population voices are fitted against.
+    pub population: Population,
+    /// The seed this square was opened with. Part of the protocol, so a run
+    /// is reproducible as a sequence of requests (Cor. 11.14).
+    pub seed: u64,
     /// When the session opened.
     pub opened: time::OffsetDateTime,
 }
 
 impl Session {
-    /// A fresh session in `city`.
+    /// A fresh session in `city`, opening onto a square already in
+    /// conversation.
+    ///
+    /// The forum is *not* empty at tick zero. A player who arrived to
+    /// silence would have no way to reach anyone except by describing them,
+    /// and description is the retrieval Theorem 4.3 denies. Prior activity is
+    /// what makes recognition possible.
     #[must_use]
-    pub fn new(city: impl Into<String>) -> Self {
+    pub fn new(city: impl Into<String>, seed: u64) -> Self {
+        let city = city.into();
+        let population = crate::substrate::population(&city);
+        let mut square = Square::new(crate::substrate::subgroups(&city));
+        let utterances = seed_square(&mut square, seed);
+        let mut forum = Forum::new();
+        let _ = open_square(&mut forum, &square, &utterances, |u| {
+            crate::substrate::utterance_body(&square, u)
+        });
         Self {
-            city: city.into(),
+            city,
             runtime: Runtime::new(),
-            forum: Forum::new(),
+            forum,
+            square,
+            population,
+            seed,
             opened: time::OffsetDateTime::now_utc(),
         }
     }
+}
+
+fn seed_square(square: &mut Square, s: u64) -> Vec<closure_runtime::voice::Utterance> {
+    seed(square, &Seeding::default(), s)
 }
 
 /// What the API reports about a session.
@@ -56,6 +86,10 @@ pub struct SessionView {
     pub posts: usize,
     /// The world tick. Advances only when a client asks it to.
     pub tick: u64,
+    /// Voices in the square. Not people, and not a headcount of anyone real.
+    pub voices: usize,
+    /// The seed this square opened with.
+    pub seed: u64,
 }
 
 impl Session {
@@ -73,6 +107,8 @@ impl Session {
                 .unwrap_or_default(),
             posts: self.forum.posts().len(),
             tick: self.forum.tick(),
+            voices: self.square.voices().len(),
+            seed: self.seed,
         }
     }
 }
@@ -102,11 +138,21 @@ impl AppState {
         }
     }
 
-    /// Register a session under `token`.
-    pub fn open(&self, token: &SessionToken, city: &str) {
+    /// Register a session under `token`, opening its square at `seed`.
+    pub fn open(&self, token: &SessionToken, city: &str, seed: u64) {
         if let Ok(mut s) = self.inner.sessions.write() {
-            s.insert(token.as_str().to_owned(), Session::new(city));
+            s.insert(token.as_str().to_owned(), Session::new(city, seed));
         }
+    }
+
+    /// Read a whole session. The square routes attach here.
+    pub fn with_session<T>(
+        &self,
+        token: &SessionToken,
+        f: impl FnOnce(&Session) -> T,
+    ) -> Option<T> {
+        let guard = self.inner.sessions.read().ok()?;
+        guard.get(token.as_str()).map(f)
     }
 
     /// Read a session view.
