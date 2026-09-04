@@ -1,6 +1,8 @@
-name: Paper
+name: Papers
 
-# The manuscript is a source artefact, so a change to it must still compile.
+# Each manuscript is a source artefact, so a change to either must still
+# compile. The matrix keeps them independent: a break in the companion fails
+# its own job rather than passing under the parent's.
 
 on:
   push:
@@ -14,20 +16,32 @@ on:
 
 jobs:
   build:
-    name: build manuscript
+    name: build ${{ matrix.paper.name }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        paper:
+          - name: common closure
+            slug: common-closure
+            dir: zuerich/docs/zuerich-common-closure
+            root: zuerich-common-closure.tex
+          - name: psychon phase mechanics
+            slug: psychon-phase-mechanics
+            dir: zuerich/docs/psychon-phase-mechanics
+            root: psychon-phase-mechanics.tex
     steps:
       - uses: actions/checkout@v4
 
       - name: Compile
         uses: xu-cheng/latex-action@v3
         with:
-          root_file: zuerich-common-closure.tex
-          working_directory: zuerich/docs/zuerich-common-closure
+          root_file: ${{ matrix.paper.root }}
+          working_directory: ${{ matrix.paper.dir }}
           latexmk_use_xelatex: false
           args: -pdf -interaction=nonstopmode -halt-on-error
 
       - uses: actions/upload-artifact@v4
         with:
-          name: manuscript
-          path: zuerich/docs/zuerich-common-closure/*.pdf
+          name: ${{ matrix.paper.slug }}
+          path: ${{ matrix.paper.dir }}/*.pdf
