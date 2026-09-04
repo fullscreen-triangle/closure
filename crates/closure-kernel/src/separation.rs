@@ -117,10 +117,7 @@ impl MediumGraph {
             ));
         }
         let medium_edges = (0..base.order()).map(|v| (v, weight)).collect();
-        Ok(Self {
-            base,
-            medium_edges,
-        })
+        Ok(Self { base, medium_edges })
     }
 
     /// The medium vertex.
@@ -404,9 +401,16 @@ mod tests {
     fn prop_3_4_all_four_cuts_are_minimisers() {
         let g = prop_3_4_witness();
         let s = g.separation(0).unwrap();
-        assert!((s.cost() - 5.0).abs() < TOLERANCE, "σ(v) = 5, got {}", s.cost());
+        assert!(
+            (s.cost() - 5.0).abs() < TOLERANCE,
+            "σ(v) = 5, got {}",
+            s.cost()
+        );
         assert_eq!(s.minimisers().len(), 4, "Proposition 3.4: four minimisers");
-        assert!(!s.is_determinate(), "binv:tiebreak: non-uniqueness is reported");
+        assert!(
+            !s.is_determinate(),
+            "binv:tiebreak: non-uniqueness is reported"
+        );
 
         let expected: BTreeSet<BTreeSet<Position>> = [
             BTreeSet::from([0]),
@@ -478,13 +482,20 @@ mod tests {
         let mut g = MediumGraph::new(base, 40.0).unwrap();
         g.set_medium_edge(0, 1.0).unwrap();
         let s = g.separation(0).unwrap();
-        assert!(s.is_determinate(), "unique minimiser expected, got {:?}", s.minimisers());
+        assert!(
+            s.is_determinate(),
+            "unique minimiser expected, got {:?}",
+            s.minimisers()
+        );
     }
 
     #[test]
     fn medium_requires_two_positions() {
         let base = ContactGraph::new(1);
-        assert!(MediumGraph::new(base, 1.0).is_err(), "Definition 2.1: n ≥ 2");
+        assert!(
+            MediumGraph::new(base, 1.0).is_err(),
+            "Definition 2.1: n ≥ 2"
+        );
     }
 
     #[test]

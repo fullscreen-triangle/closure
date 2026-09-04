@@ -1,7 +1,7 @@
 //! Server state: sessions and the worlds they inhabit.
 
 use closure_kernel::SessionToken;
-use closure_runtime::Runtime;
+use closure_runtime::{Forum, Runtime};
 use serde::Serialize;
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -14,6 +14,8 @@ pub struct Session {
     pub city: String,
     /// The node runtime for this world.
     pub runtime: Runtime,
+    /// The forum: posts, threads, and the world tick.
+    pub forum: Forum,
     /// When the session opened.
     pub opened: time::OffsetDateTime,
 }
@@ -25,6 +27,7 @@ impl Session {
         Self {
             city: city.into(),
             runtime: Runtime::new(),
+            forum: Forum::new(),
             opened: time::OffsetDateTime::now_utc(),
         }
     }
@@ -49,6 +52,10 @@ pub struct SessionView {
     pub protocol_fingerprint: String,
     /// RFC 3339 timestamp.
     pub opened: String,
+    /// Posts registered so far. A count, not a ranking.
+    pub posts: usize,
+    /// The world tick. Advances only when a client asks it to.
+    pub tick: u64,
 }
 
 impl Session {
@@ -64,6 +71,8 @@ impl Session {
                 .opened
                 .format(&time::format_description::well_known::Rfc3339)
                 .unwrap_or_default(),
+            posts: self.forum.posts().len(),
+            tick: self.forum.tick(),
         }
     }
 }
@@ -132,6 +141,26 @@ impl AppState {
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.len() == 0
+    }
+
+    /// Mutate a session's forum. The forum routes attach here.
+    pub fn with_forum<T>(
+        &self,
+        token: &SessionToken,
+        f: impl FnOnce(&mut Forum) -> T,
+    ) -> Option<T> {
+        let mut guard = self.inner.sessions.write().ok()?;
+        guard.get_mut(token.as_str()).map(|s| f(&mut s.forum))
+    }
+
+    /// Read a session's forum without mutating it.
+    pub fn with_forum_ref<T>(
+        &self,
+        token: &SessionToken,
+        f: impl FnOnce(&Forum) -> T,
+    ) -> Option<T> {
+        let guard = self.inner.sessions.read().ok()?;
+        guard.get(token.as_str()).map(|s| f(&s.forum))
     }
 
     /// Mutate a session's runtime. The conversation routes attach here.

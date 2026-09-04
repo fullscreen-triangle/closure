@@ -1,0 +1,373 @@
+//! Forum routes: posts, threads, feeds, and the tick.
+//!
+//! What is here mirrors [`closure_runtime::forum`], and what is absent
+//! mirrors it too. There is no vote endpoint, no score field, and no `top`
+//! ordering, because a ranking aggregated across agents is ill-defined
+//! (Prop. 9.6) rather than merely disallowed. A post reports the *direction*
+//! it moved the gaps — report, question, both, or neither — and that is the
+//! whole of what the API says about an act.
+//!
+//! `POST /v1/session/{token}/tick` advances the world one step. Nothing on
+//! this server runs on a timer: the world moves when a client asks it to, so
+//! a run is a sequence of requests and is reproducible as one.
+
+use crate::state::AppState;
+use axum::{
+    Json,
+    extract::{Path, Query, State},
+    http::StatusCode,
+};
+use closure_kernel::SessionToken;
+use closure_kernel::identity::Record;
+use closure_runtime::act::Gaps;
+use closure_runtime::forum::{Order, PostId, Speaker, at, classify_post};
+use serde::{Deserialize, Serialize};
+
+/// A post as the API reports it.
+///
+/// Carries the terminus and record it registered at, and the direction it
+/// moved the gaps. Deliberately no score, no reference count, and no rank.
+#[derive(Debug, Serialize)]
+pub struct PostView {
+    id: u64,
+    parent: Option<u64>,
+    speaker: Speaker,
+    body: String,
+    terminus: u32,
+    record: u64,
+    at: u64,
+    /// Direction only. `null` means the gaps were not measured, which is not
+    /// the same as measured-and-unmoved.
+    act: Option<ActView>,
+}
+
+/// The two independent directions of Theorem 7.5.
+#[derive(Debug, Serialize)]
+pub struct ActView {
+    report: bool,
+    question: bool,
+}
+
+fn view(p: &closure_runtime::forum::Post) -> PostView {
+    PostView {
+        id: p.id.0,
+        parent: p.parent.map(|x| x.0),
+        speaker: p.speaker.clone(),
+        body: p.body.clone(),
+        terminus: p.emitted.terminus,
+        record: p.emitted.record.get(),
+        at: p.at,
+        act: p.act.map(|a| ActView {
+            report: a.report,
+            question: a.question,
+        }),
+    }
+}
+
+// ------------------------------------------------------------------ post
+
+/// Register a post.
+#[derive(Debug, Deserialize)]
+pub struct NewPost {
+    /// The post being replied to, if any.
+    #[serde(default)]
+    parent: Option<u64>,
+    /// Who is speaking. Absent means the player.
+    #[serde(default)]
+    agent: Option<String>,
+    /// What is said. Never inspected by the classifier.
+    body: String,
+    /// Where it registers. Visibility follows from this and nothing else.
+    terminus: u32,
+    /// The gaps on the acting side, before and after, if measured.
+    #[serde(default)]
+    acting: Option<[f64; 2]>,
+    /// The gaps on the receiving side, before and after, if measured.
+    #[serde(default)]
+    receiving: Option<[f64; 2]>,
+}
+
+/// `POST /v1/session/{token}/posts`
+pub async fn create(
+    State(st): State<AppState>,
+    Path(token): Path<String>,
+    Json(body): Json<NewPost>,
+) -> Result<Json<PostView>, (StatusCode, Json<super::ApiError>)> {
+    let token = SessionToken::parse(&token).map_err(super::bad_request)?;
+    let speaker = body.agent.clone().map_or(Speaker::Player, Speaker::Agent);
+    // Both sides must be measured for a classification to exist. One side
+    // alone does not license half a verdict.
+    let act = match (body.acting, body.receiving) {
+        (Some(a), Some(r)) => Some(classify_post(Gaps::new(a[0], a[1]), Gaps::new(r[0], r[1]))),
+        _ => None,
+    };
+    st.with_forum(&token, |f| {
+        let record = Record::new();
+        let id = f.register(
+            body.parent.map(PostId),
+            speaker,
+            body.body.clone(),
+            at(body.terminus, record),
+            act,
+        );
+        f.get(id).map(view)
+    })
+    .flatten()
+    .map(Json)
+    .ok_or_else(super::not_found)
+}
+
+// ------------------------------------------------------------------ read
+
+/// Query for a feed.
+#[derive(Debug, Deserialize)]
+pub struct FeedQuery {
+    /// `recent` (default) or `near`. There is no `top`.
+    #[serde(default)]
+    order: Order,
+}
+
+/// `GET /v1/session/{token}/posts`
+///
+/// Returns roots and replies alike, ordered as asked. Note that `near`
+/// ordering is relative to a viewer's graph, so this endpoint — which has no
+/// viewer — serves `recent` for both and reports which it applied.
+pub async fn list(
+    State(st): State<AppState>,
+    Path(token): Path<String>,
+    Query(q): Query<FeedQuery>,
+) -> Result<Json<Vec<PostView>>, (StatusCode, Json<super::ApiError>)> {
+    let token = SessionToken::parse(&token).map_err(super::bad_request)?;
+    st.with_forum_ref(&token, |f| {
+        let mut out: Vec<PostView> = f.posts().iter().map(view).collect();
+        if matches!(q.order, Order::Recent) {
+            out.reverse();
+        }
+        out
+    })
+    .map(Json)
+    .ok_or_else(super::not_found)
+}
+
+/// `GET /v1/session/{token}/thread/{id}`
+pub async fn thread(
+    State(st): State<AppState>,
+    Path((token, id)): Path<(String, u64)>,
+) -> Result<Json<Vec<PostView>>, (StatusCode, Json<super::ApiError>)> {
+    let token = SessionToken::parse(&token).map_err(super::bad_request)?;
+    st.with_forum_ref(&token, |f| {
+        f.thread(PostId(id)).into_iter().map(view).collect()
+    })
+    .map(Json)
+    .ok_or_else(super::not_found)
+}
+
+// ------------------------------------------------------------------ tick
+
+/// What a tick reports.
+#[derive(Debug, Serialize)]
+pub struct Tick {
+    /// The new tick. Monotone.
+    tick: u64,
+    /// Posts registered so far. A count, not a ranking.
+    posts: usize,
+}
+
+/// `POST /v1/session/{token}/tick`
+///
+/// Advances the world one step and reports where it now is. It reports no
+/// verdict on what happened during the step, because there is none to
+/// compute (Theorem 11.5).
+pub async fn tick(
+    State(st): State<AppState>,
+    Path(token): Path<String>,
+) -> Result<Json<Tick>, (StatusCode, Json<super::ApiError>)> {
+    let token = SessionToken::parse(&token).map_err(super::bad_request)?;
+    st.with_forum(&token, |f| Tick {
+        tick: f.advance(),
+        posts: f.posts().len(),
+    })
+    .map(Json)
+    .ok_or_else(super::not_found)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::state::AppState;
+    use axum::body::Body;
+    use axum::http::{Request, StatusCode};
+    use closure_kernel::SessionToken;
+    use tower::ServiceExt;
+
+    /// A router with one open session, and its token.
+    fn app() -> (axum::Router, String) {
+        let st = AppState::new(std::path::PathBuf::from("."));
+        let mut rng = rand::rng();
+        let token = SessionToken::generate(&mut rng);
+        st.open(&token, "zuerich");
+        (crate::routes::router(st), token.as_str().to_owned())
+    }
+
+    async fn send(app: &axum::Router, req: Request<Body>) -> (StatusCode, serde_json::Value) {
+        let res = app.clone().oneshot(req).await.unwrap();
+        let status = res.status();
+        let bytes = axum::body::to_bytes(res.into_body(), 1 << 20)
+            .await
+            .unwrap();
+        let json = serde_json::from_slice(&bytes).unwrap_or(serde_json::Value::Null);
+        (status, json)
+    }
+
+    fn post(uri: &str, body: serde_json::Value) -> Request<Body> {
+        Request::builder()
+            .method("POST")
+            .uri(uri)
+            .header("content-type", "application/json")
+            .body(Body::from(body.to_string()))
+            .unwrap()
+    }
+
+    fn get(uri: &str) -> Request<Body> {
+        Request::builder().uri(uri).body(Body::empty()).unwrap()
+    }
+
+    #[tokio::test]
+    async fn a_post_round_trips_and_carries_a_direction_not_a_score() {
+        let (app, token) = app();
+        let (status, body) = send(
+            &app,
+            post(
+                &format!("/v1/session/{token}/posts"),
+                serde_json::json!({
+                    "body": "the hydrofoil timetable is wrong",
+                    "terminus": 0,
+                    "acting": [5.0, 3.0],
+                    "receiving": [2.0, 4.0]
+                }),
+            ),
+        )
+        .await;
+        assert_eq!(status, StatusCode::OK);
+        assert_eq!(body["speaker"], "Player");
+        assert_eq!(body["act"]["report"], true);
+        assert_eq!(body["act"]["question"], true, "Thm 7.5(ii): both at once");
+        assert!(body.get("score").is_none(), "Invariant 6");
+        assert!(body.get("votes").is_none());
+        assert!(body.get("rank").is_none());
+    }
+
+    #[tokio::test]
+    async fn an_unmeasured_exchange_reports_null_not_inert() {
+        let (app, token) = app();
+        let (_, body) = send(
+            &app,
+            post(
+                &format!("/v1/session/{token}/posts"),
+                serde_json::json!({"body": "no gaps given", "terminus": 1}),
+            ),
+        )
+        .await;
+        assert!(
+            body["act"].is_null(),
+            "absence of a classification is not a classification of absence"
+        );
+    }
+
+    #[tokio::test]
+    async fn one_side_alone_does_not_license_half_a_verdict() {
+        let (app, token) = app();
+        let (_, body) = send(
+            &app,
+            post(
+                &format!("/v1/session/{token}/posts"),
+                serde_json::json!({"body": "half", "terminus": 1, "acting": [5.0, 3.0]}),
+            ),
+        )
+        .await;
+        assert!(body["act"].is_null());
+    }
+
+    #[tokio::test]
+    async fn agents_thread_without_the_player() {
+        let (app, token) = app();
+        let (_, root) = send(
+            &app,
+            post(
+                &format!("/v1/session/{token}/posts"),
+                serde_json::json!({"agent": "kaeferberg", "body": "opening", "terminus": 0}),
+            ),
+        )
+        .await;
+        let id = root["id"].as_u64().unwrap();
+        send(
+            &app,
+            post(
+                &format!("/v1/session/{token}/posts"),
+                serde_json::json!({"agent": "wipkingen", "body": "and?", "terminus": 0, "parent": id}),
+            ),
+        )
+        .await;
+
+        let (status, thread) = send(&app, get(&format!("/v1/session/{token}/thread/{id}"))).await;
+        assert_eq!(status, StatusCode::OK);
+        assert_eq!(thread.as_array().unwrap().len(), 2, "Thm 7.4");
+        assert!(
+            thread
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|p| p["speaker"] != "Player"),
+            "no user was present"
+        );
+    }
+
+    #[tokio::test]
+    async fn the_world_moves_only_when_asked() {
+        let (app, token) = app();
+        let (_, before) = send(&app, get(&format!("/v1/session/{token}"))).await;
+        assert_eq!(before["tick"], 0);
+        let (status, t) = send(
+            &app,
+            post(&format!("/v1/session/{token}/tick"), serde_json::json!({})),
+        )
+        .await;
+        assert_eq!(status, StatusCode::OK);
+        assert_eq!(t["tick"], 1);
+        let (_, after) = send(&app, get(&format!("/v1/session/{token}"))).await;
+        assert_eq!(after["tick"], 1, "no background scheduler moved it further");
+    }
+
+    #[tokio::test]
+    async fn the_feed_has_no_top_ordering() {
+        let (app, token) = app();
+        send(
+            &app,
+            post(
+                &format!("/v1/session/{token}/posts"),
+                serde_json::json!({"body": "a", "terminus": 0}),
+            ),
+        )
+        .await;
+        let (ok, _) = send(
+            &app,
+            get(&format!("/v1/session/{token}/posts?order=recent")),
+        )
+        .await;
+        assert_eq!(ok, StatusCode::OK);
+        let (rejected, _) = send(&app, get(&format!("/v1/session/{token}/posts?order=top"))).await;
+        assert_ne!(
+            rejected,
+            StatusCode::OK,
+            "Prop. 9.6: a cross-agent ranking is ill-defined, so `top` must not parse"
+        );
+    }
+
+    #[tokio::test]
+    async fn an_unknown_session_is_not_found() {
+        let (app, _) = app();
+        let mut rng = rand::rng();
+        let other = SessionToken::generate(&mut rng);
+        let (status, _) = send(&app, get(&format!("/v1/session/{}/posts", other.as_str()))).await;
+        assert_eq!(status, StatusCode::NOT_FOUND);
+    }
+}

@@ -5,6 +5,8 @@
 //! nothing that attributes a change in the world to something they did. See
 //! the crate documentation for why those are absent rather than pending.
 
+pub mod forum;
+
 use crate::state::AppState;
 use axum::{
     Json, Router,
@@ -23,6 +25,12 @@ pub fn router(state: AppState) -> Router {
         .route("/v1/invariants", get(invariants))
         .route("/v1/session", post(open_session))
         .route("/v1/session/{token}", get(session_view))
+        .route(
+            "/v1/session/{token}/posts",
+            get(forum::list).post(forum::create),
+        )
+        .route("/v1/session/{token}/thread/{id}", get(forum::thread))
+        .route("/v1/session/{token}/tick", post(forum::tick))
         .with_state(state)
 }
 
@@ -141,8 +149,18 @@ async fn session_view(
 // ----------------------------------------------------------------- error
 
 #[derive(Debug, Serialize)]
-struct ApiError {
+pub struct ApiError {
     error: String,
+}
+
+/// No such session.
+fn not_found() -> (StatusCode, Json<ApiError>) {
+    (
+        StatusCode::NOT_FOUND,
+        Json(ApiError {
+            error: String::from("no such session"),
+        }),
+    )
 }
 
 fn bad_request(e: closure_kernel::Error) -> (StatusCode, Json<ApiError>) {
@@ -177,12 +195,15 @@ mod tests {
     /// reports success, progress, or attribution would require editing this
     /// constant, which is the point: the check is a tripwire on the API
     /// surface rather than a grep over prose.
-    const DECLARED_ROUTES: [&str; 5] = [
+    const DECLARED_ROUTES: [&str; 8] = [
         "/health",
         "/v1/cities",
         "/v1/invariants",
         "/v1/session",
         "/v1/session/{token}",
+        "/v1/session/{token}/posts",
+        "/v1/session/{token}/thread/{id}",
+        "/v1/session/{token}/tick",
     ];
 
     #[test]
@@ -195,6 +216,10 @@ mod tests {
             "attribution",
             "succeeded",
             "rank",
+            "vote",
+            "karma",
+            "top",
+            "best",
         ];
         for route in DECLARED_ROUTES {
             for word in forbidden {
@@ -210,12 +235,16 @@ mod tests {
     fn the_declared_route_list_matches_the_router() {
         // Guards against the tripwire above going stale: if a route is added
         // to `router` without being declared here, this fails.
+        // Scan the body of `router` rather than line starts: a `.route(`
+        // whose path sits on the following line must still be counted, or
+        // the tripwire can be defeated by rustfmt.
         let src = include_str!("mod.rs");
-        let declared_in_router = src
-            .lines()
-            .filter_map(|l| l.trim().strip_prefix(".route(\""))
-            .filter_map(|l| l.split('"').next())
-            .count();
+        let body = src
+            .split_once("pub fn router(")
+            .and_then(|(_, rest)| rest.split_once(".with_state(state)"))
+            .map(|(body, _)| body)
+            .expect("router() is where routes are declared");
+        let declared_in_router = body.match_indices(concat!('.', "route(")).count();
         assert_eq!(
             declared_in_router,
             DECLARED_ROUTES.len(),
