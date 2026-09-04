@@ -225,7 +225,8 @@ impl Instance {
 /// requires.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Cap {
-    /// The region capped to.
+    /// The moderator's region, kept whole. Not the region capped *to*:
+    /// see [`Moderator::cap`] for why reach survives and resolution does not.
     pub region: BTreeSet<Position>,
     /// The contacts retained, as `(u, v, w)` in city coordinates.
     pub contacts: Vec<(Position, Position, EdgeWeight)>,
@@ -234,20 +235,47 @@ pub struct Cap {
 impl Moderator {
     /// Cap this character's knowledge to `region`.
     ///
-    /// Contacts wholly inside the region survive; the rest are dropped. A cap
-    /// is therefore *less* than the moderator, which is what makes
-    /// amalgamating several of them informative rather than redundant.
+    /// The cap keeps the moderator's whole region, and reads sharply only
+    /// where that region meets `region`. Everything else is read blunt.
+    ///
+    /// It is tempting to keep only the contacts with both endpoints inside
+    /// `region` and drop the rest, and that is wrong for the reason
+    /// [`Moderator::split`] is careful about: a region is not a bag of
+    /// positions, it is positions *and the contacts between them*. A voice's
+    /// footprint is a handful of scattered positions, so an intersection of
+    /// endpoints almost never contains two adjacent ones — the cap comes out
+    /// empty, the amalgamation has nothing to join, and a character that
+    /// plainly spoke has nobody behind it. Worse, when it does survive it
+    /// survives disconnected, and a disconnected character has separation
+    /// zero, which Theorem 3.2 says no character has.
+    ///
+    /// So a cap loses resolution, never reach. What it knows about the rest
+    /// of its region is what makes it able to say anything about the part
+    /// the voice was heard in.
     #[must_use]
     pub fn cap(&self, city: &ContactGraph, region: &BTreeSet<Position>) -> Cap {
-        let keep: BTreeSet<Position> = self.region.intersection(region).copied().collect();
-        let contacts = city
+        let sharp: BTreeSet<Position> = self.region.intersection(region).copied().collect();
+        // A contact on the region's boundary is kept too. The moderator
+        // knows where its region ends, and that knowledge is what lets two
+        // caps be joined at all: an edge internal to neither region belongs
+        // to neither cap, and the amalgamation falls into components.
+        let contacts: Vec<_> = city
             .edges()
-            .filter(|(u, v, _)| keep.contains(u) && keep.contains(v))
+            .filter(|(u, v, _)| self.region.contains(u) || self.region.contains(v))
+            .map(|(u, v, w)| {
+                // Sharp where the voice was actually heard; blunt through the
+                // rest of the region, which is retained precisely so the
+                // heard positions are still connected to each other.
+                let heard = sharp.contains(&u) && sharp.contains(&v);
+                (u, v, if heard { w } else { w * BLUNT })
+            })
             .collect();
-        Cap {
-            region: keep,
-            contacts,
-        }
+        let region = contacts
+            .iter()
+            .flat_map(|(u, v, _)| [*u, *v])
+            .chain(self.region.iter().copied())
+            .collect();
+        Cap { region, contacts }
     }
 }
 
@@ -394,8 +422,20 @@ impl Character {
     /// Reassemble a character from regional caps.
     #[must_use]
     pub fn amalgamated(caps: &[Cap]) -> Option<Self> {
+        let graph = amalgamate(caps)?;
+        // A character separates: its invariant is attained and strictly
+        // positive (Thm 3.2). A reassembly that falls into components has a
+        // minimum cut of zero, and that is not a character reading its region
+        // coarsely — it is caps that never met. It happens honestly, when a
+        // voice is heard in two regions with unrelated territory between
+        // them, and the answer is to decline rather than to hand back
+        // something with a zero invariant. Nothing is invented to bridge the
+        // gap: no contact the moderators did not report is added here.
+        if graph.separation_cost()? <= 0.0 {
+            return None;
+        }
         Some(Self {
-            graph: amalgamate(caps)?,
+            graph,
             identity: Identity::new(),
         })
     }
@@ -685,6 +725,48 @@ mod tests {
         let caps = vec![m1.cap(&c, &heard), m2.cap(&c, &heard)];
         let ch = Character::amalgamated(&caps).expect("a character to reassemble");
         assert!(ch.chi().is_some(), "the reassembly has an invariant");
+    }
+
+    #[test]
+    fn a_voice_heard_in_scattered_places_still_has_someone_behind_it() {
+        // The realistic case: a voice speaks three times, in positions that
+        // are nowhere near each other. Keeping only the contacts internal to
+        // those three positions leaves nothing at all — but the character is
+        // not thereby absent, only coarsely resolved.
+        let c = city();
+        let m1 = Moderator::new(&c, region(0, 6)).unwrap();
+        let m2 = Moderator::new(&c, region(6, 12)).unwrap();
+        let heard: BTreeSet<Position> = [0, 1, 9].into_iter().collect();
+        let caps = vec![m1.cap(&c, &heard), m2.cap(&c, &heard)];
+        let ch = Character::amalgamated(&caps).expect("scattered is not absent");
+        let chi = ch.chi().expect("a character has an invariant");
+        assert!(
+            chi > 0.0,
+            "Thm 3.2: a character separates, so chi is strictly positive, got {chi}"
+        );
+        assert!(ch.graph.is_connected(), "reassembly does not disconnect");
+    }
+
+    #[test]
+    fn caps_that_never_met_yield_no_character_rather_than_a_zero_one() {
+        // A voice heard in two regions with unrelated territory between them.
+        // There is no single character behind it, and saying so is the honest
+        // answer; a graph in two components would have chi = 0, which Thm 3.2
+        // says no character has.
+        // A longer city, so two regions can sit apart with territory
+        // belonging to neither between them.
+        let mut c = ContactGraph::new(20);
+        for u in 0..19 {
+            c.add_edge(u, u + 1, 2.0).unwrap();
+        }
+        let m1 = Moderator::new(&c, region(0, 4)).unwrap();
+        let m2 = Moderator::new(&c, region(14, 18)).unwrap();
+        let heard: BTreeSet<Position> = [1, 15].into_iter().collect();
+        let caps = vec![m1.cap(&c, &heard), m2.cap(&c, &heard)];
+        assert!(
+            Character::amalgamated(&caps).is_none(),
+            "nothing is invented to bridge regions that do not touch"
+        );
     }
 
     #[test]
