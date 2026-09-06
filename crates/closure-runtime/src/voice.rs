@@ -276,25 +276,74 @@ pub struct Utterance {
     pub terminus: Position,
 }
 
+/// Which regions are adjacent, by contact in the city graph.
+///
+/// Two regions are adjacent when the city has an edge with one endpoint in
+/// each — that is, when you can walk from one to the other in a single step.
+///
+/// Adjacency is deliberately *not* set overlap. Overlap connects neighbours
+/// where the city happens to share positions, but leaves the chain broken
+/// wherever it does not: `commuting` and `extreme-sports` share nothing, so
+/// an overlap rule would strand the far end of the city and no walk could
+/// ever reach it. Contact is the relation the graph actually models, and it
+/// connects the whole city.
+fn adjacency(city: &ContactGraph, regions: &[BTreeSet<Position>]) -> Vec<Vec<usize>> {
+    (0..regions.len())
+        .map(|i| {
+            (0..regions.len())
+                .filter(|j| *j != i)
+                .filter(|j| {
+                    regions[i]
+                        .iter()
+                        .any(|u| regions[*j].iter().any(|v| city.weight(*u, *v).is_some()))
+                })
+                .collect()
+        })
+        .collect()
+}
+
 /// Populate a square, deterministically in `seed`.
 ///
-/// Voices are admitted and given walks across the subgroups. A voice may
-/// range over several regions; nothing prevents it and the fit accounts for
-/// it. Returns the utterances in order, for the caller to register as posts.
+/// Voices are admitted and given walks across the subgroups. Each voice
+/// starts in some region and, for every subsequent post, either stays or
+/// steps to a region in contact with the one it is in. A voice may range
+/// over several regions; nothing prevents it and the fit accounts for it.
+/// Returns the utterances in order, for the caller to register as posts.
+///
+/// ## Why a walk rather than an independent draw
+///
+/// Drawing a fresh region per post scattered a voice's footprint across
+/// unrelated parts of the city, and a scattered footprint has no character
+/// behind it: [`Square::character`] caps each audible moderator to the
+/// footprint and amalgamates the caps, and caps that never meet amalgamate
+/// to nothing. The walk is what makes most voices someone a player can
+/// actually reach. It is also what the documentation above this function
+/// has always claimed, and now describes.
 #[must_use]
-pub fn seed(square: &mut Square, seeding: &Seeding, seed: u64) -> Vec<Utterance> {
+pub fn seed(
+    square: &mut Square,
+    city: &ContactGraph,
+    seeding: &Seeding,
+    seed: u64,
+) -> Vec<Utterance> {
     let mut rng = ChaCha8Rng::seed_from_u64(seed);
     let regions: Vec<BTreeSet<Position>> =
         square.subgroups.iter().map(|s| s.members.clone()).collect();
     if regions.is_empty() {
         return Vec::new();
     }
+    let near = adjacency(city, &regions);
     let mut out = Vec::new();
     for i in 0..seeding.voices {
         let id = square.admit(format!("voice-{i}"));
-        for _ in 0..seeding.posts_each {
-            let region = &regions[rng.random_range(0..regions.len())];
-            let choices: Vec<Position> = region.iter().copied().collect();
+        let mut at = rng.random_range(0..regions.len());
+        for post in 0..seeding.posts_each {
+            // Stay or step. A voice that never moved would be a silo, and a
+            // voice that moved every time would not linger anywhere.
+            if post > 0 && !near[at].is_empty() && rng.random_bool(0.5) {
+                at = near[at][rng.random_range(0..near[at].len())];
+            }
+            let choices: Vec<Position> = regions[at].iter().copied().collect();
             if choices.is_empty() {
                 continue;
             }
@@ -472,17 +521,17 @@ mod tests {
     fn seeding_is_deterministic_in_the_seed() {
         let a = {
             let mut sq = Square::new(subgroups());
-            seed(&mut sq, &Seeding::default(), 42)
+            seed(&mut sq, &city(), &Seeding::default(), 42)
         };
         let b = {
             let mut sq = Square::new(subgroups());
-            seed(&mut sq, &Seeding::default(), 42)
+            seed(&mut sq, &city(), &Seeding::default(), 42)
         };
         assert_eq!(a, b, "same seed, same square (Cor. 11.14)");
 
         let c = {
             let mut sq = Square::new(subgroups());
-            seed(&mut sq, &Seeding::default(), 43)
+            seed(&mut sq, &city(), &Seeding::default(), 43)
         };
         assert_ne!(a, c, "a different session opens on a different square");
     }
@@ -490,7 +539,7 @@ mod tests {
     #[test]
     fn a_seeded_square_is_already_talking() {
         let mut sq = Square::new(subgroups());
-        let out = seed(&mut sq, &Seeding::default(), 7);
+        let out = seed(&mut sq, &city(), &Seeding::default(), 7);
         assert_eq!(out.len(), 8 * 3, "voices x posts");
         assert_eq!(sq.voices().len(), 8);
         assert!(
@@ -502,13 +551,72 @@ mod tests {
     #[test]
     fn seeded_voices_can_range_across_subgroups() {
         let mut sq = Square::new(subgroups());
-        let _ = seed(&mut sq, &Seeding::default(), 3);
+        let _ = seed(&mut sq, &city(), &Seeding::default(), 3);
         let spread = sq
             .voices()
             .iter()
             .filter(|v| v.subgroups(&sq.subgroups).len() > 1)
             .count();
         assert!(spread > 0, "the square is not partitioned into silos");
+    }
+
+    #[test]
+    fn a_seeded_voice_walks_rather_than_scattering() {
+        // The *regions* a voice spoke in must form a connected chain under
+        // contact. Note this is the right invariant and the footprint is
+        // not: a voice can stand at 1, step to the next region and speak at
+        // 3, leaving position 2 unvisited. The path was still contiguous,
+        // and it is region contact — not position adjacency — that decides
+        // whether the caps meet and someone is behind the voice.
+        let c = city();
+        let regions: Vec<BTreeSet<Position>> = subgroups().into_iter().map(|s| s.members).collect();
+        let near = adjacency(&c, &regions);
+        for s in 0..40u64 {
+            let mut sq = Square::new(subgroups());
+            let _ = seed(&mut sq, &c, &Seeding::default(), s);
+            for v in sq.voices() {
+                let foot = v.footprint();
+                let spoke: BTreeSet<usize> = (0..regions.len())
+                    .filter(|i| foot.iter().any(|t| regions[*i].contains(t)))
+                    .collect();
+                let start = *spoke.iter().next().unwrap();
+                let mut seen = BTreeSet::from([start]);
+                let mut frontier = vec![start];
+                while let Some(i) = frontier.pop() {
+                    for j in &near[i] {
+                        if spoke.contains(j) && seen.insert(*j) {
+                            frontier.push(*j);
+                        }
+                    }
+                }
+                assert_eq!(
+                    seen.len(),
+                    spoke.len(),
+                    "seed {s}, voice {:?}: regions {spoke:?} are not a walk",
+                    v.id
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn walking_gives_most_voices_someone_behind_them() {
+        // The point of the walk. Scattered footprints left the caps unable
+        // to amalgamate, so a player reading the square found almost nobody
+        // they could actually address.
+        let (c, mods) = (city(), moderators());
+        let mut sq = Square::new(subgroups());
+        let _ = seed(&mut sq, &c, &Seeding::default(), 11);
+        let ids: Vec<VoiceId> = sq.voices().iter().map(|v| v.id).collect();
+        let someone = ids
+            .iter()
+            .filter(|id| sq.character(**id, &c, &mods).is_some())
+            .count();
+        assert!(
+            someone * 2 > ids.len(),
+            "most voices should be reachable, got {someone} of {}",
+            ids.len()
+        );
     }
 
     #[test]

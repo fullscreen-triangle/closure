@@ -13,8 +13,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "eslint . --max-warnings 0",
-    "fmt": "prettier --write \"src/**/*.{ts,tsx,css}\"",
-    "fmt:check": "prettier --check \"src/**/*.{ts,tsx,css}\"",
+    "fmt": "prettier --write \"src/**/*.{ts,tsx,css}\" \"*.config.ts\"",
+    "fmt:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"*.config.ts\"",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },

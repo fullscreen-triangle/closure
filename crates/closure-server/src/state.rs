@@ -3,7 +3,7 @@
 use closure_kernel::SessionToken;
 use closure_runtime::forum::Speaker;
 use closure_runtime::forum::open_square;
-use closure_runtime::moderator::{Moderator, post_round};
+use closure_runtime::moderator::{Identity, Moderator, post_round};
 use closure_runtime::voice::{Seeding, Square, seed};
 use closure_runtime::{Forum, Runtime};
 use serde::Serialize;
@@ -39,6 +39,17 @@ pub struct Session {
     pub seed: u64,
     /// When the session opened.
     pub opened: time::OffsetDateTime,
+    /// The last observation registered here. Display only.
+    pub weather: Option<crate::weather::Observation>,
+    /// What has been asked about each voice's character, and settled.
+    ///
+    /// A character is *rebuilt* from caps on every request rather than
+    /// stored, which is what keeps it a reassembly and not a record looked
+    /// up. But an answer, once settled, has to survive the request that
+    /// settled it — otherwise `settled` counts a map that was discarded, and
+    /// the client is told "one thing is settled" forever. Only the answers
+    /// live here; the character itself is still rebuilt each time.
+    pub identities: std::collections::BTreeMap<u32, Identity>,
 }
 
 impl Session {
@@ -55,7 +66,7 @@ impl Session {
         let moderators = crate::substrate::moderators(&city);
         let city_graph = crate::substrate::city_graph();
         let mut square = Square::new(crate::substrate::subgroups(&city));
-        let utterances = seed_square(&mut square, seed);
+        let utterances = seed_square(&mut square, &city_graph, seed);
         let mut forum = Forum::new();
         let _ = open_square(&mut forum, &square, &utterances, |u| {
             crate::substrate::utterance_body(&square, u)
@@ -69,12 +80,84 @@ impl Session {
             city_graph,
             seed,
             opened: time::OffsetDateTime::now_utc(),
+            weather: None,
+            identities: std::collections::BTreeMap::new(),
         }
     }
 }
 
-fn seed_square(square: &mut Square, s: u64) -> Vec<closure_runtime::voice::Utterance> {
-    seed(square, &Seeding::default(), s)
+fn seed_square(
+    square: &mut Square,
+    city: &closure_kernel::ContactGraph,
+    s: u64,
+) -> Vec<closure_runtime::voice::Utterance> {
+    seed(square, city, &Seeding::default(), s)
+}
+
+/// Register an observation: one post per reached region, and one emission.
+///
+/// ## Why one post per region rather than one post
+///
+/// Theorem 6.2: a broadcast is not one message with many readers, it is N
+/// independent registrations, one per receiver. A single post would also be
+/// invisible to most of the city, whose graphs do not reach whatever one
+/// position it landed on. The posts are roots and are never threaded to each
+/// other — threading would make Corollary 6.7's drift chain count a
+/// re-registration that never happened.
+///
+/// ## Why the theta carries the region and never the reading
+///
+/// `protocol_fingerprint` hashes node **keys** and nothing else. Naming a
+/// node `weather/{region}` therefore makes the fingerprint see *reach* and
+/// leaves it blind to the reading: two runs fed wildly different weather
+/// that trips the same rules fingerprint identically. That is truth-blindness
+/// executable in the protocol hash rather than asserted in a comment.
+///
+/// The full reading still goes in the *value*, which is the one place it can
+/// safely be recorded: a value is opaque to the runtime, which is the fact
+/// that makes Theorem 11.5 go through.
+fn register_weather(session: &mut Session, o: &crate::weather::Observation) {
+    let source = format!("weather/{}", o.source);
+    session.runtime.emit(
+        &source,
+        serde_json::to_value(o).unwrap_or(serde_json::Value::Null),
+        None,
+    );
+    for region in crate::weather::reach(o) {
+        // The region's own character. A region too thin to have a moderator
+        // has nobody to register with, and is skipped rather than invented.
+        let Some(members) = session
+            .square
+            .subgroups
+            .iter()
+            .find(|g| g.name == region)
+            .map(|g| &g.members)
+        else {
+            continue;
+        };
+        let Some(t) = session
+            .moderators
+            .iter()
+            .find(|m| m.region == *members)
+            .and_then(crate::weather::terminus)
+        else {
+            continue;
+        };
+        session.runtime.emit(
+            &format!("weather/{region}"),
+            serde_json::to_value(o).unwrap_or(serde_json::Value::Null),
+            Some(&source),
+        );
+        let _ = session.forum.register(
+            None,
+            Speaker::World(o.source.clone()),
+            crate::weather::body(o, region),
+            closure_runtime::forum::at(t, closure_kernel::identity::Record::new()),
+            // No gaps were measured. Absence of a classification is not a
+            // classification of absence.
+            None,
+        );
+    }
 }
 
 /// What the API reports about a session.
@@ -104,6 +187,9 @@ pub struct SessionView {
     pub voices: usize,
     /// The seed this square opened with.
     pub seed: u64,
+    /// The last observation registered in this session, if any. Display
+    /// only: what it *did* is already in the termini of its posts.
+    pub weather: Option<crate::weather::Observation>,
 }
 
 impl Session {
@@ -123,6 +209,7 @@ impl Session {
             tick: self.forum.tick(),
             voices: self.square.voices().len(),
             seed: self.seed,
+            weather: self.weather.clone(),
         }
     }
 }
@@ -138,18 +225,41 @@ struct Inner {
     sessions: RwLock<HashMap<String, Session>>,
     #[allow(dead_code)]
     data_dir: PathBuf,
+    weather: crate::weather::Source,
 }
 
 impl AppState {
-    /// Build state rooted at `data_dir`.
+    /// Build state rooted at `data_dir`, with no weather.
+    ///
+    /// The default is no world feed, so tests and CI are hermetic and a run
+    /// is reproducible as a sequence of requests. Note this is about body
+    /// determinism and not about Corollary 11.14: the theta design makes the
+    /// protocol fingerprint blind to the reading either way, so turning the
+    /// live feed on does not cost reproducibility of the protocol.
+    #[cfg_attr(not(test), allow(dead_code))]
     #[must_use]
     pub fn new(data_dir: PathBuf) -> Self {
+        Self::with_weather(data_dir, crate::weather::Source::Fixed(None))
+    }
+
+    /// Build state with a weather source.
+    #[must_use]
+    pub fn with_weather(data_dir: PathBuf, weather: crate::weather::Source) -> Self {
         Self {
             inner: Arc::new(Inner {
                 sessions: RwLock::new(HashMap::new()),
                 data_dir,
+                weather,
             }),
         }
+    }
+
+    /// The current observation, if the world is reporting.
+    ///
+    /// Called by the tick handler *before* it takes the session lock — the
+    /// fetch must not happen inside it.
+    pub async fn observation(&self) -> Option<crate::weather::Observation> {
+        self.inner.weather.current().await
     }
 
     /// Register a session under `token`, opening its square at `seed`.
@@ -203,6 +313,16 @@ impl AppState {
         self.len() == 0
     }
 
+    /// Mutate a whole session. The routes that settle something attach here.
+    pub fn with_session_mut<T>(
+        &self,
+        token: &SessionToken,
+        f: impl FnOnce(&mut Session) -> T,
+    ) -> Option<T> {
+        let mut guard = self.inner.sessions.write().ok()?;
+        guard.get_mut(token.as_str()).map(f)
+    }
+
     /// Mutate a session's forum. The forum routes attach here.
     pub fn with_forum<T>(
         &self,
@@ -223,10 +343,22 @@ impl AppState {
     /// worth taking.
     ///
     /// Returns the new tick and the post count after it.
-    pub fn advance(&self, token: &SessionToken) -> Option<(u64, usize)> {
+    ///
+    /// `observation`, when present, is the world reporting itself. It is
+    /// passed in already fetched: this function holds a `std::sync::RwLock`
+    /// across its whole body, so the network call cannot happen here.
+    pub fn advance(
+        &self,
+        token: &SessionToken,
+        observation: Option<&crate::weather::Observation>,
+    ) -> Option<(u64, usize)> {
         let mut guard = self.inner.sessions.write().ok()?;
         let session = guard.get_mut(token.as_str())?;
         let tick = session.forum.advance();
+        if let Some(o) = observation {
+            register_weather(session, o);
+            session.weather = Some(o.clone());
+        }
         if !session.moderators.is_empty() {
             // Which character speaks is a function of the tick alone. No
             // region is preferred, and none is starved.
@@ -258,16 +390,5 @@ impl AppState {
     ) -> Option<T> {
         let guard = self.inner.sessions.read().ok()?;
         guard.get(token.as_str()).map(|s| f(&s.forum))
-    }
-
-    /// Mutate a session's runtime. The conversation routes attach here.
-    #[allow(dead_code)]
-    pub fn with_runtime<T>(
-        &self,
-        token: &SessionToken,
-        f: impl FnOnce(&mut Runtime) -> T,
-    ) -> Option<T> {
-        let mut guard = self.inner.sessions.write().ok()?;
-        guard.get_mut(token.as_str()).map(|s| f(&mut s.runtime))
     }
 }

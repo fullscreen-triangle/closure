@@ -23,6 +23,7 @@ with `CLOSURE_API`.
 | `npm run lint` | ESLint, zero warnings tolerated |
 | `npm run fmt` | Prettier, writing in place |
 | `npm run typecheck` | `tsc --noEmit` |
+| `npm test` | Vitest, `node` environment, pure functions only |
 
 ## What this client does not render
 
@@ -43,12 +44,29 @@ If you are adding a view, the useful question is *what propagated*, never
 
 ```
 src/
-  App.tsx              join, then session
-  lib/api.ts           typed client; mirrors closure-server routes
+  App.tsx              join, then focus: square | thread | voice
+  lib/
+    api.ts             typed client; mirrors closure-server routes
+    speaker.ts         reads the Speaker union; every component goes through it
+    act.ts             renders an act's two directions, and its absence
+    hooks.ts           useAsync, usePolling, useHeartbeat
   components/
     JoinForm.tsx       paste a token
     SessionPanel.tsx   what the session has accumulated
+    WorldClock.tsx     the tick, and the reading the city last reported
+    Feed.tsx           roots only, with reply counts and region chips
+    ThreadView.tsx     one root and its replies
+    Composer.tsx       post at a terminus you pick in two steps
+    VoicePanel.tsx     character -> prune -> ask
+    PositionStrip.tsx  a 31-cell span of the city
+    ActMark.tsx        report / question / neither / not measured
 ```
+
+There is deliberately **no router**. The app has one address — the token,
+already in `?token=` — and a `/voice/7` route would make voices linkable and
+therefore enumerable, rebuilding at the URL layer the retrieval the API
+refuses. Switching views here is *focus*, not navigation, so the square keeps
+moving beside an open voice panel.
 
 Types in `lib/api.ts` are hand-mirrored from the Rust route handlers. If you
 change a response shape in `closure-server`, change it here too — the CI

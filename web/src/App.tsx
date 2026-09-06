@@ -1,22 +1,51 @@
-import { useCallback, useEffect, useState } from 'react'
-import { api, ApiError, normaliseToken, type SessionView } from './lib/api'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  api,
+  ApiError,
+  normaliseToken,
+  type NewPost,
+  type PostView,
+  type SessionView,
+  type SubgroupView,
+} from './lib/api'
+import { useAsync, useHeartbeat, usePolling } from './lib/hooks'
 import { JoinForm } from './components/JoinForm'
 import { SessionPanel } from './components/SessionPanel'
+import { WorldClock } from './components/WorldClock'
+import { Feed } from './components/Feed'
+import { ThreadView } from './components/ThreadView'
+import { VoicePanel } from './components/VoicePanel'
+import { Composer } from './components/Composer'
 
 /**
  * The interaction surface.
  *
- * A player arrives here with a token minted by the CLI, pastes it, and is
- * joined to a running city. There is no lobby, no difficulty select, and no
- * progress bar — the last of those is not an omission but a consequence: the
- * runtime cannot compute a verdict, so a client showing one would be
- * displaying a number the server does not have.
+ * A player arrives with a token minted by the CLI, pastes it, and is joined
+ * to a running city. There is no lobby, no difficulty select, and no progress
+ * bar — the last is not an omission but a consequence: the runtime cannot
+ * compute a verdict, so a client showing one would be displaying a number the
+ * server does not have.
+ *
+ * **No router.** The app has one address — the token, already in `?token=` —
+ * and a `/voice/7` route would make voices linkable and therefore
+ * enumerable, reintroducing at the URL layer the retrieval the API refuses.
+ * Switching between the square, a thread, and a voice is *focus*, not
+ * navigation: the feed stays live beside whatever is open.
  */
+type Focus =
+  | { kind: 'square' }
+  | { kind: 'thread'; root: number }
+  | { kind: 'voice'; id: number; from: number }
+
 export function App() {
   const [token, setToken] = useState<string | null>(null)
-  const [session, setSession] = useState<SessionView | null>(null)
+  const [joined, setJoined] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [focus, setFocus] = useState<Focus>({ kind: 'square' })
+  const [region, setRegion] = useState<string | null>(null)
+  const [composing, setComposing] = useState(false)
+  const [reading, setReading] = useState(false)
 
   // A token may arrive in the URL, because `closure session new` opens the
   // browser for you.
@@ -31,8 +60,9 @@ export function App() {
     setError(null)
     try {
       await api.openSession(t)
-      setSession(await api.session(t))
+      await api.session(t)
       setToken(t)
+      setJoined(true)
       window.history.replaceState({}, '', `?token=${encodeURIComponent(t)}`)
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'could not reach the host')
@@ -42,13 +72,143 @@ export function App() {
   }, [])
 
   useEffect(() => {
-    if (token && !session && !busy) void join(token)
-  }, [token, session, busy, join])
+    if (token && !joined && !busy) void join(token)
+  }, [token, joined, busy, join])
+
+  const live = joined && token !== null ? token : null
+
+  const session = usePolling<SessionView>(
+    useMemo(() => (live ? () => api.session(live) : null), [live]),
+    4000,
+  )
+  const posts = usePolling<PostView[]>(
+    useMemo(() => (live ? () => api.posts(live) : null), [live]),
+    3000,
+  )
+  // The regions do not change during a session, so this is fetched once and
+  // then left alone.
+  const [groups, runGroups] = useAsync<SubgroupView[]>()
+  useEffect(() => {
+    if (live) void runGroups(() => api.subgroups(live))
+  }, [live, runGroups])
+
+  const refreshBoth = posts.refresh
+  const beat = useHeartbeat(
+    useMemo(
+      () =>
+        live
+          ? async () => {
+              await api.tick(live)
+              refreshBoth()
+            }
+          : null,
+      [live, refreshBoth],
+    ),
+    8000,
+    // Held while the player is composing or reading a character: the square
+    // should not move out from under someone who is mid-sentence.
+    composing || reading,
+  )
+
+  const [posted, runPost] = useAsync<PostView>()
+  const submit = useCallback(
+    (p: NewPost) => {
+      if (!live) return
+      void runPost(async () => {
+        const out = await api.createPost(live, p)
+        refreshBoth()
+        return out
+      })
+    },
+    [live, runPost, refreshBoth],
+  )
+
+  const fetchThread = useCallback(
+    (id: number) => {
+      if (!live) return Promise.resolve<PostView[]>([])
+      return api.thread(live, id)
+    },
+    [live],
+  )
+
+  const subgroups = groups.kind === 'ok' ? groups.value : []
+
+  if (!live) {
+    return (
+      <Shell>
+        <JoinForm onJoin={join} busy={busy} error={error} />
+      </Shell>
+    )
+  }
 
   return (
+    <Shell>
+      {session.value && <SessionPanel session={session.value} token={live} />}
+
+      <WorldClock
+        tick={session.value?.tick ?? 0}
+        beat={beat}
+        weather={session.value?.weather ?? null}
+      />
+
+      {focus.kind === 'square' && (
+        <>
+          <Feed
+            posts={posts.value ?? []}
+            subgroups={subgroups}
+            region={region}
+            onRegion={setRegion}
+            onThread={(root) => {
+              setFocus({ kind: 'thread', root })
+            }}
+            onVoice={(id, from) => {
+              setFocus({ kind: 'voice', id, from })
+            }}
+            stale={posts.error}
+          />
+          <Composer
+            subgroups={subgroups}
+            onPost={submit}
+            busy={posted.kind === 'loading'}
+            error={posted.kind === 'failed' ? posted.message : null}
+            onFocusChange={setComposing}
+          />
+        </>
+      )}
+
+      {focus.kind === 'thread' && (
+        <ThreadView
+          token={live}
+          root={focus.root}
+          fetchThread={fetchThread}
+          onBack={() => {
+            setFocus({ kind: 'square' })
+          }}
+          onVoice={(id, from) => {
+            setFocus({ kind: 'voice', id, from })
+          }}
+        />
+      )}
+
+      {focus.kind === 'voice' && (
+        <VoicePanel
+          token={live}
+          id={focus.id}
+          onBack={() => {
+            setFocus({ kind: 'square' })
+          }}
+          onBusy={setReading}
+        />
+      )}
+    </Shell>
+  )
+}
+
+function Shell({ children }: { children: React.ReactNode }) {
+  return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col px-6 py-16">
-      <header className="mb-12">
-        <h1 className="font-mono text-sm uppercase tracking-[0.3em] opacity-60">
+      <header className="mb-10">
+        <h1 className="font-mono text-sm uppercase tracking-[0.3em] text-[var(--muted)]">
           closure
         </h1>
         <p className="mt-3 text-2xl leading-snug">
@@ -56,13 +216,9 @@ export function App() {
         </p>
       </header>
 
-      {session ? (
-        <SessionPanel session={session} token={token ?? ''} />
-      ) : (
-        <JoinForm onJoin={join} busy={busy} error={error} />
-      )}
+      {children}
 
-      <footer className="mt-auto pt-16 text-xs leading-relaxed opacity-50">
+      <footer className="mt-auto pt-16 text-xs leading-relaxed text-[var(--muted)]">
         <p>
           This instrument reports what propagated. It does not report whether you
           succeeded, and it cannot tell you which of your actions mattered — both are

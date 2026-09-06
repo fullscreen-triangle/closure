@@ -171,6 +171,9 @@ pub struct Tick {
     tick: u64,
     /// Posts registered so far. A count, not a ranking.
     posts: usize,
+    /// What the world reported this step, if it was reporting. Display only
+    /// — its mechanical effect is already in the termini of its posts.
+    weather: Option<crate::weather::Observation>,
 }
 
 /// `POST /v1/session/{token}/tick`
@@ -183,8 +186,17 @@ pub async fn tick(
     Path(token): Path<String>,
 ) -> Result<Json<Tick>, (StatusCode, Json<super::ApiError>)> {
     let token = SessionToken::parse(&token).map_err(super::bad_request)?;
-    st.advance(&token)
-        .map(|(tick, posts)| Json(Tick { tick, posts }))
+    // Fetched before the session lock is taken: `advance` holds a
+    // `std::sync::RwLock` across its whole body and must not await.
+    let observation = st.observation().await;
+    st.advance(&token, observation.as_ref())
+        .map(|(tick, posts)| {
+            Json(Tick {
+                tick,
+                posts,
+                weather: observation,
+            })
+        })
         .ok_or_else(super::not_found)
 }
 
@@ -194,6 +206,8 @@ mod tests {
     use axum::body::Body;
     use axum::http::{Request, StatusCode};
     use closure_kernel::SessionToken;
+    use closure_runtime::forum::Speaker;
+    use closure_runtime::moderator::Moderator;
     use tower::ServiceExt;
 
     /// A router with one open session, and its token.
@@ -357,6 +371,291 @@ mod tests {
             StatusCode::OK,
             "Prop. 9.6: a cross-agent ranking is ill-defined, so `top` must not parse"
         );
+    }
+
+    // ------------------------------------------------------- the world
+
+    fn obs(t: f64, w: f64) -> crate::weather::Observation {
+        crate::weather::Observation {
+            temperature_c: t,
+            wind_kph: w,
+            precipitation_mm: 0.0,
+            code: 0,
+            taken: format!("2026-09-06T18:{:02}", (t.abs() as u32) % 60),
+            source: String::from("open-meteo"),
+        }
+    }
+
+    /// A router whose world reports `o`, and its token.
+    fn app_with(o: Option<crate::weather::Observation>) -> (axum::Router, String) {
+        let st = AppState::with_weather(
+            std::path::PathBuf::from("."),
+            crate::weather::Source::Fixed(o),
+        );
+        let mut rng = rand::rng();
+        let token = SessionToken::generate(&mut rng);
+        st.open(&token, "zuerich", 20260904);
+        (crate::routes::router(st), token.as_str().to_owned())
+    }
+
+    #[tokio::test]
+    async fn the_default_server_has_no_weather() {
+        let (app, token) = app();
+        let (_, t) = send(
+            &app,
+            post(&format!("/v1/session/{token}/tick"), serde_json::json!({})),
+        )
+        .await;
+        assert!(t["weather"].is_null(), "hermetic unless asked otherwise");
+        let (_, v) = send(&app, get(&format!("/v1/session/{token}"))).await;
+        assert_eq!(v["nodes"], 0, "no world, no nodes");
+    }
+
+    #[tokio::test]
+    async fn the_fingerprint_sees_reach_and_not_the_reading() {
+        // The heart of it. 26.7 °C and −5 °C are as different as readings
+        // get, and both trip exactly the same rules: windy, and temperature
+        // at an extreme. Identical reach, so identical protocol — while the
+        // bodies a player reads differ completely.
+        //
+        // This is Theorem truth-blind as an executable claim rather than a
+        // comment: the mechanism cannot tell these two runs apart.
+        let mut fps = Vec::new();
+        let mut termini = Vec::new();
+        let mut bodies = Vec::new();
+        for o in [obs(26.7, 30.0), obs(-5.0, 30.0)] {
+            let (app, token) = app_with(Some(o));
+            send(
+                &app,
+                post(&format!("/v1/session/{token}/tick"), serde_json::json!({})),
+            )
+            .await;
+            let (_, v) = send(&app, get(&format!("/v1/session/{token}"))).await;
+            fps.push((
+                v["protocol_fingerprint"].as_str().unwrap().to_owned(),
+                v["nodes"].as_u64().unwrap(),
+                v["record"].as_u64().unwrap(),
+            ));
+            let (_, posts) = send(&app, get(&format!("/v1/session/{token}/posts"))).await;
+            let world: Vec<_> = posts
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter(|p| p["speaker"].get("World").is_some())
+                .collect();
+            assert!(!world.is_empty(), "the world said something");
+            termini.push(
+                world
+                    .iter()
+                    .map(|p| p["terminus"].as_u64().unwrap())
+                    .collect::<Vec<_>>(),
+            );
+            bodies.push(
+                world
+                    .iter()
+                    .map(|p| p["body"].as_str().unwrap().to_owned())
+                    .collect::<Vec<_>>(),
+            );
+        }
+        assert_eq!(fps[0], fps[1], "the protocol cannot see the reading");
+        assert_eq!(termini[0], termini[1], "reach is identical");
+        assert_ne!(bodies[0], bodies[1], "what a reader sees is not identical");
+    }
+
+    #[tokio::test]
+    async fn the_world_wakes_the_runtime_up() {
+        // Before this work `nodes`/`record` were 0 for every session that
+        // ever existed, because nothing fed the runtime.
+        let (app, token) = app_with(Some(obs(26.7, 30.0)));
+        let (_, before) = send(&app, get(&format!("/v1/session/{token}"))).await;
+        assert_eq!(before["nodes"], 0);
+        send(
+            &app,
+            post(&format!("/v1/session/{token}/tick"), serde_json::json!({})),
+        )
+        .await;
+        let (_, after) = send(&app, get(&format!("/v1/session/{token}"))).await;
+        assert!(after["nodes"].as_u64().unwrap() > 0);
+        assert!(after["record"].as_u64().unwrap() > 0);
+        assert_ne!(
+            after["protocol_fingerprint"].as_str().unwrap(),
+            "e3b0c44298fc1c14",
+            "no longer the hash of the empty string"
+        );
+    }
+
+    #[tokio::test]
+    async fn a_source_that_is_down_does_not_stop_the_world() {
+        // It works offline. A day the world did not report is a day, not an
+        // error: there is no exit code to return (Thm 11.5).
+        let (app, token) = app_with(None);
+        let mut counts = Vec::new();
+        for _ in 0..6 {
+            let (status, t) = send(
+                &app,
+                post(&format!("/v1/session/{token}/tick"), serde_json::json!({})),
+            )
+            .await;
+            assert_eq!(status, StatusCode::OK);
+            counts.push(t["posts"].as_u64().unwrap());
+        }
+        assert!(counts.windows(2).all(|w| w[1] > w[0]), "{counts:?}");
+        let (_, v) = send(&app, get(&format!("/v1/session/{token}"))).await;
+        assert_eq!(v["nodes"], 0, "nothing is invented when nothing reported");
+    }
+
+    #[tokio::test]
+    async fn a_world_post_is_a_root_and_carries_no_act() {
+        let (app, token) = app_with(Some(obs(26.7, 30.0)));
+        send(
+            &app,
+            post(&format!("/v1/session/{token}/tick"), serde_json::json!({})),
+        )
+        .await;
+        let (_, posts) = send(&app, get(&format!("/v1/session/{token}/posts"))).await;
+        let world: Vec<_> = posts
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|p| p["speaker"].get("World").is_some())
+            .collect();
+        assert!(
+            world.len() > 1,
+            "N registrations, one per receiver (Thm 6.2)"
+        );
+        for p in &world {
+            assert!(p["parent"].is_null(), "roots, never a thread (Cor. 6.7)");
+            assert!(p["act"].is_null(), "no gaps were measured");
+            assert_eq!(p["speaker"]["World"], "open-meteo", "names the source");
+        }
+    }
+
+    #[tokio::test]
+    async fn weather_does_not_move_the_substrate() {
+        // Guards the decision not to reweight the city graph. If a reading
+        // could move a gap, a character could close its goal (Thm 7.4) and
+        // an already-pruned agent's chi would shift with nothing recording
+        // why.
+        let st = AppState::with_weather(
+            std::path::PathBuf::from("."),
+            crate::weather::Source::Fixed(Some(obs(-5.0, 120.0))),
+        );
+        let mut rng = rand::rng();
+        let token = SessionToken::generate(&mut rng);
+        st.open(&token, "zuerich", 20260904);
+        let before = st
+            .with_session(&token, |s| {
+                s.moderators.iter().map(|m| m.gap()).collect::<Vec<_>>()
+            })
+            .unwrap();
+        for _ in 0..10 {
+            let o = st.observation().await;
+            st.advance(&token, o.as_ref());
+        }
+        let after = st
+            .with_session(&token, |s| {
+                s.moderators.iter().map(|m| m.gap()).collect::<Vec<_>>()
+            })
+            .unwrap();
+        assert_eq!(before, after, "a reading is not a change to the city");
+        assert!(
+            st.with_session(&token, |s| s.moderators.iter().all(Moderator::is_open))
+                .unwrap(),
+            "every character still cannot close its goal (Thm 7.4)"
+        );
+    }
+
+    #[tokio::test]
+    async fn a_reached_region_registers_at_its_weakest_point() {
+        // Not a position derived from the reading. The observation lands
+        // where the region already has an open question, which is the one
+        // place it can arrive without being put there by its content.
+        let o = obs(26.7, 30.0);
+        let st = AppState::with_weather(
+            std::path::PathBuf::from("."),
+            crate::weather::Source::Fixed(Some(o.clone())),
+        );
+        let mut rng = rand::rng();
+        let token = SessionToken::generate(&mut rng);
+        st.open(&token, "zuerich", 20260904);
+        // `wants()` is read before the tick, since the round that follows it
+        // may move the character's weakest point.
+        let want: std::collections::BTreeSet<u32> = st
+            .with_session(&token, |s| {
+                crate::weather::reach(&o)
+                    .into_iter()
+                    .filter_map(|r| {
+                        let m = s.square.subgroups.iter().find(|g| g.name == r)?;
+                        s.moderators
+                            .iter()
+                            .find(|x| x.region == m.members)
+                            .and_then(crate::weather::terminus)
+                    })
+                    .collect()
+            })
+            .unwrap();
+        assert!(!want.is_empty(), "the reach is non-empty");
+        let ob = st.observation().await;
+        st.advance(&token, ob.as_ref());
+        let got: std::collections::BTreeSet<u32> = st
+            .with_forum_ref(&token, |f| {
+                f.posts()
+                    .iter()
+                    .filter(|p| matches!(p.speaker, Speaker::World(_)))
+                    .map(|p| p.emitted.terminus)
+                    .collect()
+            })
+            .unwrap();
+        assert_eq!(got, want);
+    }
+
+    #[tokio::test]
+    async fn the_trajectory_is_the_reach_set() {
+        let o = obs(26.7, 30.0);
+        let st = AppState::with_weather(
+            std::path::PathBuf::from("."),
+            crate::weather::Source::Fixed(Some(o.clone())),
+        );
+        let mut rng = rand::rng();
+        let token = SessionToken::generate(&mut rng);
+        st.open(&token, "zuerich", 20260904);
+        let ob = st.observation().await;
+        st.advance(&token, ob.as_ref());
+        let want: std::collections::BTreeSet<String> =
+            std::iter::once(format!("weather/{}", o.source))
+                .chain(
+                    crate::weather::reach(&o)
+                        .into_iter()
+                        .map(|r| format!("weather/{r}")),
+                )
+                .collect();
+        let got = st
+            .with_session(&token, |s| {
+                s.runtime
+                    .trajectory()
+                    .into_iter()
+                    .map(str::to_owned)
+                    .collect::<std::collections::BTreeSet<_>>()
+            })
+            .unwrap();
+        // The trajectory names reach and nothing else: no reading, no time,
+        // no region the weather did not touch.
+        assert_eq!(got, want);
+    }
+
+    #[tokio::test]
+    async fn a_speaker_round_trips_on_the_wire() {
+        use closure_runtime::voice::VoiceId;
+        for (s, want) in [
+            (Speaker::Player, serde_json::json!("Player")),
+            (Speaker::Voice(VoiceId(3)), serde_json::json!({"Voice": 3})),
+            (
+                Speaker::World(String::from("open-meteo")),
+                serde_json::json!({"World": "open-meteo"}),
+            ),
+        ] {
+            assert_eq!(serde_json::to_value(&s).unwrap(), want);
+        }
     }
 
     #[tokio::test]

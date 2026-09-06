@@ -152,17 +152,29 @@ pub struct CharacterView {
 /// audible to and amalgamating the caps. Note the absence of a candidate
 /// list: there is nothing here to choose between, because nothing was
 /// enumerated.
+///
+/// A voice that spoke too narrowly for a character to be built from it is a
+/// **400**, not a 404, and carries the same sentence [`prune`] does. The
+/// distinction matters: the session is there, the voice is there, and the
+/// substrate is honestly declining rather than failing to find something.
+/// Collapsing it into "no such session" would make a client infer the reason
+/// from a healthy session poll, which is a guess dressed as a fact.
 pub async fn character(
     State(st): State<AppState>,
     Path((token, id)): Path<(String, u32)>,
 ) -> Result<Json<CharacterView>, (StatusCode, Json<super::ApiError>)> {
     let token = SessionToken::parse(&token).map_err(super::bad_request)?;
-    st.with_session(&token, |s| {
+    let out = st.with_session(&token, |s| {
+        // An unknown voice is a 404 like an unknown session; only a voice
+        // that exists and ranged too narrowly is the 400.
         let voice = s.square.voice(VoiceId(id))?;
-        let ch = s
+        let Some(ch) = s
             .square
-            .character(VoiceId(id), &s.city_graph, &s.moderators)?;
-        Some(CharacterView {
+            .character(VoiceId(id), &s.city_graph, &s.moderators)
+        else {
+            return Some(None);
+        };
+        Some(Some(CharacterView {
             voice: id,
             audible_to: s
                 .square
@@ -178,12 +190,19 @@ pub async fn character(
                 .collect(),
             footprint: voice.footprint().into_iter().collect(),
             chi: ch.chi(),
-            identity: ch.identity.settled().clone(),
-        })
-    })
-    .flatten()
-    .map(Json)
-    .ok_or_else(super::not_found)
+            identity: s
+                .identities
+                .get(&id)
+                .map_or_else(Default::default, |i| i.settled().clone()),
+        }))
+    });
+    match out.flatten() {
+        Some(Some(v)) => Ok(Json(v)),
+        Some(None) => Err(super::bad_request_msg(
+            "that voice has not said enough for anyone to be behind it",
+        )),
+        None => Err(super::not_found()),
+    }
 }
 
 /// A pruned agent.
@@ -277,17 +296,22 @@ pub async fn ask(
             "a question with no admissible answers has none",
         ));
     }
-    let out = st.with_session(&token, |s| {
-        let mut ch = s
+    let out = st.with_session_mut(&token, |s| {
+        // The character is rebuilt, as always. Only what the asking settles
+        // is kept, in the session's own map: an answer that did not outlive
+        // the request that settled it would make `settled` a count of a
+        // discarded map, and the client would be told the same "one thing is
+        // settled" after every question.
+        let ch = s
             .square
             .character(VoiceId(id), &s.city_graph, &s.moderators)?;
         let opts: Vec<&str> = body.options.iter().map(String::as_str).collect();
-        let graph = ch.graph.clone();
-        let value = ch.identity.ask(&graph, &body.key, &opts)?;
+        let identity = s.identities.entry(id).or_default();
+        let value = identity.ask(&ch.graph, &body.key, &opts)?;
         Some(AskedView {
             key: body.key.clone(),
             value,
-            settled: ch.identity.len(),
+            settled: identity.len(),
         })
     });
     match out {
@@ -488,6 +512,38 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn a_refusal_is_told_apart_from_a_missing_session() {
+        // Three outcomes, three answers. A client must never have to infer
+        // which one it got by polling something else and guessing.
+        let (app, token) = app();
+        let (missing, _) = send(&app, get("/v1/session/AAAAAAAAAAAA/voices/0/character")).await;
+        assert_eq!(missing, StatusCode::NOT_FOUND);
+        let (unknown, _) = send(
+            &app,
+            get(&format!("/v1/session/{token}/voices/9999/character")),
+        )
+        .await;
+        assert_eq!(unknown, StatusCode::NOT_FOUND, "no such voice");
+        // Whichever voices are narrow, a refusal says why in the same words
+        // `prune` uses, and never masquerades as a lookup failure.
+        for id in 0..8 {
+            let (status, body) = send(
+                &app,
+                get(&format!("/v1/session/{token}/voices/{id}/character")),
+            )
+            .await;
+            if status == StatusCode::BAD_REQUEST {
+                assert_eq!(
+                    body["error"],
+                    "that voice has not said enough for anyone to be behind it"
+                );
+            } else {
+                assert_eq!(status, StatusCode::OK, "voice {id}");
+            }
+        }
+    }
+
+    #[tokio::test]
     async fn an_attribute_exists_only_once_it_is_asked_for() {
         let (app, token) = app();
         let id = someone(&app, &token).await;
@@ -526,17 +582,60 @@ mod tests {
         .await;
         assert_eq!(again["value"].as_str().unwrap(), first);
 
-        // And nothing else was invented along the way.
+        // What was asked survives the request that asked it, and nothing
+        // else came with it. Both halves matter: an identity that emptied
+        // between requests would make `settled` a count of a discarded map,
+        // and one that filled with anything unasked would be a profile.
         let (_, ch) = send(
             &app,
             get(&format!("/v1/session/{token}/voices/{id}/character")),
         )
         .await;
+        let identity = ch["identity"].as_object().unwrap();
         assert_eq!(
-            ch["identity"].as_object().unwrap().len(),
-            0,
-            "the character carries no attribute nobody asked for"
+            identity.len(),
+            1,
+            "the character carries no attribute nobody asked for, and loses none that was"
         );
+        assert_eq!(identity["grundschule"].as_str().unwrap(), first);
+    }
+
+    #[tokio::test]
+    async fn what_is_settled_accumulates_and_is_never_a_fraction() {
+        let (app, token) = app();
+        let id = someone(&app, &token).await;
+
+        let mut seen: Vec<usize> = Vec::new();
+        for (key, opts) in [
+            ("grundschule", ["Wipkingen", "Aussersihl"]),
+            ("district", ["Altstadt", "Enge"]),
+            ("car", ["none", "one"]),
+        ] {
+            let (status, asked) = send(
+                &app,
+                post(
+                    &format!("/v1/session/{token}/voices/{id}/ask"),
+                    serde_json::json!({ "key": key, "options": opts }),
+                ),
+            )
+            .await;
+            assert_eq!(status, StatusCode::OK);
+            seen.push(asked["settled"].as_u64().unwrap() as usize);
+        }
+        // Three questions, three answers. Before the identities map this
+        // read [1, 1, 1]: every ask rebuilt the character, settled into it,
+        // and dropped it.
+        assert_eq!(seen, vec![1, 2, 3]);
+
+        // `settled` is a count of what exists, never "3 of N". There is no
+        // N: no list of the questions a character could be asked exists to
+        // be completed, which is why nothing here reports a denominator.
+        let (_, ch) = send(
+            &app,
+            get(&format!("/v1/session/{token}/voices/{id}/character")),
+        )
+        .await;
+        assert_eq!(ch["identity"].as_object().unwrap().len(), 3);
     }
 
     #[tokio::test]
@@ -587,8 +686,12 @@ mod tests {
         )
         .await;
         let (_, posts) = send(&app, get(&format!("/v1/session/{token}/posts"))).await;
+        // A weather observation is not one of the round's posts: the world
+        // reports itself, it does not take a turn. Under the default (no
+        // world feed) this filter removes nothing; it states the intent.
         let fresh: Vec<_> = posts.as_array().unwrap()[..posts.as_array().unwrap().len() - start]
             .iter()
+            .filter(|p| p["speaker"].get("World").is_none())
             .collect();
         assert!(!fresh.is_empty());
         // Unlike the seeded square, these gaps were actually measured, so

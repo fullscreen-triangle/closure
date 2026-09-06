@@ -17,7 +17,7 @@ export function JoinForm({ onJoin, busy, error }: Props) {
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <label htmlFor="token" className="block text-sm opacity-70">
+      <label htmlFor="token" className="block text-sm text-[var(--muted)]">
         Paste the token from <code className="font-mono">closure session new</code>
       </label>
 
@@ -47,7 +47,7 @@ export function JoinForm({ onJoin, busy, error }: Props) {
         </p>
       )}
 
-      <p className="pt-6 text-sm leading-relaxed opacity-60">
+      <p className="pt-6 text-sm leading-relaxed text-[var(--muted)]">
         No token? Install the CLI, then run{' '}
         <code className="font-mono">closure login</code> followed by{' '}
         <code className="font-mono">closure session new</code>.

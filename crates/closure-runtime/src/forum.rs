@@ -76,6 +76,12 @@ pub struct PostId(pub u64);
 /// There is no constructor path from a description to an [`Speaker::Agent`],
 /// which is Theorem 4.3 expressed as a missing capability rather than a
 /// comment.
+///
+/// [`Speaker::World`] sits **outside** that ordering rather than extending
+/// it. The city is not someone: it never becomes an agent, it is never
+/// pruned, and no voice is noted for it. It is a condition registering at a
+/// position, and it is a speaker only in the sense that a post has to come
+/// from somewhere.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Speaker {
     /// The player. Themselves an agent, and not privileged here.
@@ -84,6 +90,14 @@ pub enum Speaker {
     Voice(VoiceId),
     /// A pruned agent, by its handle. Was a voice first.
     Agent(String),
+    /// The world itself, by the name of the source that reported it.
+    ///
+    /// The payload names the *source* — `"open-meteo"` — and never the
+    /// reading. Nothing in this crate reads it. A condition in the city
+    /// reaches the square by registering at a terminus, exactly as any other
+    /// post does, and its text is display-only: text the mechanism acted on
+    /// would be a fifth operation (§11) and there is no fifth.
+    World(String),
 }
 
 impl Speaker {
@@ -620,7 +634,13 @@ mod tests {
                 members: [3, 4].into_iter().collect(),
             },
         ]);
-        let utterances = seed(&mut sq, &Seeding::default(), 11);
+        // The city these two regions are cut from: a path, so they are in
+        // contact at 2-3 and a voice can walk between them.
+        let mut city = closure_kernel::ContactGraph::new(5);
+        for u in 0..4 {
+            city.add_edge(u, u + 1, 2.0).unwrap();
+        }
+        let utterances = seed(&mut sq, &city, &Seeding::default(), 11);
         let mut f = Forum::new();
         let ids = open_square(&mut f, &sq, &utterances, |u| {
             format!("{:?} at {}", u.voice, u.terminus)

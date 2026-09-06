@@ -20,6 +20,7 @@
 mod routes;
 mod state;
 mod substrate;
+mod weather;
 
 use anyhow::Result;
 use clap::Parser;
@@ -41,6 +42,14 @@ struct Args {
     #[arg(long, env = "CLOSURE_DATA_DIR", default_value = "./data")]
     data_dir: std::path::PathBuf,
 
+    /// Open-Meteo forecast endpoint, **bare** — no query string. The
+    /// coordinates and fields are appended, so a URL that already carries a
+    /// `?` would produce a malformed request and a world that never reports.
+    /// Unset means the world does not report, which keeps a run hermetic and
+    /// its post bodies deterministic.
+    #[arg(long, env = "CLOSURE_WEATHER_URL")]
+    weather_url: Option<String>,
+
     /// Comma-separated origins permitted to call the API.
     #[arg(
         long,
@@ -55,7 +64,23 @@ async fn main() -> Result<()> {
     let args = Args::parse();
     init_tracing();
 
-    let state = state::AppState::new(args.data_dir.clone());
+    let source = match args.weather_url.as_deref() {
+        // Refuse at startup rather than serve `weather: null` forever. The
+        // query string is appended, so a `?` here silently malforms every
+        // request, and a source that is down is indistinguishable from one
+        // that was never configured.
+        Some(u) if u.contains('?') => {
+            anyhow::bail!(
+                "--weather-url must be the bare endpoint, without a query string; the coordinates and fields are appended"
+            )
+        }
+        Some(u) => {
+            tracing::info!(url = %u, "the world will report itself");
+            weather::Source::Live(weather::Live::new(u))
+        }
+        None => weather::Source::Fixed(None),
+    };
+    let state = state::AppState::with_weather(args.data_dir.clone(), source);
 
     let cors = build_cors(&args.allowed_origins)?;
     let app = routes::router(state)

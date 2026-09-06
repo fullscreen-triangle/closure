@@ -12,16 +12,23 @@ interface Props {
  * it. The record is monotone and never falls; the fingerprint is what makes a
  * session reproducible, since the trajectory is not. There is deliberately
  * nothing here that reads as a score.
+ *
+ * When the runtime holds nothing, that is said in words rather than hidden.
+ * A panel that quietly dropped its empty figures would let a reader assume
+ * they were being computed and were merely small.
  */
 export function SessionPanel({ session, token }: Props) {
   return (
-    <section className="space-y-8">
-      <div>
-        <p className="text-sm opacity-60">You are in</p>
-        <p className="text-3xl">{session.city}</p>
-      </div>
-
-      <dl className="grid grid-cols-2 gap-6 border-y border-[var(--rule)] py-6 text-sm sm:grid-cols-4">
+    <section>
+      <dl className="grid grid-cols-2 gap-x-6 gap-y-5 border-y border-[var(--rule)] py-5 text-sm sm:grid-cols-4">
+        <Figure label="city" value={session.city} />
+        <Figure label="tick" value={String(session.tick)} />
+        <Figure label="posts" value={String(session.posts)} />
+        <Figure
+          label="voices"
+          value={String(session.voices)}
+          hint="handles, not people"
+        />
         <Figure label="nodes" value={String(session.nodes)} />
         <Figure
           label="record"
@@ -33,16 +40,21 @@ export function SessionPanel({ session, token }: Props) {
           value={session.protocol_fingerprint}
           hint="what is reproducible"
         />
-        <Figure label="opened" value={new Date(session.opened).toLocaleString()} />
+        <Figure
+          label="seed"
+          value={String(session.seed)}
+          hint="restate this to reopen the same square"
+        />
       </dl>
 
-      <p className="font-mono text-xs opacity-40">{token}</p>
+      {session.nodes === 0 && (
+        <p className="mt-3 text-xs text-[var(--muted)]">
+          The runtime holds no nodes in this session yet — nothing has propagated into
+          it. It fills once the world reports itself.
+        </p>
+      )}
 
-      <p className="text-sm leading-relaxed opacity-70">
-        The conversation surface attaches here. Agents divide their attention across
-        scenes you cannot see, so one may answer you thinly, or not at that moment at
-        all. That is the scheduler, not a fault.
-      </p>
+      <p className="mt-3 font-mono text-xs text-[var(--muted)]">{token}</p>
     </section>
   )
 }
@@ -58,9 +70,9 @@ function Figure({
 }) {
   return (
     <div>
-      <dt className="text-xs uppercase tracking-wider opacity-50">{label}</dt>
+      <dt className="text-xs uppercase tracking-wider text-[var(--muted)]">{label}</dt>
       <dd className="mt-1 break-all font-mono">{value}</dd>
-      {hint && <dd className="mt-1 text-xs opacity-40">{hint}</dd>}
+      {hint && <dd className="mt-1 text-xs text-[var(--muted)]">{hint}</dd>}
     </div>
   )
 }

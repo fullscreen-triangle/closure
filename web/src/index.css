@@ -26,3 +26,27 @@ body {
   font-family: theme('fontFamily.serif');
   -webkit-font-smoothing: antialiased;
 }
+
+/*
+ * Keyboard focus must be visible. The token input sets `outline-none`, and
+ * without this rule a keyboard user cannot see where they are at all.
+ */
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/*
+ * The auto-tick *is* motion, and it is held by default when a reader has
+ * asked for less of it (see `useHeartbeat`). This covers anything else.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
