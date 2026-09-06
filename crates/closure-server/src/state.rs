@@ -8,7 +8,6 @@ use closure_runtime::voice::{Seeding, Square, seed};
 use closure_runtime::{Forum, Runtime};
 use serde::Serialize;
 use std::collections::HashMap;
-use std::path::PathBuf;
 use std::sync::{Arc, RwLock};
 
 /// How many instances a character splits into when it takes a turn.
@@ -31,9 +30,10 @@ pub struct Session {
     /// The characters talking in this city, one per region. A voice is a
     /// split of one of these, never an entry looked up among them.
     pub moderators: Vec<Moderator>,
-    /// The graph the city is cut from. Needed to cap a moderator when a
-    /// character has to be reassembled.
-    pub city_graph: closure_kernel::ContactGraph,
+    /// The society this session opened onto: the graph, and the regions cut
+    /// from it. Generated from `seed` and nothing else, so restating the seed
+    /// reopens the same world (Cor. 11.14).
+    pub society: crate::society::Society,
     /// The seed this square was opened with. Part of the protocol, so a run
     /// is reproducible as a sequence of requests (Cor. 11.14).
     pub seed: u64,
@@ -63,10 +63,14 @@ impl Session {
     #[must_use]
     pub fn new(city: impl Into<String>, seed: u64) -> Self {
         let city = city.into();
-        let moderators = crate::substrate::moderators(&city);
-        let city_graph = crate::substrate::city_graph();
-        let mut square = Square::new(crate::substrate::subgroups(&city));
-        let utterances = seed_square(&mut square, &city_graph, seed);
+        // One generation, used for all three. They used to be three
+        // independent calls that each rebuilt the graph and had to agree by
+        // construction; a generated world makes that agreement a thing to
+        // hold rather than assume.
+        let society = crate::society::Society::generate(seed);
+        let moderators = society.moderators();
+        let mut square = Square::new(society.subgroups());
+        let utterances = seed_square(&mut square, &society.graph, seed);
         let mut forum = Forum::new();
         let _ = open_square(&mut forum, &square, &utterances, |u| {
             crate::substrate::utterance_body(&square, u)
@@ -77,7 +81,7 @@ impl Session {
             forum,
             square,
             moderators,
-            city_graph,
+            society,
             seed,
             opened: time::OffsetDateTime::now_utc(),
             weather: None,
@@ -123,14 +127,14 @@ fn register_weather(session: &mut Session, o: &crate::weather::Observation) {
         serde_json::to_value(o).unwrap_or(serde_json::Value::Null),
         None,
     );
-    for region in crate::weather::reach(o) {
+    for region in crate::weather::reach(o, &session.society) {
         // The region's own character. A region too thin to have a moderator
         // has nobody to register with, and is skipped rather than invented.
         let Some(members) = session
             .square
             .subgroups
             .iter()
-            .find(|g| g.name == region)
+            .find(|g| g.name == *region)
             .map(|g| &g.members)
         else {
             continue;
@@ -151,7 +155,7 @@ fn register_weather(session: &mut Session, o: &crate::weather::Observation) {
         let _ = session.forum.register(
             None,
             Speaker::World(o.source.clone()),
-            crate::weather::body(o, region),
+            crate::weather::body(o, &region),
             closure_runtime::forum::at(t, closure_kernel::identity::Record::new()),
             // No gaps were measured. Absence of a classification is not a
             // classification of absence.
@@ -187,6 +191,9 @@ pub struct SessionView {
     pub voices: usize,
     /// The seed this square opened with.
     pub seed: u64,
+    /// Positions in this session's city. Generated, so it differs per
+    /// session — the client cannot assume a fixed width.
+    pub order: u32,
     /// The last observation registered in this session, if any. Display
     /// only: what it *did* is already in the termini of its posts.
     pub weather: Option<crate::weather::Observation>,
@@ -209,6 +216,7 @@ impl Session {
             tick: self.forum.tick(),
             voices: self.square.voices().len(),
             seed: self.seed,
+            order: self.society.order(),
             weather: self.weather.clone(),
         }
     }
@@ -223,13 +231,17 @@ pub struct AppState {
 #[derive(Debug)]
 struct Inner {
     sessions: RwLock<HashMap<String, Session>>,
-    #[allow(dead_code)]
-    data_dir: PathBuf,
     weather: crate::weather::Source,
 }
 
 impl AppState {
-    /// Build state rooted at `data_dir`, with no weather.
+    /// Build state with no weather.
+    ///
+    /// There is no data directory. There used to be a `--data-dir` flag
+    /// pointing at "city substrates", and it was read by nothing — the city
+    /// was hardcoded, and is now generated from the seed. A flag promising a
+    /// data source that does not exist is worse than no flag: it tells a
+    /// reader the substrate came from somewhere.
     ///
     /// The default is no world feed, so tests and CI are hermetic and a run
     /// is reproducible as a sequence of requests. Note this is about body
@@ -238,17 +250,16 @@ impl AppState {
     /// live feed on does not cost reproducibility of the protocol.
     #[cfg_attr(not(test), allow(dead_code))]
     #[must_use]
-    pub fn new(data_dir: PathBuf) -> Self {
-        Self::with_weather(data_dir, crate::weather::Source::Fixed(None))
+    pub fn new() -> Self {
+        Self::with_weather(crate::weather::Source::Fixed(None))
     }
 
     /// Build state with a weather source.
     #[must_use]
-    pub fn with_weather(data_dir: PathBuf, weather: crate::weather::Source) -> Self {
+    pub fn with_weather(weather: crate::weather::Source) -> Self {
         Self {
             inner: Arc::new(Inner {
                 sessions: RwLock::new(HashMap::new()),
-                data_dir,
                 weather,
             }),
         }

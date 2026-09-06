@@ -1,5 +1,5 @@
 /**
- * The city as 31 cells.
+ * The city as a strip of cells, one per position.
  *
  * Regions overlap, and the overlap is the point — it is why a voice heard in
  * one region can be audible to the character of another, and therefore why a
@@ -8,12 +8,18 @@
  */
 export function PositionStrip({
   span,
-  order = 31,
+  order,
   mark,
 }: {
   /** Positions in this region. */
   span: number[]
-  order?: number
+  /**
+   * Positions in the city. Required, and deliberately not defaulted: the
+   * society is generated per session, so its width differs every time. A
+   * default would render a strip that looked right and was not — cells
+   * beyond it vanishing, or phantom cells past the end of the world.
+   */
+  order: number
   /** One position to call out, if any. */
   mark?: number | null
 }) {

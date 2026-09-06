@@ -27,11 +27,14 @@ const PRESETS: { key: string; options: string[] }[] = [
 export function VoicePanel({
   token,
   id,
+  order,
   onBack,
   onBusy,
 }: {
   token: string
   id: number
+  /** Positions in this session's city. Generated, so never assumed. */
+  order: number
   onBack: () => void
   /** Held true while the player is here, so the square does not move under them. */
   onBusy: (busy: boolean) => void
@@ -117,7 +120,7 @@ export function VoicePanel({
 
             <dt className="text-[var(--muted)]">spoke at</dt>
             <dd className="flex items-center gap-3">
-              <PositionStrip span={ch.value.footprint} />
+              <PositionStrip span={ch.value.footprint} order={order} />
               <span className="font-mono text-xs text-[var(--muted)]">
                 {ch.value.footprint.join(' ')}
               </span>

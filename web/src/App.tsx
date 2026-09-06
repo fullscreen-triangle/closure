@@ -168,6 +168,7 @@ export function App() {
           />
           <Composer
             subgroups={subgroups}
+            order={session.value?.order ?? 0}
             onPost={submit}
             busy={posted.kind === 'loading'}
             error={posted.kind === 'failed' ? posted.message : null}
@@ -194,6 +195,7 @@ export function App() {
         <VoicePanel
           token={live}
           id={focus.id}
+          order={session.value?.order ?? 0}
           onBack={() => {
             setFocus({ kind: 'square' })
           }}

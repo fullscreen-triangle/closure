@@ -212,7 +212,7 @@ mod tests {
 
     /// A router with one open session, and its token.
     fn app() -> (axum::Router, String) {
-        let st = AppState::new(std::path::PathBuf::from("."));
+        let st = AppState::new();
         let mut rng = rand::rng();
         let token = SessionToken::generate(&mut rng);
         st.open(&token, "zuerich", 20260904);
@@ -388,10 +388,7 @@ mod tests {
 
     /// A router whose world reports `o`, and its token.
     fn app_with(o: Option<crate::weather::Observation>) -> (axum::Router, String) {
-        let st = AppState::with_weather(
-            std::path::PathBuf::from("."),
-            crate::weather::Source::Fixed(o),
-        );
+        let st = AppState::with_weather(crate::weather::Source::Fixed(o));
         let mut rng = rand::rng();
         let token = SessionToken::generate(&mut rng);
         st.open(&token, "zuerich", 20260904);
@@ -536,10 +533,7 @@ mod tests {
         // could move a gap, a character could close its goal (Thm 7.4) and
         // an already-pruned agent's chi would shift with nothing recording
         // why.
-        let st = AppState::with_weather(
-            std::path::PathBuf::from("."),
-            crate::weather::Source::Fixed(Some(obs(-5.0, 120.0))),
-        );
+        let st = AppState::with_weather(crate::weather::Source::Fixed(Some(obs(-5.0, 120.0))));
         let mut rng = rand::rng();
         let token = SessionToken::generate(&mut rng);
         st.open(&token, "zuerich", 20260904);
@@ -571,10 +565,7 @@ mod tests {
         // where the region already has an open question, which is the one
         // place it can arrive without being put there by its content.
         let o = obs(26.7, 30.0);
-        let st = AppState::with_weather(
-            std::path::PathBuf::from("."),
-            crate::weather::Source::Fixed(Some(o.clone())),
-        );
+        let st = AppState::with_weather(crate::weather::Source::Fixed(Some(o.clone())));
         let mut rng = rand::rng();
         let token = SessionToken::generate(&mut rng);
         st.open(&token, "zuerich", 20260904);
@@ -582,7 +573,7 @@ mod tests {
         // may move the character's weakest point.
         let want: std::collections::BTreeSet<u32> = st
             .with_session(&token, |s| {
-                crate::weather::reach(&o)
+                crate::weather::reach(&o, &s.society)
                     .into_iter()
                     .filter_map(|r| {
                         let m = s.square.subgroups.iter().find(|g| g.name == r)?;
@@ -612,23 +603,23 @@ mod tests {
     #[tokio::test]
     async fn the_trajectory_is_the_reach_set() {
         let o = obs(26.7, 30.0);
-        let st = AppState::with_weather(
-            std::path::PathBuf::from("."),
-            crate::weather::Source::Fixed(Some(o.clone())),
-        );
+        let st = AppState::with_weather(crate::weather::Source::Fixed(Some(o.clone())));
         let mut rng = rand::rng();
         let token = SessionToken::generate(&mut rng);
         st.open(&token, "zuerich", 20260904);
         let ob = st.observation().await;
         st.advance(&token, ob.as_ref());
-        let want: std::collections::BTreeSet<String> =
-            std::iter::once(format!("weather/{}", o.source))
-                .chain(
-                    crate::weather::reach(&o)
-                        .into_iter()
-                        .map(|r| format!("weather/{r}")),
-                )
-                .collect();
+        let want: std::collections::BTreeSet<String> = st
+            .with_session(&token, |s| {
+                std::iter::once(format!("weather/{}", o.source))
+                    .chain(
+                        crate::weather::reach(&o, &s.society)
+                            .into_iter()
+                            .map(|r| format!("weather/{r}")),
+                    )
+                    .collect()
+            })
+            .unwrap();
         let got = st
             .with_session(&token, |s| {
                 s.runtime
@@ -665,5 +656,56 @@ mod tests {
         let other = SessionToken::generate(&mut rng);
         let (status, _) = send(&app, get(&format!("/v1/session/{}/posts", other.as_str()))).await;
         assert_eq!(status, StatusCode::NOT_FOUND);
+    }
+    #[tokio::test]
+    async fn a_generated_society_hears_weather_wherever_it_is() {
+        // The end-to-end claim behind generating the substrate: a reading
+        // that is a consideration somewhere registers somewhere, in whatever
+        // society the seed happened to draw. The old table named six fixed
+        // regions and would have registered nowhere at all here.
+        //
+        // Storm conditions, chosen to trip every rule, so the only reason a
+        // society could hear nothing is that it is entirely under a roof.
+        let o = obs(30.0, 40.0);
+        let mut heard = 0usize;
+        let mut roofed = 0usize;
+        let n = 24usize;
+        for i in 0..n {
+            let seed = (i as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ 0xC17A;
+            let st = AppState::with_weather(crate::weather::Source::Fixed(Some(o.clone())));
+            let mut rng = rand::rng();
+            let token = SessionToken::generate(&mut rng);
+            st.open(&token, "zuerich", seed);
+            let all_indoors = st
+                .with_session(&token, |s| {
+                    s.society
+                        .regions
+                        .iter()
+                        .all(|r| r.affords == crate::society::Affordance::Indoors)
+                })
+                .unwrap();
+            let ob = st.observation().await;
+            st.advance(&token, ob.as_ref());
+            let world = st
+                .with_forum_ref(&token, |f| {
+                    f.posts()
+                        .iter()
+                        .filter(|p| matches!(p.speaker, Speaker::World(_)))
+                        .count()
+                })
+                .unwrap();
+            if all_indoors {
+                roofed += 1;
+                assert_eq!(world, 0, "seed {seed}: a roofed society heard weather");
+            } else {
+                assert!(world > 0, "seed {seed}: nowhere heard a storm");
+                heard += 1;
+            }
+        }
+        assert!(heard + roofed == n);
+        assert!(
+            heard > 0,
+            "no society heard anything, which is not a substrate"
+        );
     }
 }

@@ -18,13 +18,18 @@ pub struct City {
 }
 
 /// Cities the scaffold knows about without contacting a host.
+///
+/// No floor is published here. The host generates a society per session from
+/// the seed, so a floor stated before the seed is known would describe no
+/// world in particular. `floor` stays `Option` because a host that *did*
+/// bind a fixed substrate could honestly publish one; this one does not.
 #[must_use]
 pub fn builtin() -> Vec<City> {
     vec![City {
         id: "zuerich".into(),
         name: "Zürich".into(),
-        substrate: "Statistik Stadt Zürich, open government data".into(),
-        floor: Some(0.0197),
+        substrate: "generated per session from the seed; no city is modelled".into(),
+        floor: None,
     }]
 }
 

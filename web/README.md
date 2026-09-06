@@ -58,7 +58,7 @@ src/
     ThreadView.tsx     one root and its replies
     Composer.tsx       post at a terminus you pick in two steps
     VoicePanel.tsx     character -> prune -> ask
-    PositionStrip.tsx  a 31-cell span of the city
+    PositionStrip.tsx  a span of the city, one cell per position
     ActMark.tsx        report / question / neither / not measured
 ```
 

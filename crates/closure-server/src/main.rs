@@ -18,6 +18,7 @@
 //! honest measurement surface for this class of phenomenon.
 
 mod routes;
+mod society;
 mod state;
 mod substrate;
 mod weather;
@@ -34,13 +35,13 @@ use tower_http::{compression::CompressionLayer, cors::CorsLayer, trace::TraceLay
     about = "Host for the closure runtime"
 )]
 struct Args {
-    /// Address to bind.
-    #[arg(long, env = "CLOSURE_BIND", default_value = "0.0.0.0:8080")]
+    /// Address to bind. Loopback by default.
+    ///
+    /// The API has no authentication beyond a session token that the CLI
+    /// mints locally, so binding every interface would put an unauthenticated
+    /// host on the network. Anyone wanting that can ask for it explicitly.
+    #[arg(long, env = "CLOSURE_BIND", default_value = "127.0.0.1:8080")]
     bind: SocketAddr,
-
-    /// Directory holding city substrates.
-    #[arg(long, env = "CLOSURE_DATA_DIR", default_value = "./data")]
-    data_dir: std::path::PathBuf,
 
     /// Open-Meteo forecast endpoint, **bare** — no query string. The
     /// coordinates and fields are appended, so a URL that already carries a
@@ -80,7 +81,7 @@ async fn main() -> Result<()> {
         }
         None => weather::Source::Fixed(None),
     };
-    let state = state::AppState::with_weather(args.data_dir.clone(), source);
+    let state = state::AppState::with_weather(source);
 
     let cors = build_cors(&args.allowed_origins)?;
     let app = routes::router(state)

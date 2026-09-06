@@ -154,6 +154,23 @@ record yields fictional agents consistent with aggregate statistics. See
 Other cities are new substrate bindings, not new engines: the language depends
 on a substrate only through four obligations.
 
+### What the server runs on, which is not this
+
+The binding above is the *validation* substrate: it is what the measurements
+in [`zuerich/`](zuerich/) were taken against. The running host does not use
+it. `closure-server` **generates a society per session** from the session
+seed — a graph, its overlapping regions, and the characters cut from them —
+and no city is modelled.
+
+That is a decision rather than a shortcut. The goal of a run is unreachable
+by construction (Thm 11.5: no exit code is computable), so a more faithful
+city would not bring a player closer to finishing; fidelity is not a currency
+here. What a substrate has to supply is structure — connected regions,
+overlapping where they meet, joined thinly — and that structure is exactly
+what can be drawn. Generating it also removes the last privileged starting
+point: every session opens somewhere different, and nowhere is the right
+place to have started.
+
 ---
 
 ## Status

@@ -11,7 +11,16 @@
 //! theorem made operational: an observation with arbitrary veridicality but
 //! identical reach changes nothing about the run. A player reading the
 //! square learns that it is windy; the mechanism learns only that something
-//! registered on the lake.
+//! registered on the water.
+//!
+//! ## Why it cannot name a region
+//!
+//! The society is generated per session ([`crate::society`]), so its region
+//! names are drawn and a rule naming one would match nothing. The rules key
+//! off [`Affordance`] instead, which is the only structured fact a region
+//! carries. That is a stronger position than the one it replaced: a rule
+//! about wind and water is a claim about weather, where a rule about
+//! `watersports` was a claim about one particular city.
 //!
 //! ## What is deliberately absent
 //!
@@ -29,6 +38,7 @@
 //!   a value would let a client invert the mapping and read the weather off
 //!   the terminus, which is content entering the mechanism by the back door.
 
+use crate::society::{Affordance, Society};
 use closure_runtime::moderator::Moderator;
 use serde::{Deserialize, Serialize};
 use std::time::{Duration, Instant};
@@ -64,53 +74,80 @@ pub struct Observation {
     pub source: String,
 }
 
-/// Which regions an observation reaches, and why.
+/// What an observation is a consideration *for*.
 ///
 /// **This table is the entire mechanical content of the weather.** Everything
 /// else about an observation is display. Stated here as a table rather than
 /// buried inside a formatter, because it is the part that has to be argued
 /// for.
 ///
-/// | condition | reaches |
+/// | condition | is a consideration for |
 /// |---|---|
-/// | wind ≥ 15 km/h | `watersports`, `lake-transport` |
-/// | precipitation > 0 mm | `commuting` |
-/// | temperature ≤ 0 °C or ≥ 25 °C | `extreme-sports`, `commuting` |
-/// | code ≥ 45 (fog and worse) | `lake-transport`, `commuting` |
+/// | wind ≥ 15 km/h | [`Affordance::Water`] |
+/// | precipitation > 0 mm | [`Affordance::Transit`] |
+/// | temperature ≤ 0 °C or ≥ 25 °C | [`Affordance::Open`], [`Affordance::Transit`] |
+/// | code ≥ 45 (fog and worse) | [`Affordance::Water`], [`Affordance::Transit`] |
 ///
-/// `carbon-composites` and `eth-materials` appear in no rule, because a
-/// laboratory is indoors. That absence is the check on the whole scheme: a
-/// mapping that touched every region would be one that had stopped
-/// distinguishing, and a consideration that reaches everything is not a
-/// consideration.
+/// ## Why this keys off affordance and not off a region name
 ///
-/// An observation matching no rule reaches nothing and registers nowhere.
-/// That is a day the weather was not a consideration, and nothing is
-/// invented to cover it.
+/// It used to name six regions, because there were six and they were fixed.
+/// A society is generated now, and its region names are drawn — so a table
+/// of names would match nothing and the weather would silently register
+/// nowhere. The deeper reason is the better one: a rule that named
+/// `watersports` was not saying anything about weather, it was saying
+/// something about that one city. Keyed on affordance, the same four lines
+/// are a claim about wind and water that holds in every society the
+/// generator can produce.
+///
+/// [`Affordance::Indoors`] appears in no rule, because a roof is a roof.
+/// That absence is the check on the whole scheme: a mapping that touched
+/// every region would be one that had stopped distinguishing, and a
+/// consideration that reaches everything is not a consideration.
+///
+/// An observation matching no rule is a consideration for nothing and
+/// registers nowhere. That is a day the weather was not a consideration, and
+/// nothing is invented to cover it.
 #[must_use]
-pub fn reach(o: &Observation) -> Vec<&'static str> {
-    let mut out: Vec<&'static str> = Vec::new();
-    let mut add = |r: &'static str| {
-        if !out.contains(&r) {
-            out.push(r);
+pub fn considers(o: &Observation) -> Vec<Affordance> {
+    let mut out: Vec<Affordance> = Vec::new();
+    let mut add = |a: Affordance| {
+        if !out.contains(&a) {
+            out.push(a);
         }
     };
     if o.wind_kph >= 15.0 {
-        add("watersports");
-        add("lake-transport");
+        add(Affordance::Water);
     }
     if o.precipitation_mm > 0.0 {
-        add("commuting");
+        add(Affordance::Transit);
     }
     if o.temperature_c <= 0.0 || o.temperature_c >= 25.0 {
-        add("extreme-sports");
-        add("commuting");
+        add(Affordance::Open);
+        add(Affordance::Transit);
     }
     if o.code >= 45 {
-        add("lake-transport");
-        add("commuting");
+        add(Affordance::Water);
+        add(Affordance::Transit);
     }
     out
+}
+
+/// Which of `society`'s regions an observation reaches.
+///
+/// The composition of [`considers`] with the society's own affordances. Two
+/// societies fed the same observation reach different regions, and the same
+/// society fed two observations that trip the same rules reaches the same
+/// ones — which is truth-blindness surviving the move to a generated
+/// substrate rather than being a property of the old fixed table.
+#[must_use]
+pub fn reach(o: &Observation, society: &Society) -> Vec<String> {
+    let considered = considers(o);
+    society
+        .regions
+        .iter()
+        .filter(|r| considered.contains(&r.affords))
+        .map(|r| r.name.clone())
+        .collect()
 }
 
 /// Where in a region an observation registers.
@@ -250,6 +287,7 @@ pub fn parse(body: &str) -> Option<Observation> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::society::Society;
 
     /// A body captured from the live endpoint. Inline, so no test touches
     /// the network.
@@ -270,6 +308,10 @@ mod tests {
         }
     }
 
+    fn seeds() -> impl Iterator<Item = u64> {
+        (0..32u64).map(|i| i.wrapping_mul(0x9E37_79B9_7F4A_7C15))
+    }
+
     #[test]
     fn a_captured_reply_parses() {
         let o = parse(CAPTURED).unwrap();
@@ -288,16 +330,32 @@ mod tests {
     }
 
     #[test]
-    fn the_laboratory_regions_are_never_reached() {
-        // Indoors is indoors. If this ever fails, the mapping has stopped
-        // distinguishing and the weather has become a global modifier.
+    fn what_is_under_a_roof_is_never_reached() {
+        // Indoors is indoors, in every society the generator can produce.
+        // If this ever fails the mapping has stopped distinguishing and the
+        // weather has become a global modifier.
+        //
+        // Note this is now a claim about the *generator*, not about two
+        // region names that happened to be spelled a certain way. The test
+        // it replaced went vacuously green the moment the names changed.
         for t in [-20.0, -5.0, 0.0, 12.0, 18.0, 25.0, 26.7, 40.0] {
             for w in [0.0, 5.0, 14.9, 15.0, 30.0, 120.0] {
                 for p in [0.0, 0.1, 20.0] {
                     for code in [0, 3, 45, 61, 95] {
-                        let r = reach(&obs(t, w, p, code));
-                        assert!(!r.contains(&"carbon-composites"), "{t} {w} {p} {code}");
-                        assert!(!r.contains(&"eth-materials"), "{t} {w} {p} {code}");
+                        let o = obs(t, w, p, code);
+                        assert!(
+                            !considers(&o).contains(&Affordance::Indoors),
+                            "{t} {w} {p} {code}"
+                        );
+                        for s in seeds().take(8) {
+                            let soc = Society::generate(s);
+                            let reached = reach(&o, &soc);
+                            for r in &soc.regions {
+                                if r.affords == Affordance::Indoors {
+                                    assert!(!reached.contains(&r.name), "seed {s}: {}", r.name);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -305,26 +363,39 @@ mod tests {
     }
 
     #[test]
-    fn an_ordinary_day_reaches_nothing() {
+    fn an_ordinary_day_is_a_consideration_for_nothing() {
         // 18 °C, light air, dry, clear. Nothing is invented for a day the
         // weather was not a consideration.
-        assert!(reach(&obs(18.0, 5.0, 0.0, 0)).is_empty());
+        let o = obs(18.0, 5.0, 0.0, 0);
+        assert!(considers(&o).is_empty());
+        for s in seeds() {
+            assert!(reach(&o, &Society::generate(s)).is_empty());
+        }
     }
 
     #[test]
-    fn registrations_are_deduplicated_by_region() {
-        // Hot and raining and foggy all name `commuting`. It is reached
+    fn a_region_is_reached_once_however_many_rules_name_it() {
+        // Hot and raining and foggy all consider transit. It is reached
         // once: a broadcast is N registrations, one per receiver, not one
         // per reason.
-        let r = reach(&obs(30.0, 2.0, 5.0, 45));
-        let n = r.iter().filter(|x| **x == "commuting").count();
-        assert_eq!(n, 1, "got {r:?}");
+        let o = obs(30.0, 2.0, 5.0, 45);
+        let n = considers(&o)
+            .iter()
+            .filter(|a| **a == Affordance::Transit)
+            .count();
+        assert_eq!(n, 1, "got {:?}", considers(&o));
+        for s in seeds() {
+            let r = reach(&o, &Society::generate(s));
+            let mut sorted = r.clone();
+            sorted.sort();
+            sorted.dedup();
+            assert_eq!(sorted.len(), r.len(), "seed {s}: {r:?}");
+        }
     }
 
     #[test]
-    fn wind_reaches_the_lake_and_nothing_else() {
-        let r = reach(&obs(18.0, 20.0, 0.0, 0));
-        assert_eq!(r, vec!["watersports", "lake-transport"]);
+    fn wind_is_a_consideration_for_water_and_nothing_else() {
+        assert_eq!(considers(&obs(18.0, 20.0, 0.0, 0)), vec![Affordance::Water]);
     }
 
     #[test]
@@ -332,16 +403,30 @@ mod tests {
         // Truth-blindness at the level of the table: two readings that trip
         // the same rules are the same input to the mechanism, however
         // different they look to a reader.
-        assert_eq!(
-            reach(&obs(26.7, 30.0, 0.0, 0)),
-            reach(&obs(-5.0, 30.0, 0.0, 0))
-        );
+        let hot = obs(26.7, 30.0, 0.0, 0);
+        let cold = obs(-5.0, 30.0, 0.0, 0);
+        assert_eq!(considers(&hot), considers(&cold));
+        for s in seeds() {
+            let soc = Society::generate(s);
+            assert_eq!(reach(&hot, &soc), reach(&cold, &soc));
+        }
+    }
+
+    #[test]
+    fn the_same_weather_reaches_different_places_in_different_societies() {
+        // The point of generating: a society is not a relabelling of one
+        // fixed city, so the same reading is a consideration in different
+        // places depending on where you are.
+        let o = obs(30.0, 30.0, 5.0, 45);
+        let shapes: std::collections::BTreeSet<Vec<String>> =
+            seeds().map(|s| reach(&o, &Society::generate(s))).collect();
+        assert!(shapes.len() > 4, "got {} distinct reaches", shapes.len());
     }
 
     #[test]
     fn a_body_names_the_region_and_carries_no_verdict() {
-        let b = body(&obs(26.7, 30.0, 0.0, 0), "watersports");
-        assert!(b.contains("watersports"));
+        let b = body(&obs(26.7, 30.0, 0.0, 0), "harbour-rowing");
+        assert!(b.contains("harbour-rowing"));
         assert!(b.contains("26.7"));
         for banned in ["score", "rank", "good", "bad", "warning", "alert"] {
             assert!(!b.to_lowercase().contains(banned), "{b}");

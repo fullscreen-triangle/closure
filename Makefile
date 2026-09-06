@@ -53,13 +53,13 @@ dev: ## Run the server and the web surface together
 	@echo "api  -> http://localhost:$(API_PORT)"
 	@echo "web  -> http://localhost:$(WEB_PORT)"
 	@trap 'kill 0' EXIT INT TERM; \
-	  CLOSURE_BIND=0.0.0.0:$(API_PORT) $(CARGO) run -p closure-server & \
+	  CLOSURE_BIND=127.0.0.1:$(API_PORT) $(CARGO) run -p closure-server & \
 	  cd $(WEB) && $(NPM) run dev & \
 	  wait
 
 .PHONY: dev-server
 dev-server: ## Run only the API
-	CLOSURE_BIND=0.0.0.0:$(API_PORT) $(CARGO) run -p closure-server
+	CLOSURE_BIND=127.0.0.1:$(API_PORT) $(CARGO) run -p closure-server
 
 .PHONY: dev-web
 dev-web: ## Run only the web surface

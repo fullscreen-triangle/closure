@@ -70,15 +70,34 @@ struct City {
     id: &'static str,
     name: &'static str,
     substrate: &'static str,
-    floor: f64,
 }
 
+/// The cities on offer.
+///
+/// ## Why there is no floor here any more
+///
+/// This used to advertise `floor: 0.0197` and a substrate of "Statistik
+/// Stadt Zürich, open government data". Neither was true: the graph was
+/// hand-written, and the floor was a number attached to a city that no
+/// longer exists — the society is generated per session now, so a floor
+/// published before the seed is known would be a measurement of nothing.
+///
+/// A number that had to be right and was not is worse than no number. If a
+/// client wants the floor of the world it is actually in, that is a fact
+/// about a session, and the session is where it can honestly be asked.
+///
+/// ## Why a city is still a name and not a world
+///
+/// The name a player picks does not choose a substrate — [`crate::society`]
+/// draws from the seed alone. That is deliberate. A city whose name selected
+/// a world would make one world privileged, and the whole point of
+/// generating is that none is: the goal is unreachable in every society, so
+/// a carefully-built one buys nothing a drawn one does not.
 async fn cities() -> Json<Vec<City>> {
     Json(vec![City {
         id: "zuerich",
         name: "Zürich",
-        substrate: "Statistik Stadt Zürich, open government data",
-        floor: 0.0197,
+        substrate: "generated per session from the seed; no city is modelled",
     }])
 }
 
@@ -227,7 +246,7 @@ mod tests {
 
     #[tokio::test]
     async fn a_session_round_trips_through_its_token() {
-        let st = AppState::new(std::path::PathBuf::from("."));
+        let st = AppState::new();
         let mut rng = rand::rng();
         let token = SessionToken::generate(&mut rng);
         assert!(!st.contains(&token));

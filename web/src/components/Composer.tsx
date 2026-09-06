@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { NewPost, SubgroupView } from '../lib/api'
+import { affordanceLabel } from '../lib/affordance'
 import { PositionStrip } from './PositionStrip'
 
 /**
@@ -19,12 +20,15 @@ import { PositionStrip } from './PositionStrip'
  */
 export function Composer({
   subgroups,
+  order,
   onPost,
   busy,
   error,
   onFocusChange,
 }: {
   subgroups: SubgroupView[]
+  /** Positions in this session's city. Generated, so never assumed. */
+  order: number
   onPost: (p: NewPost) => void
   busy: boolean
   error: string | null
@@ -85,9 +89,9 @@ export function Composer({
       {group && (
         <div className="mt-4">
           <div className="flex flex-wrap items-center gap-3">
-            <PositionStrip span={group.positions} mark={terminus} />
+            <PositionStrip span={group.positions} order={order} mark={terminus} />
             <span className="font-mono text-xs text-[var(--muted)]">
-              standing at {terminus ?? '—'}
+              standing at {terminus ?? '—'} · {affordanceLabel(group.affords)}
             </span>
           </div>
           <div className="mt-2 flex flex-wrap gap-1">

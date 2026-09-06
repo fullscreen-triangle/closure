@@ -64,6 +64,13 @@ export interface SessionView {
   voices: number
   /** The seed this square opened with. */
   seed: number
+  /**
+   * Positions in this session's city.
+   *
+   * The society is generated from the seed, so this differs between
+   * sessions. Nothing may assume a fixed width.
+   */
+  order: number
   /** The last reading registered here, if the world is reporting. */
   weather: Observation | null
 }
@@ -103,12 +110,24 @@ export interface PostView {
   act: ActView | null
 }
 
+/**
+ * What a region is like.
+ *
+ * The only structured fact a region carries. Region names are drawn per
+ * session and say nothing on their own, so this is how a reader tells a
+ * shoreline from a roof — and therefore why the weather registered in one
+ * place and not another. Display only: nothing here may act on it.
+ */
+export type Affordance = 'water' | 'open' | 'transit' | 'indoors'
+
 export interface SubgroupView {
   name: string
   /** Positions this region spans. Visibility follows from these. */
   positions: number[]
   /** Voices heard here. A count of handles, not of people. */
   voices: number
+  /** What this region is like. Null if the host does not say. */
+  affords: Affordance | null
 }
 
 export interface VoiceView {

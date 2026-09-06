@@ -56,6 +56,15 @@ pub struct SubgroupView {
     positions: Vec<u32>,
     /// Voices heard here. A count of handles, not of people.
     voices: usize,
+    /// What this region is like: water, open, transit, indoors.
+    ///
+    /// Reported because the region names are drawn and say nothing on their
+    /// own — a player who cannot tell a roof from a shoreline cannot read
+    /// why the weather registered in one place and not another. It is a
+    /// display fact, and the only structured one a region has; nothing in
+    /// the client may act on it, for the same reason nothing in the server
+    /// acts on a post body.
+    affords: Option<crate::society::Affordance>,
 }
 
 /// `GET /v1/session/{token}/subgroups`
@@ -72,6 +81,7 @@ pub async fn subgroups(
                 name: g.name.clone(),
                 positions: g.members.iter().copied().collect(),
                 voices: s.square.voices_in(g).len(),
+                affords: s.society.affordance_of(&g.name),
             })
             .collect()
     })
@@ -170,7 +180,7 @@ pub async fn character(
         let voice = s.square.voice(VoiceId(id))?;
         let Some(ch) = s
             .square
-            .character(VoiceId(id), &s.city_graph, &s.moderators)
+            .character(VoiceId(id), &s.society.graph, &s.moderators)
         else {
             return Some(None);
         };
@@ -233,7 +243,9 @@ pub async fn prune(
 ) -> Result<Json<AgentView>, (StatusCode, Json<super::ApiError>)> {
     let token = SessionToken::parse(&token).map_err(super::bad_request)?;
     let out = st.with_session(&token, |s| {
-        let agent = s.square.prune(VoiceId(id), &s.city_graph, &s.moderators)?;
+        let agent = s
+            .square
+            .prune(VoiceId(id), &s.society.graph, &s.moderators)?;
         Some(AgentView {
             id: agent.id.clone(),
             order: agent.graph.order(),
@@ -304,7 +316,7 @@ pub async fn ask(
         // settled" after every question.
         let ch = s
             .square
-            .character(VoiceId(id), &s.city_graph, &s.moderators)?;
+            .character(VoiceId(id), &s.society.graph, &s.moderators)?;
         let opts: Vec<&str> = body.options.iter().map(String::as_str).collect();
         let identity = s.identities.entry(id).or_default();
         let value = identity.ask(&ch.graph, &body.key, &opts)?;
@@ -332,7 +344,7 @@ mod tests {
     use tower::ServiceExt;
 
     fn app() -> (axum::Router, String) {
-        let st = AppState::new(std::path::PathBuf::from("."));
+        let st = AppState::new();
         let mut rng = rand::rng();
         let token = SessionToken::generate(&mut rng);
         st.open(&token, "zuerich", 20260904);
@@ -733,7 +745,7 @@ mod tests {
     #[tokio::test]
     async fn the_same_seed_opens_the_same_square() {
         let build = || {
-            let st = AppState::new(std::path::PathBuf::from("."));
+            let st = AppState::new();
             let mut rng = rand::rng();
             let token = SessionToken::generate(&mut rng);
             st.open(&token, "zuerich", 77);
