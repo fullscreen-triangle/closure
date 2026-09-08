@@ -221,8 +221,18 @@ export const api = {
   cities: () => request<City[]>('/v1/cities'),
   invariants: () => request<Invariant[]>('/v1/invariants'),
 
-  openSession: (token: string, city = 'zuerich') =>
-    request<{ token: string; city: string }>('/v1/session', {
+  /**
+   * Open a session in a city of the player's naming.
+   *
+   * There is no default here on purpose. A default city would be the one a
+   * player got by saying nothing, and the point is that no city is that —
+   * the server draws a society from the seed and the name, and holds no
+   * table from one to the other. The caller must decide what to call the
+   * place, which is a decision a player makes rather than one a client
+   * makes for them.
+   */
+  openSession: (token: string, city: string) =>
+    request<{ token: string; city: string; seed: number }>('/v1/session', {
       method: 'POST',
       body: JSON.stringify({ token, city }),
     }),

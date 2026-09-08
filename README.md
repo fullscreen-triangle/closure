@@ -162,6 +162,14 @@ it. `closure-server` **generates a society per session** from the session
 seed — a graph, its overlapping regions, and the characters cut from them —
 and no city is modelled.
 
+There is therefore no list of cities to choose from. A player names the place
+themselves, in any words they like, and the name seeds the draw along with
+the token: a different name is a different society, and restating the pair
+reopens the same one. The host keeps no table from name to world, so no name
+is bound to a prepared city and none is refused. `/v1/cities` reports that
+rule rather than a menu, because a menu of ten cities would claim ten bound
+substrates that do not exist.
+
 That is a decision rather than a shortcut. The goal of a run is unreachable
 by construction (Thm 11.5: no exit code is computable), so a more faithful
 city would not bring a player closer to finishing; fidelity is not a currency
@@ -169,7 +177,7 @@ here. What a substrate has to supply is structure — connected regions,
 overlapping where they meet, joined thinly — and that structure is exactly
 what can be drawn. Generating it also removes the last privileged starting
 point: every session opens somewhere different, and nowhere is the right
-place to have started.
+place to have started — including the city a player thought they had picked.
 
 ---
 

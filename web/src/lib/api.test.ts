@@ -67,6 +67,25 @@ describe('bodies', () => {
     }
   })
 
+  it('sends whatever city the player named, unaltered', async () => {
+    // The host keeps no list of cities, so the client must not quietly
+    // normalise, title-case, or substitute a name. The name also seeds the
+    // square, so altering it here would open a different world than the one
+    // the player asked for.
+    const f = stub(200, { token: 'T', city: 'the place I grew up', seed: 1 })
+    await api.openSession('T', 'the place I grew up')
+    const init = (f.mock.calls[0] as unknown as [string, RequestInit])[1]
+    const sent = JSON.parse(init.body as string) as Record<string, unknown>
+    expect(sent).toEqual({ token: 'T', city: 'the place I grew up' })
+  })
+
+  it('has no default city to fall back on', () => {
+    // A default would be the city a player got by saying nothing, and the
+    // point is that none is. Typed as required, so this is a compile-time
+    // guarantee; asserted here so the intent survives a refactor.
+    expect(api.openSession.length).toBe(2)
+  })
+
   it('strips nulls rather than sending them as absent-but-present fields', async () => {
     const f = stub(200, {})
     await api.createPost('T', {

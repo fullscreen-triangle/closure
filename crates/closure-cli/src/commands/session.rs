@@ -16,8 +16,14 @@ pub struct Args {
 enum Cmd {
     /// Mint a token for a new session.
     New {
-        /// Which city to inhabit.
-        #[arg(long, default_value = "zuerich")]
+        /// Which city to inhabit. Any name — no name is bound to a world,
+        /// and the host has no list to check yours against.
+        ///
+        /// The name seeds the square along with the token, so restating the
+        /// pair reopens the same one and writing a different name opens a
+        /// different society. It does not pick a prepared city; there are
+        /// none.
+        #[arg(long, default_value = "somewhere")]
         city: String,
 
         /// Print the token only, with no surrounding prose. Useful in scripts.
@@ -51,7 +57,17 @@ fn new(ctx: &Context, city: &str, quiet: bool, no_open: bool) -> Result<()> {
     let token = SessionToken::generate(&mut rng);
 
     let cfg = crate::config::Config::load()?;
-    let url = format!("{}/join?token={}", cfg.web.trim_end_matches('/'), token);
+    // The city travels with the token because the pair is what draws the
+    // square. A link carrying only the token would land the player on a
+    // form asking them to name the city again, and a name they retyped
+    // differently would be a different one.
+    let url = {
+        let mut u = reqwest::Url::parse(&format!("{}/join", cfg.web.trim_end_matches('/')))?;
+        u.query_pairs_mut()
+            .append_pair("token", token.as_str())
+            .append_pair("city", city);
+        u.to_string()
+    };
 
     if quiet {
         println!("{token}");

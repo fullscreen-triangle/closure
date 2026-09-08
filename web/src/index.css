@@ -2,21 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * The instrument is dark, and not conditionally.
+ *
+ * This used to carry both palettes and let `prefers-color-scheme` choose,
+ * which meant the surface a reader saw depended on their operating system
+ * rather than on anything here. That is fine for a document and wrong for
+ * this: the square is a dim room someone is listening in, the type is set
+ * to be read for a long time at low contrast, and the light palette was a
+ * second design nobody was tuning.
+ *
+ * Contrast is checked rather than assumed. On `--paper` #14120f: `--ink` is
+ * 14.6:1 and `--muted` is 5.6:1, so metadata clears WCAG AA for body text
+ * and is not merely a faded version of the foreground. `--rule` is below
+ * text contrast deliberately — it draws boundaries and never carries words.
+ */
 :root {
-  color-scheme: light dark;
-  --ink: #16130f;
-  --paper: #faf8f4;
-  --muted: #6b6459;
-  --rule: #d9d2c6;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ink: #ece7df;
-    --paper: #14120f;
-    --muted: #948b7d;
-    --rule: #302b24;
-  }
+  color-scheme: dark;
+  --ink: #ece7df;
+  --paper: #14120f;
+  --muted: #948b7d;
+  --rule: #302b24;
 }
 
 body {

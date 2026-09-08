@@ -70,9 +70,27 @@ struct City {
     id: &'static str,
     name: &'static str,
     substrate: &'static str,
+    /// Whether this host binds a fixed substrate to the name. Always false
+    /// here, and present so a client can say so rather than imply it.
+    bound: bool,
 }
 
-/// The cities on offer.
+/// The cities on offer, which is to say: none in particular.
+///
+/// ## Why this list does not enumerate cities
+///
+/// It used to hold one entry, Zürich, and that was the only city a player
+/// could name. Lifting the restriction is not a matter of lengthening the
+/// list. A host offering ten cities would be claiming ten bound substrates
+/// and it has none: [`crate::society`] draws a world from the seed and never
+/// reads the name. Ten names would make those ten privileged and every other
+/// name illegitimate, which is exactly the privilege generating removed.
+///
+/// So the endpoint reports the rule instead of a menu. `any` is not a city;
+/// it is the statement that a city here is a name a player writes, that the
+/// name is theirs, and that no name is bound to a world. A client wanting a
+/// picker may offer suggestions of its own — they will be suggestions about
+/// vocabulary, not about substrate.
 ///
 /// ## Why there is no floor here any more
 ///
@@ -88,16 +106,19 @@ struct City {
 ///
 /// ## Why a city is still a name and not a world
 ///
-/// The name a player picks does not choose a substrate — [`crate::society`]
-/// draws from the seed alone. That is deliberate. A city whose name selected
-/// a world would make one world privileged, and the whole point of
-/// generating is that none is: the goal is unreachable in every society, so
-/// a carefully-built one buys nothing a drawn one does not.
+/// The name a player writes does seed the draw, so writing a different one
+/// opens a different society. It does not *select* one: there is no table
+/// from name to world, and no name reaches a world another name could not.
+/// A city whose name chose a prepared substrate would make that world
+/// privileged, and the whole point of generating is that none is — the goal
+/// is unreachable in every society, so a carefully-built one buys nothing a
+/// drawn one does not.
 async fn cities() -> Json<Vec<City>> {
     Json(vec![City {
-        id: "zuerich",
-        name: "Zürich",
-        substrate: "generated per session from the seed; no city is modelled",
+        id: "any",
+        name: "any city you name",
+        substrate: "generated per session from the seed and the name; no city is modelled",
+        bound: false,
     }])
 }
 
@@ -133,7 +154,7 @@ async fn invariants() -> Json<Vec<InvariantView>> {
 struct OpenSession {
     /// Token minted by the CLI.
     token: String,
-    /// Which city to inhabit.
+    /// Which city to inhabit. Any name; none is bound to a world.
     #[serde(default = "default_city")]
     city: String,
     /// The seed the square opens at. Omitted means one is drawn.
@@ -146,8 +167,20 @@ struct OpenSession {
     seed: Option<u64>,
 }
 
+/// How long a city name may be, in characters.
+///
+/// Generous enough that no real place name and no reasonable invention hits
+/// it, small enough that a name cannot be used as storage.
+const CITY_NAME_LIMIT: usize = 64;
+
+/// The city a request that names none opens in.
+///
+/// Deliberately not a real place. A default of `zuerich` made one city the
+/// one you got by saying nothing, and a player who never touched the field
+/// would have concluded the world was Zürich — which it was not, then or
+/// now. `somewhere` is honest about being a placeholder and reads as one.
 fn default_city() -> String {
-    String::from("zuerich")
+    String::from("somewhere")
 }
 
 #[derive(Debug, Serialize)]
@@ -164,13 +197,37 @@ async fn open_session(
     Json(body): Json<OpenSession>,
 ) -> Result<Json<Opened>, (StatusCode, Json<ApiError>)> {
     let token = SessionToken::parse(&body.token).map_err(bad_request)?;
-    // A drawn seed is derived from the token, so the pair (token, city) is
-    // the whole of what a run needs to be restated.
-    let seed = body.seed.unwrap_or_else(|| seed_from(token.as_str()));
-    st.open(&token, &body.city, seed);
+    // Any name is a city, but it is stored for the life of the session and
+    // echoed to every client that reads it, so it is bounded. The limit is
+    // on length alone — refusing names for their characters would be this
+    // host deciding which cities are allowed to exist, which is the same
+    // privilege the list refuses.
+    let city = body.city.trim();
+    if city.is_empty() {
+        return Err(bad_request_msg("a city needs a name; any name will do"));
+    }
+    if city.chars().count() > CITY_NAME_LIMIT {
+        return Err(bad_request_msg(
+            "that city name is too long to carry around",
+        ));
+    }
+    let city = city.to_owned();
+    // A drawn seed is derived from the token *and* the city name, so the
+    // pair (token, city) is the whole of what a run needs to be restated.
+    //
+    // The name is mixed in because it is a player's to choose and ought to
+    // matter. Deriving from the token alone made two players who named
+    // different cities inhabit a bit-identical world, which would make the
+    // field decorative — and a field that looks like a choice and is not is
+    // worse than no field. An explicit `seed` still overrides both, so a run
+    // stays restatable from the seed alone (Cor. 11.14).
+    let seed = body
+        .seed
+        .unwrap_or_else(|| seed_from(token.as_str(), &city));
+    st.open(&token, &city, seed);
     Ok(Json(Opened {
         token: token.as_str().to_owned(),
-        city: body.city,
+        city,
         seed,
     }))
 }
@@ -213,12 +270,23 @@ fn not_found() -> (StatusCode, Json<ApiError>) {
 /// Deliberately not random. A session opened twice with the same token opens
 /// on the same square, which is what makes the token alone sufficient to
 /// restate a run.
-fn seed_from(token: &str) -> u64 {
+/// Draw a seed from what the player supplied and nothing else.
+///
+/// FNV-1a over the token and the city name, separated by a byte that cannot
+/// occur in either, so that ("AB", "C") and ("A", "BC") do not collide into
+/// the same world. Not a cryptographic hash and not asked to be one: it
+/// draws a world, it does not protect anything.
+fn seed_from(token: &str, city: &str) -> u64 {
     let mut h: u64 = 0xcbf2_9ce4_8422_2325;
-    for b in token.as_bytes() {
-        h ^= u64::from(*b);
-        h = h.wrapping_mul(0x0000_0100_0000_01b3);
-    }
+    let mut eat = |bytes: &[u8]| {
+        for b in bytes {
+            h ^= u64::from(*b);
+            h = h.wrapping_mul(0x0000_0100_0000_01b3);
+        }
+    };
+    eat(token.as_bytes());
+    eat(&[0]);
+    eat(city.as_bytes());
     h
 }
 
@@ -250,11 +318,70 @@ mod tests {
         let mut rng = rand::rng();
         let token = SessionToken::generate(&mut rng);
         assert!(!st.contains(&token));
-        st.open(&token, "zuerich", 20260904);
+        st.open(&token, "kigali", 20260904);
         assert!(st.contains(&token));
         let view = st.view(&token).expect("session exists");
-        assert_eq!(view.city, "zuerich");
+        assert_eq!(view.city, "kigali");
         assert_eq!(view.record, 0, "a fresh session has deposited nothing");
+    }
+
+    #[test]
+    fn any_name_is_a_city_and_none_is_privileged() {
+        // The whole content of "you can play anywhere": the host has no
+        // list to check a name against, so there is no name it prefers and
+        // none it refuses. `zuerich` is in here to make the point that it
+        // is now one name among all of them rather than the one.
+        let mut rng = rand::rng();
+        let token = SessionToken::generate(&mut rng);
+        let st = AppState::new();
+        for name in [
+            "zuerich",
+            "kigali",
+            "valparaíso",
+            "the place I grew up",
+            "x",
+        ] {
+            st.open(&token, name, seed_from(token.as_str(), name));
+            assert_eq!(st.view(&token).expect("session exists").city, name);
+        }
+    }
+
+    #[test]
+    fn naming_a_different_city_opens_a_different_society() {
+        // Why the name is mixed into the seed at all. If it were not, this
+        // field would look like a choice and be scenery.
+        let mut rng = rand::rng();
+        let token = SessionToken::generate(&mut rng);
+        let a = seed_from(token.as_str(), "kigali");
+        let b = seed_from(token.as_str(), "zuerich");
+        assert_ne!(a, b);
+        assert_ne!(
+            crate::society::Society::generate(a).regions.len() * 100
+                + crate::society::Society::generate(a).order() as usize,
+            crate::society::Society::generate(b).regions.len() * 100
+                + crate::society::Society::generate(b).order() as usize,
+            "two names drew the same shape; unlucky, but check the mixing"
+        );
+    }
+
+    #[test]
+    fn the_same_name_and_token_reopen_the_same_square() {
+        // Cor. 11.14: reproducibility attaches to the protocol, and the
+        // protocol here is the pair a player restates.
+        let mut rng = rand::rng();
+        let token = SessionToken::generate(&mut rng);
+        assert_eq!(
+            seed_from(token.as_str(), "kigali"),
+            seed_from(token.as_str(), "kigali")
+        );
+    }
+
+    #[test]
+    fn the_separator_keeps_a_name_from_bleeding_into_a_token() {
+        // ("AB", "C") and ("A", "BC") must not be the same world. Without
+        // the separator byte they would be, and two unrelated players would
+        // quietly share a square.
+        assert_ne!(seed_from("AB", "C"), seed_from("A", "BC"));
     }
 
     /// Invariant 6, checked against the declared routes.

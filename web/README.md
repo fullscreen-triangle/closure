@@ -49,9 +49,10 @@ src/
     api.ts             typed client; mirrors closure-server routes
     speaker.ts         reads the Speaker union; every component goes through it
     act.ts             renders an act's two directions, and its absence
+    affordance.ts      what a region is like, as a word and never a colour
     hooks.ts           useAsync, usePolling, useHeartbeat
   components/
-    JoinForm.tsx       paste a token
+    JoinForm.tsx       paste a token, and name the city yourself
     SessionPanel.tsx   what the session has accumulated
     WorldClock.tsx     the tick, and the reading the city last reported
     Feed.tsx           roots only, with reply counts and region chips
@@ -62,11 +63,23 @@ src/
     ActMark.tsx        report / question / neither / not measured
 ```
 
-There is deliberately **no router**. The app has one address — the token,
-already in `?token=` — and a `/voice/7` route would make voices linkable and
-therefore enumerable, rebuilding at the URL layer the retrieval the API
-refuses. Switching views here is *focus*, not navigation, so the square keeps
-moving beside an open voice panel.
+There is deliberately **no router**. The app has one address — the token and
+the city, already in `?token=&city=` — and a `/voice/7` route would make
+voices linkable and therefore enumerable, rebuilding at the URL layer the
+retrieval the API refuses. Switching views here is *focus*, not navigation,
+so the square keeps moving beside an open voice panel.
+
+The city is a **text field, not a picker**. The host draws a society from the
+seed and the name and holds no list to check one against, so a dropdown would
+claim bound substrates that do not exist and would make every unlisted name
+look disallowed. Both halves travel in the URL because both draw the square:
+a link carrying only the token lands on the form with the name still to fill
+in.
+
+The theme is **dark unconditionally**, not `prefers-color-scheme`. A reader's
+operating system should not decide which of two designs they get when only
+one of them is being tuned; `lib/theme.test.ts` asserts the palette sits on
+bare `:root` so a media query cannot creep back in.
 
 Types in `lib/api.ts` are hand-mirrored from the Rust route handlers. If you
 change a response shape in `closure-server`, change it here too — the CI

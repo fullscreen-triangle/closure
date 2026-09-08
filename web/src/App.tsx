@@ -39,6 +39,10 @@ type Focus =
 
 export function App() {
   const [token, setToken] = useState<string | null>(null)
+  // The city the session was opened under. Held so a reload can rejoin the
+  // same square: the name seeds the draw, so rejoining under a different
+  // one would silently be a different city.
+  const [city, setCity] = useState<string | null>(null)
   const [joined, setJoined] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -48,22 +52,33 @@ export function App() {
   const [reading, setReading] = useState(false)
 
   // A token may arrive in the URL, because `closure session new` opens the
-  // browser for you.
+  // browser for you. It carries the city alongside, since the pair is what
+  // draws the square — a token on its own does not name a world.
   useEffect(() => {
-    const fromUrl = new URLSearchParams(window.location.search).get('token')
+    const q = new URLSearchParams(window.location.search)
+    const fromUrl = q.get('token')
+    const named = q.get('city')
     if (fromUrl) setToken(normaliseToken(fromUrl))
+    if (named !== null && named.trim()) setCity(named.trim())
   }, [])
 
-  const join = useCallback(async (raw: string) => {
+  const join = useCallback(async (raw: string, named: string) => {
     const t = normaliseToken(raw)
+    const c = named.trim()
+    if (!c) return
     setBusy(true)
     setError(null)
     try {
-      await api.openSession(t)
+      await api.openSession(t, c)
       await api.session(t)
       setToken(t)
+      setCity(c)
       setJoined(true)
-      window.history.replaceState({}, '', `?token=${encodeURIComponent(t)}`)
+      window.history.replaceState(
+        {},
+        '',
+        `?token=${encodeURIComponent(t)}&city=${encodeURIComponent(c)}`,
+      )
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'could not reach the host')
     } finally {
@@ -71,9 +86,12 @@ export function App() {
     }
   }, [])
 
+  // Rejoin without asking only when the URL supplied both halves. With a
+  // token and no city there is nothing to open — the form asks rather than
+  // picking a name on the player's behalf.
   useEffect(() => {
-    if (token && !joined && !busy) void join(token)
-  }, [token, joined, busy, join])
+    if (token && city && !joined && !busy) void join(token, city)
+  }, [token, city, joined, busy, join])
 
   const live = joined && token !== null ? token : null
 
@@ -136,7 +154,14 @@ export function App() {
   if (!live) {
     return (
       <Shell>
-        <JoinForm onJoin={join} busy={busy} error={error} />
+        <JoinForm
+          onJoin={join}
+          /* A token can arrive from the CLI without a city; keep it in the
+             field so the player fills in the name rather than re-pasting. */
+          initialToken={token ?? ''}
+          busy={busy}
+          error={error}
+        />
       </Shell>
     )
   }

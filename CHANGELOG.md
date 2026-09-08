@@ -27,10 +27,30 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   open, transit, indoors) rather than its name, so the same four rules hold in
   every society the generator can produce. What is under a roof is never
   reached, in any of them.
+- `web/`: the city is named by the player in a text field on the join form,
+  and travels with the token in the URL so a reload reopens the same square.
 - The manuscript, its eight panels, and a 24-experiment validation suite.
 
 ### Changed
 
+- **Any city, named by the player.** Zürich was the only city that could be
+  opened, and it is now one name among all of them. The host keeps no list to
+  check a name against, so none is privileged and none is refused — the only
+  bound is a 64-character length, since a name is stored for the life of a
+  session and echoed to every client that reads it. Lengthening the list was
+  the wrong fix: ten cities would claim ten bound substrates, and the host has
+  none. `/v1/cities` reports that rule instead of a menu.
+- The session seed is drawn from the token **and the city name**, separated by
+  a byte that occurs in neither. Previously the name was scenery: two players
+  who named different cities inhabited a bit-identical world. An explicit
+  `seed` still overrides both, so a run stays restatable (Cor. 11.14).
+- The default city is `somewhere` rather than `zuerich`. A player who never
+  touched the field would have concluded the world was Zürich, which it was
+  not, then or now.
+- `web/`: the surface is **dark unconditionally**, rather than following
+  `prefers-color-scheme`. The palette it already used in dark mode is now the
+  only one; a reader's operating system should not choose between two designs
+  when only one is being tuned.
 - `closure-server` binds `127.0.0.1:8080` by default rather than `0.0.0.0`.
   The API has no authentication beyond a locally minted session token, so
   serving every interface was not a safe default to ship.
